@@ -1,12 +1,44 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { decodeVin } from "@/lib/nhtsa";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/types/actions";
 import type { Vehicle, VehicleInsert } from "@/types/database";
+import type { DecodedVehicleInfo } from "@/types/nhtsa";
 
 type VehicleFormState = ActionResult<Vehicle> | undefined;
 type DeleteVehicleFormState = ActionResult<null> | undefined;
+
+export async function lookupVinAction(
+  vin: string,
+): Promise<ActionResult<DecodedVehicleInfo>> {
+  if (typeof vin !== "string") {
+    return { success: false, error: "Enter a valid VIN." };
+  }
+
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError) {
+      console.error("Could not verify the current user for VIN lookup.", authError);
+      return { success: false, error: "Unable to verify your session. Please try again." };
+    }
+
+    if (!user) {
+      return { success: false, error: "Sign in to decode a VIN." };
+    }
+
+    return await decodeVin(vin);
+  } catch (error) {
+    console.error("VIN lookup action failed.", error);
+    return { success: false, error: "The VIN lookup service is unavailable. Please try again." };
+  }
+}
 
 function readOptionalText(
   formData: FormData,
@@ -117,6 +149,12 @@ export async function createVehicle(
 
     if (error) {
       console.error("Could not create vehicle.", error);
+      if (error.code === "23505") {
+        return {
+          success: false,
+          error: "This vehicle is already in your garage.",
+        };
+      }
       if (error.code === "PGRST205" || error.code === "42P01") {
         return {
           success: false,

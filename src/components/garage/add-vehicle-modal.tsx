@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
-import { createVehicle } from "@/actions/vehicles";
+import { useActionState, useState, useTransition } from "react";
+import { createVehicle, lookupVinAction } from "@/actions/vehicles";
+import { VehicleFields } from "@/components/garage/vehicle-fields";
 
 interface AddVehicleModalProps {
   onClose: () => void;
@@ -9,7 +10,33 @@ interface AddVehicleModalProps {
 
 export function AddVehicleModal({ onClose }: AddVehicleModalProps) {
   const [state, formAction, isPending] = useActionState(createVehicle, undefined);
-  const currentYear = new Date().getFullYear();
+  const [vin, setVin] = useState("");
+  const [year, setYear] = useState("");
+  const [make, setMake] = useState("");
+  const [model, setModel] = useState("");
+  const [trim, setTrim] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [decodeError, setDecodeError] = useState("");
+  const [decodeMessage, setDecodeMessage] = useState("");
+  const [isDecoding, startDecode] = useTransition();
+
+  function handleDecodeVin() {
+    setDecodeError("");
+    setDecodeMessage("");
+    startDecode(async () => {
+      const result = await lookupVinAction(vin);
+      if (!result.success) {
+        setDecodeError(result.error);
+        return;
+      }
+
+      setYear(result.data.year?.toString() ?? "");
+      setMake(result.data.make ?? "");
+      setModel(result.data.model ?? "");
+      setTrim(result.data.trim ?? "");
+      setDecodeMessage("Decoded vehicle details. Review and edit before saving.");
+    });
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4">
@@ -42,73 +69,28 @@ export function AddVehicleModal({ onClose }: AddVehicleModalProps) {
         </div>
 
         <form action={formAction}>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="space-y-2 sm:col-span-2">
-              <span className="block text-sm font-medium text-zinc-200">VIN</span>
-              <input
-                name="vin"
-                type="text"
-                required
-                minLength={17}
-                maxLength={17}
-                pattern="[A-HJ-NPR-Za-hj-npr-z0-9]{17}"
-                title="Enter all 17 VIN characters, excluding I, O, and Q."
-                autoCapitalize="characters"
-                autoComplete="off"
-                placeholder="17-character vehicle identification number"
-                className="h-11 w-full rounded-lg border border-white/10 bg-[#0b0e0f] px-3 text-sm uppercase text-white outline-none placeholder:normal-case placeholder:text-zinc-600 focus:border-lime-400"
-              />
-            </label>
-            <label className="space-y-2">
-              <span className="block text-sm font-medium text-zinc-200">Year</span>
-              <input
-                name="year"
-                type="number"
-                min={1886}
-                max={currentYear + 1}
-                placeholder="e.g. 2022"
-                className="h-11 w-full rounded-lg border border-white/10 bg-[#0b0e0f] px-3 text-sm text-white outline-none placeholder:text-zinc-600 focus:border-lime-400"
-              />
-            </label>
-            <label className="space-y-2">
-              <span className="block text-sm font-medium text-zinc-200">Make</span>
-              <input
-                name="make"
-                maxLength={100}
-                placeholder="e.g. Toyota"
-                className="h-11 w-full rounded-lg border border-white/10 bg-[#0b0e0f] px-3 text-sm text-white outline-none placeholder:text-zinc-600 focus:border-lime-400"
-              />
-            </label>
-            <label className="space-y-2">
-              <span className="block text-sm font-medium text-zinc-200">Model</span>
-              <input
-                name="model"
-                maxLength={100}
-                placeholder="e.g. GR86"
-                className="h-11 w-full rounded-lg border border-white/10 bg-[#0b0e0f] px-3 text-sm text-white outline-none placeholder:text-zinc-600 focus:border-lime-400"
-              />
-            </label>
-            <label className="space-y-2">
-              <span className="block text-sm font-medium text-zinc-200">Trim</span>
-              <input
-                name="trim"
-                maxLength={100}
-                placeholder="e.g. Premium"
-                className="h-11 w-full rounded-lg border border-white/10 bg-[#0b0e0f] px-3 text-sm text-white outline-none placeholder:text-zinc-600 focus:border-lime-400"
-              />
-            </label>
-            <label className="space-y-2 sm:col-span-2">
-              <span className="block text-sm font-medium text-zinc-200">
-                Nickname
-              </span>
-              <input
-                name="nickname"
-                maxLength={80}
-                placeholder="Optional name for your build"
-                className="h-11 w-full rounded-lg border border-white/10 bg-[#0b0e0f] px-3 text-sm text-white outline-none placeholder:text-zinc-600 focus:border-lime-400"
-              />
-            </label>
-          </div>
+          <VehicleFields
+            vin={vin}
+            year={year}
+            make={make}
+            model={model}
+            trim={trim}
+            nickname={nickname}
+            decodeError={decodeError}
+            decodeMessage={decodeMessage}
+            isDecoding={isDecoding}
+            onVinChange={(value) => {
+              setVin(value);
+              setDecodeError("");
+              setDecodeMessage("");
+            }}
+            onYearChange={setYear}
+            onMakeChange={setMake}
+            onModelChange={setModel}
+            onTrimChange={setTrim}
+            onNicknameChange={setNickname}
+            onDecode={handleDecodeVin}
+          />
 
           {state && !state.success && (
             <p role="alert" className="mt-4 text-sm text-red-300">
