@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { Vehicle } from "@/types/database";
 import { VehicleCard } from "@/components/garage/vehicle-card";
 import { AddVehicleModal } from "@/components/garage/add-vehicle-modal";
+import { SignOutControl } from "@/components/auth/sign-out-control";
 
 interface GarageDashboardProps {
   vehicles: Vehicle[];
@@ -29,13 +30,16 @@ export function GarageDashboard({ vehicles }: GarageDashboardProps) {
                 : `${vehicles.length} vehicles in your collection`}
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => setIsFormOpen((isOpen) => !isOpen)}
-            className="h-11 rounded-lg bg-lime-400 px-5 text-sm font-semibold text-[#111513] transition hover:bg-lime-300"
-          >
-            {isFormOpen ? "Close form" : "Add Vehicle"}
-          </button>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <button
+              type="button"
+              onClick={() => setIsFormOpen((isOpen) => !isOpen)}
+              className="h-11 rounded-lg bg-lime-400 px-5 text-sm font-semibold text-[#111513] transition hover:bg-lime-300"
+            >
+              {isFormOpen ? "Close form" : "Add Vehicle"}
+            </button>
+            <SignOutControl />
+          </div>
         </header>
 
         {isFormOpen && (

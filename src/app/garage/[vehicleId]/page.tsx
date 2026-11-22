@@ -3,6 +3,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { getVehicleMods } from "@/actions/mods";
 import { getUserVehicle } from "@/actions/vehicles";
+import { SignOutControl } from "@/components/auth/sign-out-control";
 import { AddModForm } from "@/components/mods/add-mod-form";
 import { BuildSummary } from "@/components/mods/build-summary";
 import { ModList } from "@/components/mods/mod-list";
@@ -40,12 +41,15 @@ async function VehicleBuildContent({
   return (
     <main className="min-h-screen bg-[#0b0e0f] px-5 py-8 text-white sm:px-8 sm:py-12">
       <div className="mx-auto max-w-6xl">
-        <Link
-          href="/garage"
-          className="inline-flex text-sm font-medium text-lime-300 transition hover:text-lime-200"
-        >
-          ← Back to garage
-        </Link>
+        <div className="flex items-center justify-between gap-4">
+          <Link
+            href="/garage"
+            className="inline-flex text-sm font-medium text-lime-300 transition hover:text-lime-200"
+          >
+            ← Back to garage
+          </Link>
+          <SignOutControl />
+        </div>
         <VehicleDetails vehicle={vehicleResult.data} />
         <div className="mt-8">
           <BuildSummary mods={modsResult.data} />
@@ -96,6 +100,9 @@ function BuildError({ message }: { message: string }) {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#0b0e0f] px-5 text-white">
       <section className="max-w-md rounded-2xl border border-white/10 bg-[#131819] p-8 text-center">
+        <div className="mb-5 flex justify-end">
+          <SignOutControl />
+        </div>
         <h1 className="text-xl font-semibold">This build isn&apos;t available</h1>
         <p role="alert" className="mt-3 text-sm leading-6 text-zinc-400">
           {message}

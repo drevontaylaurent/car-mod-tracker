@@ -71,3 +71,26 @@ export async function authenticate(
 
   redirect("/garage");
 }
+
+export async function signOut(
+  _previousState: AuthFormState,
+  _formData: FormData,
+): Promise<AuthFormState> {
+  void _previousState;
+  void _formData;
+
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error("Could not sign out.", error);
+      return { success: false, error: "Could not sign out. Please try again." };
+    }
+  } catch (error) {
+    console.error("Sign-out request failed.", error);
+    return { success: false, error: "Could not sign out. Please try again." };
+  }
+
+  redirect("/login");
+}
