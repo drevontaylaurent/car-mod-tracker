@@ -26,20 +26,55 @@ export interface VehicleInsert {
 
 export type VehicleUpdate = Partial<Omit<VehicleInsert, "user_id">>;
 
+export const MOD_CATEGORIES = [
+  "Engine",
+  "Suspension",
+  "Exhaust",
+  "Exterior",
+  "Interior",
+  "Wheels/Tires",
+  "Electronics",
+] as const;
+
+export type ModCategory = (typeof MOD_CATEGORIES)[number];
+
+export const MOD_STATUSES = ["Wishlist", "Ordered", "Installed"] as const;
+
+export type ModStatus = (typeof MOD_STATUSES)[number];
+
 export interface Mod {
   id: string;
   vehicle_id: string;
   user_id: string;
-  name: string;
-  category: string;
+  part_name: string;
   brand: string | null;
-  part_number: string | null;
-  cost: number | null;
-  installed_at: string | null;
+  category: ModCategory;
+  status: ModStatus;
+  cost: number;
+  install_date: string | null;
   notes: string | null;
   created_at: string;
   updated_at: string;
 }
+
+export interface ModInsert {
+  id?: string;
+  vehicle_id: string;
+  user_id: string;
+  part_name: string;
+  brand?: string | null;
+  category: ModCategory;
+  status?: ModStatus;
+  cost?: number;
+  install_date?: string | null;
+  notes?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type ModUpdate = Partial<
+  Omit<ModInsert, "id" | "user_id" | "vehicle_id" | "created_at">
+>;
 
 export interface DecodedVin {
   vin: string;
@@ -60,6 +95,12 @@ export interface Database {
         Row: Vehicle & Record<string, unknown>;
         Insert: VehicleInsert & Record<string, unknown>;
         Update: VehicleUpdate & Record<string, unknown>;
+        Relationships: [];
+      };
+      mods: {
+        Row: Mod & Record<string, unknown>;
+        Insert: ModInsert & Record<string, unknown>;
+        Update: ModUpdate & Record<string, unknown>;
         Relationships: [];
       };
     };

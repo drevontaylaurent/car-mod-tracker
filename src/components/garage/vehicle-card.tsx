@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import Link from "next/link";
 import { deleteVehicle } from "@/actions/vehicles";
 import type { Vehicle } from "@/types/database";
 
@@ -22,7 +23,14 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-lime-300">
             Vehicle
           </p>
-          <h2 className="mt-2 text-xl font-semibold text-white">{title}</h2>
+          <h2 className="mt-2 text-xl font-semibold text-white">
+            <Link
+              href={`/garage/${vehicle.id}`}
+              className="transition hover:text-lime-300"
+            >
+              {title}
+            </Link>
+          </h2>
           {vehicle.nickname && (
             <p className="mt-1 text-sm text-zinc-400">
               {[vehicle.year, vehicle.make, vehicle.model, vehicle.trim]
@@ -46,6 +54,12 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
       </div>
 
       <div className="mt-auto pt-5">
+        <Link
+          href={`/garage/${vehicle.id}`}
+          className="mb-4 inline-flex text-sm font-semibold text-lime-300 transition hover:text-lime-200"
+        >
+          Open build
+        </Link>
         {state && !state.success && (
           <p role="alert" className="mb-3 text-sm text-red-300">
             {state.error}

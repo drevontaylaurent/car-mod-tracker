@@ -9,6 +9,8 @@ import type { DecodedVehicleInfo } from "@/types/nhtsa";
 
 type VehicleFormState = ActionResult<Vehicle> | undefined;
 type DeleteVehicleFormState = ActionResult<null> | undefined;
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export async function lookupVinAction(
   vin: string,
@@ -210,6 +212,52 @@ export async function getUserVehicles(): Promise<ActionResult<Vehicle[]>> {
   } catch (error) {
     console.error("Vehicle lookup failed.", error);
     return { success: false, error: "Could not load your vehicles. Please try again." };
+  }
+}
+
+export async function getUserVehicle(
+  vehicleId: string,
+): Promise<ActionResult<Vehicle>> {
+  if (typeof vehicleId !== "string" || !UUID_PATTERN.test(vehicleId.trim())) {
+    return { success: false, error: "Vehicle not found in your garage." };
+  }
+
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError) {
+      console.error("Could not verify the current user.", authError);
+      return { success: false, error: "Unable to verify your session. Please try again." };
+    }
+
+    if (!user) {
+      return { success: false, error: "Sign in to view this vehicle." };
+    }
+
+    const { data, error } = await supabase
+      .from("vehicles")
+      .select("*")
+      .eq("id", vehicleId.trim())
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Could not load vehicle details.", error);
+      return { success: false, error: "Could not load this vehicle. Please try again." };
+    }
+
+    if (!data) {
+      return { success: false, error: "Vehicle not found in your garage." };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error("Vehicle detail lookup failed.", error);
+    return { success: false, error: "Could not load this vehicle. Please try again." };
   }
 }
 
