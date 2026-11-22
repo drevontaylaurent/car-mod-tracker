@@ -1,0 +1,225 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { createClient } from "@/lib/supabase/server";
+import type { ActionResult } from "@/types/actions";
+import type { Vehicle, VehicleInsert } from "@/types/database";
+
+type VehicleFormState = ActionResult<Vehicle> | undefined;
+type DeleteVehicleFormState = ActionResult<null> | undefined;
+
+function readOptionalText(
+  formData: FormData,
+  fieldName: string,
+  label: string,
+  maxLength: number,
+): ActionResult<string | null> {
+  const value = formData.get(fieldName);
+
+  if (value === null) {
+    return { success: true, data: null };
+  }
+
+  if (typeof value !== "string") {
+    return { success: false, error: `Enter a valid ${label.toLowerCase()}.` };
+  }
+
+  const normalizedValue = value.trim();
+  if (normalizedValue.length > maxLength) {
+    return {
+      success: false,
+      error: `${label} must be ${maxLength} characters or fewer.`,
+    };
+  }
+
+  return { success: true, data: normalizedValue || null };
+}
+
+export async function createVehicle(
+  _previousState: VehicleFormState,
+  formData: FormData,
+): Promise<ActionResult<Vehicle>> {
+  const vinValue = formData.get("vin");
+  if (typeof vinValue !== "string") {
+    return { success: false, error: "Enter a valid 17-character VIN." };
+  }
+
+  const vin = vinValue.trim().toUpperCase();
+  if (!/^[A-HJ-NPR-Z0-9]{17}$/.test(vin)) {
+    return { success: false, error: "Enter a valid 17-character VIN." };
+  }
+
+  const yearValue = formData.get("year");
+  if (yearValue !== null && typeof yearValue !== "string") {
+    return { success: false, error: "Enter a valid model year." };
+  }
+
+  const yearText = typeof yearValue === "string" ? yearValue.trim() : "";
+  const year = yearText ? Number(yearText) : null;
+  if (
+    year !== null &&
+    (!Number.isInteger(year) || year < 1886 || year > new Date().getFullYear() + 1)
+  ) {
+    return {
+      success: false,
+      error: `Enter a model year between 1886 and ${new Date().getFullYear() + 1}.`,
+    };
+  }
+
+  const make = readOptionalText(formData, "make", "Make", 100);
+  const model = readOptionalText(formData, "model", "Model", 100);
+  const trim = readOptionalText(formData, "trim", "Trim", 100);
+  const nickname = readOptionalText(formData, "nickname", "Nickname", 80);
+
+  if (!make.success) {
+    return make;
+  }
+  if (!model.success) {
+    return model;
+  }
+  if (!trim.success) {
+    return trim;
+  }
+  if (!nickname.success) {
+    return nickname;
+  }
+
+  const vehicleDetails = {
+    vin,
+    year,
+    make: make.data,
+    model: model.data,
+    trim: trim.data,
+    nickname: nickname.data,
+  };
+
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError) {
+      console.error("Could not verify the current user.", authError);
+      return { success: false, error: "Unable to verify your session. Please try again." };
+    }
+
+    if (!user) {
+      return { success: false, error: "Sign in to add a vehicle." };
+    }
+
+    const { data, error } = await supabase
+      .from("vehicles")
+      .insert({ ...vehicleDetails, user_id: user.id } satisfies VehicleInsert)
+      .select("*")
+      .single();
+
+    if (error) {
+      console.error("Could not create vehicle.", error);
+      if (error.code === "PGRST205" || error.code === "42P01") {
+        return {
+          success: false,
+          error: "Vehicle storage is not set up yet. Apply the vehicles SQL migration.",
+        };
+      }
+      return { success: false, error: "Could not add this vehicle. Please try again." };
+    }
+
+    revalidatePath("/garage");
+    return { success: true, data };
+  } catch (error) {
+    console.error("Vehicle creation failed.", error);
+    return { success: false, error: "Could not add this vehicle. Please try again." };
+  }
+}
+
+export async function getUserVehicles(): Promise<ActionResult<Vehicle[]>> {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError) {
+      console.error("Could not verify the current user.", authError);
+      return { success: false, error: "Unable to verify your session. Please try again." };
+    }
+
+    if (!user) {
+      return { success: false, error: "Sign in to view your garage." };
+    }
+
+    const { data, error } = await supabase
+      .from("vehicles")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Could not load vehicles.", error);
+      if (error.code === "PGRST205" || error.code === "42P01") {
+        return {
+          success: false,
+          error: "Vehicle storage is not set up yet. Apply the vehicles SQL migration.",
+        };
+      }
+      return { success: false, error: "Could not load your vehicles. Please try again." };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error("Vehicle lookup failed.", error);
+    return { success: false, error: "Could not load your vehicles. Please try again." };
+  }
+}
+
+export async function deleteVehicle(
+  _previousState: DeleteVehicleFormState,
+  formData: FormData,
+): Promise<ActionResult<null>> {
+  const vehicleId = formData.get("vehicleId");
+  if (typeof vehicleId !== "string" || vehicleId.trim().length === 0) {
+    return { success: false, error: "Select a valid vehicle to delete." };
+  }
+
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError) {
+      console.error("Could not verify the current user.", authError);
+      return { success: false, error: "Unable to verify your session. Please try again." };
+    }
+
+    if (!user) {
+      return { success: false, error: "Sign in to delete a vehicle." };
+    }
+
+    const { data, error } = await supabase
+      .from("vehicles")
+      .delete()
+      .eq("id", vehicleId.trim())
+      .eq("user_id", user.id)
+      .select("id");
+
+    if (error) {
+      console.error("Could not delete vehicle.", error);
+      return { success: false, error: "Could not delete this vehicle. Please try again." };
+    }
+
+    if (data.length === 0) {
+      return { success: false, error: "Vehicle not found or already deleted." };
+    }
+
+    revalidatePath("/garage");
+    return { success: true, data: null };
+  } catch (error) {
+    console.error("Vehicle deletion failed.", error);
+    return { success: false, error: "Could not delete this vehicle. Please try again." };
+  }
+}
