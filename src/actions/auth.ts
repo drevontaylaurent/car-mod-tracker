@@ -102,7 +102,7 @@ export async function signOut(
   redirect("/login");
 }
 
-async function getPasswordRecoveryRedirectUrl(): Promise<string> {
+async function getPasswordRecoveryCallbackUrl(): Promise<string> {
   const requestHeaders = await headers();
   const hostHeader =
     requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
@@ -125,7 +125,7 @@ async function getPasswordRecoveryRedirectUrl(): Promise<string> {
   }
 
   const protocol = host === "localhost:3000" ? "http:" : "https:";
-  return new URL("/reset-password", `${protocol}//${host}`).toString();
+  return new URL("/auth/callback", `${protocol}//${host}`).toString();
 }
 
 async function getPasswordRecoveryClient() {
@@ -176,7 +176,7 @@ export async function requestPasswordReset(
   try {
     const supabase = await createClient();
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: await getPasswordRecoveryRedirectUrl(),
+      redirectTo: await getPasswordRecoveryCallbackUrl(),
     });
 
     if (error) {
@@ -273,6 +273,18 @@ export async function resetPassword(
         error:
           "Could not update your password. Your reset link may be invalid or expired; request a new one.",
       };
+    }
+
+    try {
+      const { error: signOutError } = await supabase.auth.signOut({
+        scope: "local",
+      });
+
+      if (signOutError) {
+        console.error("Could not sign out after password reset.", signOutError);
+      }
+    } catch (error) {
+      console.error("Could not sign out after password reset.", error);
     }
 
     (await cookies()).delete("password-recovery-session");

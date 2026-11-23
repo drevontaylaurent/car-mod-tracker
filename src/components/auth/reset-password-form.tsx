@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   checkPasswordRecoverySession,
   resetPassword,
@@ -15,6 +15,7 @@ type ResetPasswordAction = (formData: FormData) => void;
 const initialState: PasswordRecoveryFormState = { success: false };
 
 export function ResetPasswordForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const hasInvalidLink =
     searchParams.has("error") || searchParams.has("error_code");
@@ -28,6 +29,15 @@ export function ResetPasswordForm() {
     hasInvalidLink ||
     recoveryStatus === "invalid" ||
     state.recoverySessionInvalid === true;
+
+  useEffect(() => {
+    if (!state.success) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => router.replace("/login"), 2000);
+    return () => window.clearTimeout(timeout);
+  }, [router, state.success]);
 
   useEffect(() => {
     if (hasInvalidLink) {
@@ -125,7 +135,9 @@ function PasswordResetSuccess() {
       role="status"
       className="mt-8 space-y-4 rounded-lg border border-lime-400/20 bg-lime-400/10 p-5"
     >
-      <p className="text-sm text-lime-100">Your password has been updated.</p>
+      <p className="text-sm text-lime-100">
+        Your password has been updated. Redirecting to sign in...
+      </p>
       <Link
         href="/login"
         className="block rounded-lg bg-lime-400 px-4 py-3 text-center text-sm font-semibold text-[#111513] transition hover:bg-lime-300"
