@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { getVehicleMods } from "@/actions/mods";
 import { getUserVehicle } from "@/actions/vehicles";
 import { SignOutControl } from "@/components/auth/sign-out-control";
+import { ApplicationHeader } from "@/components/layout/application-header";
 import { AddModForm } from "@/components/mods/add-mod-form";
 import { BuildSummary } from "@/components/mods/build-summary";
 import { ModList } from "@/components/mods/mod-list";
@@ -39,17 +40,9 @@ async function VehicleBuildContent({
   }
 
   return (
-    <main className="min-h-screen bg-[#0b0e0f] px-5 py-8 text-white sm:px-8 sm:py-12">
-      <div className="mx-auto max-w-6xl">
-        <div className="flex items-center justify-between gap-4">
-          <Link
-            href="/garage"
-            className="inline-flex text-sm font-medium text-lime-300 transition hover:text-lime-200"
-          >
-            ← Back to garage
-          </Link>
-          <SignOutControl />
-        </div>
+    <main className="min-h-screen bg-background text-foreground">
+      <ApplicationHeader />
+      <div className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-12">
         <VehicleDetails vehicle={vehicleResult.data} />
         <div className="mt-8">
           <BuildSummary mods={modsResult.data} />

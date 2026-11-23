@@ -89,7 +89,8 @@ function InvalidRecoveryLink() {
   return (
     <div
       role="alert"
-      className="mt-8 space-y-4 rounded-lg border border-red-400/30 bg-red-400/10 p-5"
+      className="state-message mt-8 space-y-4 p-5"
+      data-tone="error"
     >
       <div>
         <h2 className="font-semibold text-red-100">
@@ -122,7 +123,8 @@ function CheckingRecoveryLink() {
     <p
       role="status"
       aria-live="polite"
-      className="mt-8 rounded-lg border border-white/10 bg-[#111516] px-4 py-3 text-sm text-zinc-300"
+      className="state-message mt-8"
+      data-tone="loading"
     >
       Checking your password reset link...
     </p>
@@ -133,7 +135,8 @@ function PasswordResetSuccess() {
   return (
     <div
       role="status"
-      className="mt-8 space-y-4 rounded-lg border border-lime-400/20 bg-lime-400/10 p-5"
+      className="state-message mt-8 space-y-4 p-5"
+      data-tone="success"
     >
       <p className="text-sm text-lime-100">
         Your password has been updated. Redirecting to sign in...
@@ -160,10 +163,7 @@ function PasswordFields({
   return (
     <form action={formAction} className="mt-8 space-y-5">
       <div className="space-y-2">
-        <label
-          htmlFor="password"
-          className="block text-sm font-medium text-zinc-200"
-        >
+        <label htmlFor="password" className="field-label">
           New password
         </label>
         <input
@@ -176,15 +176,12 @@ function PasswordFields({
           maxLength={128}
           disabled={isPending}
           placeholder="At least 8 characters"
-          className="h-12 w-full rounded-lg border border-white/10 bg-[#111516] px-4 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 disabled:opacity-60"
+          className="field-control"
         />
       </div>
 
       <div className="space-y-2">
-        <label
-          htmlFor="confirmPassword"
-          className="block text-sm font-medium text-zinc-200"
-        >
+        <label htmlFor="confirmPassword" className="field-label">
           Confirm new password
         </label>
         <input
@@ -197,14 +194,15 @@ function PasswordFields({
           maxLength={128}
           disabled={isPending}
           placeholder="Enter your new password again"
-          className="h-12 w-full rounded-lg border border-white/10 bg-[#111516] px-4 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 disabled:opacity-60"
+          className="field-control"
         />
       </div>
 
       {error && (
         <p
           role="alert"
-          className="rounded-lg border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200"
+          className="state-message"
+          data-tone="error"
         >
           {error}
         </p>
@@ -213,7 +211,7 @@ function PasswordFields({
       <button
         type="submit"
         disabled={isPending}
-        className="flex h-12 w-full items-center justify-center rounded-lg bg-lime-400 px-4 text-sm font-semibold text-[#111513] transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-60"
+        className="button-primary w-full"
       >
         {isPending ? "Please wait..." : "Update password"}
       </button>

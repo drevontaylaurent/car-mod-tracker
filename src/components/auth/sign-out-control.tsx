@@ -15,7 +15,7 @@ export function SignOutControl() {
         <button
           type="submit"
           disabled={isPending}
-          className="h-11 rounded-lg border border-white/15 px-4 text-sm font-medium text-zinc-300 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+          className="button-secondary"
         >
           {isPending ? "Signing out..." : "Sign out"}
         </button>

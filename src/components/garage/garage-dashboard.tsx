@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { Vehicle } from "@/types/database";
 import { VehicleCard } from "@/components/garage/vehicle-card";
 import { AddVehicleModal } from "@/components/garage/add-vehicle-modal";
-import { SignOutControl } from "@/components/auth/sign-out-control";
+import { ApplicationHeader } from "@/components/layout/application-header";
 
 interface GarageDashboardProps {
   vehicles: Vehicle[];
@@ -14,8 +14,9 @@ export function GarageDashboard({ vehicles }: GarageDashboardProps) {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   return (
-    <main className="min-h-screen bg-[#0b0e0f] px-5 py-10 text-white sm:px-8 sm:py-14">
-      <div className="mx-auto max-w-6xl">
+    <main className="min-h-screen bg-background text-foreground">
+      <ApplicationHeader active="garage" />
+      <div className="mx-auto max-w-6xl px-5 py-10 sm:px-8 sm:py-14">
         <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-lime-300">
@@ -34,11 +35,10 @@ export function GarageDashboard({ vehicles }: GarageDashboardProps) {
             <button
               type="button"
               onClick={() => setIsFormOpen((isOpen) => !isOpen)}
-              className="h-11 rounded-lg bg-lime-400 px-5 text-sm font-semibold text-[#111513] transition hover:bg-lime-300"
+              className="button-primary"
             >
               {isFormOpen ? "Close form" : "Add Vehicle"}
             </button>
-            <SignOutControl />
           </div>
         </header>
 
@@ -71,7 +71,7 @@ export function GarageDashboard({ vehicles }: GarageDashboardProps) {
               <button
                 type="button"
                 onClick={() => setIsFormOpen(true)}
-                className="mt-6 h-11 rounded-lg bg-lime-400 px-5 text-sm font-semibold text-[#111513] transition hover:bg-lime-300"
+                className="button-primary mt-6"
               >
                 Add Vehicle
               </button>

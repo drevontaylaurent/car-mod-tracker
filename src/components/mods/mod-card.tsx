@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { deleteMod, updateModStatus } from "@/actions/mods";
-import { MOD_STATUSES, type Mod, type ModStatus } from "@/types/database";
+import { MOD_STATUSES, type Mod } from "@/types/database";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 interface ModCardProps {
   mod: Mod;
@@ -13,12 +14,6 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD",
 });
-
-const statusClassNames: Record<ModStatus, string> = {
-  Wishlist: "border-amber-300/20 bg-amber-300/10 text-amber-200",
-  Ordered: "border-sky-300/20 bg-sky-300/10 text-sky-200",
-  Installed: "border-lime-300/20 bg-lime-300/10 text-lime-200",
-};
 
 export function ModCard({ mod }: ModCardProps) {
   const router = useRouter();
@@ -75,11 +70,7 @@ export function ModCard({ mod }: ModCardProps) {
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="text-lg font-semibold text-white">{mod.part_name}</h3>
-            <span
-              className={`rounded-full border px-2.5 py-1 text-xs font-medium ${statusClassNames[status]}`}
-            >
-              {status}
-            </span>
+            <StatusBadge status={status} />
           </div>
           <p className="mt-1 text-sm text-zinc-400">
             {[mod.brand, mod.category].filter(Boolean).join(" · ")}

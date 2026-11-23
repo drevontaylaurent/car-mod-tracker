@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sign in | Car Mod Tracker",
+  title: "Car Mod Tracker | Performance Build Systems",
   description: "Track your vehicles, upgrades, and build details.",
 };
 
