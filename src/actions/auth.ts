@@ -94,3 +94,119 @@ export async function signOut(
 
   redirect("/login");
 }
+
+function getPasswordRecoveryRedirectUrl(): string {
+  if (
+    process.env.VERCEL_ENV === "production" &&
+    process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}/auth/callback`;
+  }
+
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}/auth/callback`;
+  }
+
+  return "http://localhost:3000/auth/callback";
+}
+
+export async function requestPasswordReset(
+  _previousState: AuthFormState,
+  formData: FormData,
+): Promise<AuthFormState> {
+  const emailValue = formData.get("email");
+
+  if (typeof emailValue !== "string") {
+    return { success: false, error: "Enter a valid email address." };
+  }
+
+  const email = emailValue.trim();
+
+  if (
+    email.length > 254 ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  ) {
+    return { success: false, error: "Enter a valid email address." };
+  }
+
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: getPasswordRecoveryRedirectUrl(),
+    });
+
+    if (error) {
+      console.error("Password reset request failed.", error);
+      return {
+        success: false,
+        error: "Unable to request a password reset right now. Please try again.",
+      };
+    }
+
+    return {
+      success: true,
+      message:
+        "If an account exists for that email, a password reset link will be sent shortly.",
+    };
+  } catch (error) {
+    console.error("Password reset request failed.", error);
+    return {
+      success: false,
+      error: "Unable to request a password reset right now. Please try again.",
+    };
+  }
+}
+
+export async function resetPassword(
+  _previousState: AuthFormState,
+  formData: FormData,
+): Promise<AuthFormState> {
+  const passwordValue = formData.get("password");
+  const confirmPasswordValue = formData.get("confirmPassword");
+
+  if (
+    typeof passwordValue !== "string" ||
+    typeof confirmPasswordValue !== "string"
+  ) {
+    return { success: false, error: "Enter and confirm your new password." };
+  }
+
+  if (passwordValue.length < 8 || passwordValue.length > 128) {
+    return {
+      success: false,
+      error: "Your password must be between 8 and 128 characters long.",
+    };
+  }
+
+  if (passwordValue !== confirmPasswordValue) {
+    return { success: false, error: "Your passwords do not match." };
+  }
+
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.updateUser({
+      password: passwordValue,
+    });
+
+    if (error) {
+      console.error("Password update failed.", error);
+      return {
+        success: false,
+        error:
+          "Could not update your password. Your reset link may be invalid or expired; request a new one.",
+      };
+    }
+
+    return {
+      success: true,
+      message: "Your password has been updated.",
+    };
+  } catch (error) {
+    console.error("Password update failed.", error);
+    return {
+      success: false,
+      error:
+        "Could not update your password. Your reset link may be invalid or expired; request a new one.",
+    };
+  }
+}

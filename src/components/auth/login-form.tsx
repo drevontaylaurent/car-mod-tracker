@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useActionState } from "react";
+import Link from "next/link";
 import { authenticate } from "@/actions/auth";
 import type { AuthFormState } from "@/types/auth";
 
@@ -58,6 +59,16 @@ function AuthForm({ mode }: { mode: AuthMode }) {
           className="h-12 w-full rounded-lg border border-white/10 bg-[#111516] px-4 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20"
         />
       </div>
+      {!isSignUp && (
+        <div className="-mt-2 text-right">
+          <Link
+            href="/forgot-password"
+            className="text-sm text-lime-300 transition hover:text-lime-200"
+          >
+            Forgot password?
+          </Link>
+        </div>
+      )}
 
       {state.error && (
         <p
