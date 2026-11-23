@@ -33,6 +33,16 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (request.nextUrl.pathname === "/") {
+    const redirectResponse = NextResponse.redirect(
+      new URL(user ? "/garage" : "/login", request.url),
+    );
+    response.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie);
+    });
+    return redirectResponse;
+  }
+
   if (!user) {
     const redirectResponse = NextResponse.redirect(new URL("/login", request.url));
     response.cookies.getAll().forEach((cookie) => {
@@ -45,5 +55,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/garage/:path*"],
+  matcher: ["/", "/garage/:path*"],
 };
