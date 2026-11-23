@@ -3,3 +3,7 @@ export interface AuthFormState {
   error?: string;
   message?: string;
 }
+
+export interface PasswordRecoveryFormState extends AuthFormState {
+  recoverySessionInvalid?: boolean;
+}

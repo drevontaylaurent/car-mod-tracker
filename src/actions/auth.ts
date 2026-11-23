@@ -1,9 +1,12 @@
 "use server";
 
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import type { AuthFormState } from "@/types/auth";
+import type {
+  AuthFormState,
+  PasswordRecoveryFormState,
+} from "@/types/auth";
 
 export async function authenticate(
   _previousState: AuthFormState,
@@ -70,6 +73,7 @@ export async function authenticate(
     };
   }
 
+  (await cookies()).delete("password-recovery-session");
   redirect("/garage");
 }
 
@@ -88,6 +92,8 @@ export async function signOut(
       console.error("Could not sign out.", error);
       return { success: false, error: "Could not sign out. Please try again." };
     }
+
+    (await cookies()).delete("password-recovery-session");
   } catch (error) {
     console.error("Sign-out request failed.", error);
     return { success: false, error: "Could not sign out. Please try again." };
@@ -120,6 +126,32 @@ async function getPasswordRecoveryRedirectUrl(): Promise<string> {
 
   const protocol = host === "localhost:3000" ? "http:" : "https:";
   return new URL("/reset-password", `${protocol}//${host}`).toString();
+}
+
+async function getPasswordRecoveryClient() {
+  try {
+    const cookieStore = await cookies();
+
+    if (cookieStore.get("password-recovery-session")?.value !== "verified") {
+      return null;
+    }
+
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
+
+    if (error) {
+      console.error("Could not verify password recovery session.", error);
+      return null;
+    }
+
+    return user ? supabase : null;
+  } catch (error) {
+    console.error("Could not verify password recovery session.", error);
+    return null;
+  }
 }
 
 export async function requestPasswordReset(
@@ -169,10 +201,23 @@ export async function requestPasswordReset(
   }
 }
 
+export async function checkPasswordRecoverySession(): Promise<AuthFormState> {
+  const supabase = await getPasswordRecoveryClient();
+
+  if (!supabase) {
+    return {
+      success: false,
+      error: "This reset link is invalid or expired. Request a new one.",
+    };
+  }
+
+  return { success: true };
+}
+
 export async function resetPassword(
   _previousState: AuthFormState,
   formData: FormData,
-): Promise<AuthFormState> {
+): Promise<PasswordRecoveryFormState> {
   const passwordValue = formData.get("password");
   const confirmPasswordValue = formData.get("confirmPassword");
 
@@ -194,20 +239,43 @@ export async function resetPassword(
     return { success: false, error: "Your passwords do not match." };
   }
 
+  const supabase = await getPasswordRecoveryClient();
+
+  if (!supabase) {
+    return {
+      success: false,
+      error: "This reset link is invalid or expired. Request a new one.",
+      recoverySessionInvalid: true,
+    };
+  }
+
   try {
-    const supabase = await createClient();
     const { error } = await supabase.auth.updateUser({
       password: passwordValue,
     });
 
     if (error) {
       console.error("Password update failed.", error);
+      const {
+        data: { user: currentUser },
+      } = await supabase.auth.getUser();
+
+      if (!currentUser) {
+        return {
+          success: false,
+          error: "This reset link is invalid or expired. Request a new one.",
+          recoverySessionInvalid: true,
+        };
+      }
+
       return {
         success: false,
         error:
           "Could not update your password. Your reset link may be invalid or expired; request a new one.",
       };
     }
+
+    (await cookies()).delete("password-recovery-session");
 
     return {
       success: true,
@@ -218,7 +286,8 @@ export async function resetPassword(
     return {
       success: false,
       error:
-        "Could not update your password. Your reset link may be invalid or expired; request a new one.",
+        "This reset link is invalid or expired. Request a new one.",
+      recoverySessionInvalid: true,
     };
   }
 }

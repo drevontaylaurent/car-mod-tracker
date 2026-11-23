@@ -37,6 +37,7 @@ export async function proxy(request: NextRequest) {
     }
 
     const redirectUrl = new URL("/reset-password", request.url);
+    let recoverySessionEstablished = false;
 
     try {
       const { error } = await supabase.auth.exchangeCodeForSession(code);
@@ -44,6 +45,8 @@ export async function proxy(request: NextRequest) {
       if (error) {
         console.error("Could not establish password recovery session.", error);
         redirectUrl.searchParams.set("error", "invalid-link");
+      } else {
+        recoverySessionEstablished = true;
       }
     } catch (error) {
       console.error("Could not establish password recovery session.", error);
@@ -54,6 +57,17 @@ export async function proxy(request: NextRequest) {
     response.cookies.getAll().forEach((cookie) => {
       redirectResponse.cookies.set(cookie);
     });
+    if (recoverySessionEstablished) {
+      redirectResponse.cookies.set("password-recovery-session", "verified", {
+        httpOnly: true,
+        secure: request.nextUrl.protocol === "https:",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 60,
+      });
+    } else {
+      redirectResponse.cookies.delete("password-recovery-session");
+    }
     return redirectResponse;
   }
 
