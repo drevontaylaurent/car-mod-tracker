@@ -29,6 +29,34 @@ export async function proxy(request: NextRequest) {
     },
   });
 
+  if (request.nextUrl.pathname === "/reset-password") {
+    const code = request.nextUrl.searchParams.get("code");
+
+    if (code === null) {
+      return response;
+    }
+
+    const redirectUrl = new URL("/reset-password", request.url);
+
+    try {
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+      if (error) {
+        console.error("Could not establish password recovery session.", error);
+        redirectUrl.searchParams.set("error", "invalid-link");
+      }
+    } catch (error) {
+      console.error("Could not establish password recovery session.", error);
+      redirectUrl.searchParams.set("error", "invalid-link");
+    }
+
+    const redirectResponse = NextResponse.redirect(redirectUrl);
+    response.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie);
+    });
+    return redirectResponse;
+  }
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -55,5 +83,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/garage/:path*"],
+  matcher: ["/", "/reset-password", "/garage/:path*"],
 };

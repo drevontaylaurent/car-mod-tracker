@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { AuthFormState } from "@/types/auth";
@@ -95,19 +96,30 @@ export async function signOut(
   redirect("/login");
 }
 
-function getPasswordRecoveryRedirectUrl(): string {
-  if (
-    process.env.VERCEL_ENV === "production" &&
-    process.env.VERCEL_PROJECT_PRODUCTION_URL
-  ) {
-    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}/auth/callback`;
+async function getPasswordRecoveryRedirectUrl(): Promise<string> {
+  const requestHeaders = await headers();
+  const hostHeader =
+    requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
+
+  if (!hostHeader) {
+    throw new Error("The current application host is unavailable.");
   }
 
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}/auth/callback`;
+  const host = new URL(`https://${hostHeader}`).host;
+  const trustedHosts = new Set(
+    [
+      "localhost:3000",
+      process.env.VERCEL_PROJECT_PRODUCTION_URL,
+      process.env.VERCEL_URL,
+    ].filter((value): value is string => Boolean(value)),
+  );
+
+  if (!trustedHosts.has(host)) {
+    throw new Error("The current application host is not trusted.");
   }
 
-  return "http://localhost:3000/auth/callback";
+  const protocol = host === "localhost:3000" ? "http:" : "https:";
+  return new URL("/reset-password", `${protocol}//${host}`).toString();
 }
 
 export async function requestPasswordReset(
@@ -132,7 +144,7 @@ export async function requestPasswordReset(
   try {
     const supabase = await createClient();
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: getPasswordRecoveryRedirectUrl(),
+      redirectTo: await getPasswordRecoveryRedirectUrl(),
     });
 
     if (error) {

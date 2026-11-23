@@ -14,7 +14,8 @@ export function ResetPasswordForm() {
     resetPassword,
     initialState,
   );
-  const hasInvalidLink = searchParams.get("error") === "invalid-link";
+  const hasInvalidLink =
+    searchParams.has("error") || searchParams.has("error_code");
 
   return (
     <form action={formAction} className="mt-8 space-y-5">
