@@ -1,6 +1,12 @@
 "use client";
 
+import { VehicleDetailFields } from "@/components/garage/vehicle-detail-fields";
+
+export type VehicleEntryMode = "vin" | "manual";
+
 interface VehicleFieldsProps {
+  mode: VehicleEntryMode;
+  showVehicleDetails: boolean;
   vin: string;
   year: string;
   make: string;
@@ -20,6 +26,8 @@ interface VehicleFieldsProps {
 }
 
 export function VehicleFields({
+  mode,
+  showVehicleDetails,
   vin,
   year,
   make,
@@ -38,15 +46,20 @@ export function VehicleFields({
   onDecode,
 }: VehicleFieldsProps) {
   const currentYear = new Date().getFullYear();
+  const shouldShowVehicleDetails =
+    mode === "manual" || showVehicleDetails;
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      <label className="space-y-2 sm:col-span-2">
-        <span className="field-label">VIN</span>
+      <div className="sm:col-span-2">
+        <label htmlFor="vehicle-vin" className="field-label">
+          {mode === "manual" ? "VIN (Optional)" : "VIN"}
+        </label>
         <input
+          id="vehicle-vin"
           name="vin"
           type="text"
-          required
+          required={mode === "vin"}
           minLength={17}
           maxLength={17}
           pattern="[A-HJ-NPR-Za-hj-npr-z0-9]{17}"
@@ -58,82 +71,49 @@ export function VehicleFields({
           onChange={(event) => onVinChange(event.target.value)}
           className="field-control uppercase placeholder:normal-case"
         />
-        <button
-          type="button"
-          onClick={onDecode}
-          disabled={isDecoding || vin.length !== 17}
-          className="button-secondary mt-2"
-        >
-          {isDecoding ? "Decoding VIN..." : "Decode VIN"}
-        </button>
-        {decodeError && (
-          <p role="alert" className="state-message mt-2" data-tone="error">
-            {decodeError}
+        {mode === "manual" && (
+          <p className="mt-2 text-sm text-zinc-400">
+            Don&apos;t know your VIN? You can add it later.
           </p>
         )}
-        {decodeMessage && (
-          <p role="status" className="state-message mt-2" data-tone="success">
-            {decodeMessage}
-          </p>
+        {mode === "vin" && (
+          <>
+            <button
+              type="button"
+              onClick={onDecode}
+              disabled={isDecoding || vin.length !== 17}
+              className="button-secondary mt-2"
+            >
+              {isDecoding ? "Decoding VIN..." : "Decode VIN"}
+            </button>
+            {decodeError && (
+              <p role="alert" className="state-message mt-2" data-tone="error">
+                {decodeError}
+              </p>
+            )}
+            {decodeMessage && (
+              <p role="status" className="state-message mt-2" data-tone="success">
+                {decodeMessage}
+              </p>
+            )}
+          </>
         )}
-      </label>
-      <label className="space-y-2">
-        <span className="field-label">Year</span>
-        <input
-          name="year"
-          type="number"
-          min={1886}
-          max={currentYear + 1}
-          placeholder="e.g. 2022"
-          value={year}
-          onChange={(event) => onYearChange(event.target.value)}
-          className="field-control"
+      </div>
+      {shouldShowVehicleDetails && (
+        <VehicleDetailFields
+          year={year}
+          make={make}
+          model={model}
+          trim={trim}
+          nickname={nickname}
+          currentYear={currentYear}
+          onYearChange={onYearChange}
+          onMakeChange={onMakeChange}
+          onModelChange={onModelChange}
+          onTrimChange={onTrimChange}
+          onNicknameChange={onNicknameChange}
         />
-      </label>
-      <label className="space-y-2">
-        <span className="field-label">Make</span>
-        <input
-          name="make"
-          maxLength={100}
-          placeholder="e.g. Toyota"
-          value={make}
-          onChange={(event) => onMakeChange(event.target.value)}
-          className="field-control"
-        />
-      </label>
-      <label className="space-y-2">
-        <span className="field-label">Model</span>
-        <input
-          name="model"
-          maxLength={100}
-          placeholder="e.g. GR86"
-          value={model}
-          onChange={(event) => onModelChange(event.target.value)}
-          className="field-control"
-        />
-      </label>
-      <label className="space-y-2">
-        <span className="field-label">Trim</span>
-        <input
-          name="trim"
-          maxLength={100}
-          placeholder="e.g. Premium"
-          value={trim}
-          onChange={(event) => onTrimChange(event.target.value)}
-          className="field-control"
-        />
-      </label>
-      <label className="space-y-2 sm:col-span-2">
-        <span className="field-label">Nickname</span>
-        <input
-          name="nickname"
-          maxLength={80}
-          placeholder="Optional name for your build"
-          value={nickname}
-          onChange={(event) => onNicknameChange(event.target.value)}
-          className="field-control"
-        />
-      </label>
+      )}
     </div>
   );
 }

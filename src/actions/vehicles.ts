@@ -73,15 +73,26 @@ export async function createVehicle(
   _previousState: VehicleFormState,
   formData: FormData,
 ): Promise<ActionResult<Vehicle>> {
+  const entryMode = formData.get("entryMode");
+  if (entryMode !== "vin" && entryMode !== "manual") {
+    return { success: false, error: "Choose how to add this vehicle." };
+  }
+
   const vinValue = formData.get("vin");
-  if (typeof vinValue !== "string") {
+  if (vinValue !== null && typeof vinValue !== "string") {
     return { success: false, error: "Enter a valid 17-character VIN." };
   }
 
-  const vin = vinValue.trim().toUpperCase();
-  if (!/^[A-HJ-NPR-Z0-9]{17}$/.test(vin)) {
+  const normalizedVin =
+    typeof vinValue === "string" ? vinValue.trim().toUpperCase() : "";
+  const hasValidVin = /^[A-HJ-NPR-Z0-9]{17}$/.test(normalizedVin);
+  if (
+    (entryMode === "vin" && !hasValidVin) ||
+    (normalizedVin.length > 0 && !hasValidVin)
+  ) {
     return { success: false, error: "Enter a valid 17-character VIN." };
   }
+  const vin = normalizedVin || null;
 
   const yearValue = formData.get("year");
   if (yearValue !== null && typeof yearValue !== "string") {
@@ -150,20 +161,43 @@ export async function createVehicle(
       .single();
 
     if (error) {
-      console.error("Could not create vehicle.", error);
+      console.error("Could not create vehicle.", { code: error.code });
       if (error.code === "23505") {
         return {
           success: false,
           error: "This vehicle is already in your garage.",
         };
       }
-      if (error.code === "PGRST205" || error.code === "42P01") {
+      if (error.code === "23502") {
         return {
           success: false,
-          error: "Vehicle storage is not set up yet. Apply the vehicles SQL migration.",
+          error:
+            "Vehicle storage still requires a VIN. Apply the latest Supabase migration to allow VIN-less vehicles.",
         };
       }
-      return { success: false, error: "Could not add this vehicle. Please try again." };
+      if (error.code === "23514") {
+        return {
+          success: false,
+          error:
+            "Vehicle details did not pass storage validation. Check the VIN and model year.",
+        };
+      }
+      if (
+        error.code === "PGRST204" ||
+        error.code === "PGRST205" ||
+        error.code === "42P01" ||
+        error.code === "42703"
+      ) {
+        return {
+          success: false,
+          error:
+            "Vehicle storage is out of date. Apply the latest Supabase migrations and try again.",
+        };
+      }
+      return {
+        success: false,
+        error: "Could not save this vehicle. Please try again.",
+      };
     }
 
     revalidatePath("/garage");

@@ -33,7 +33,7 @@ export function VehicleProfilePanel({
         <Specification label="Trim" value={vehicle.trim} />
         <div className="build-profile-panel__vin">
           <dt className="technical-label">VIN</dt>
-          <dd>{vehicle.vin}</dd>
+          <dd>{vehicle.vin ?? "Not provided"}</dd>
         </div>
       </dl>
 

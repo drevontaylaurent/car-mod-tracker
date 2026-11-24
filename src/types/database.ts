@@ -1,7 +1,7 @@
 export interface Vehicle {
   id: string;
   user_id: string;
-  vin: string;
+  vin: string | null;
   year: number | null;
   make: string | null;
   model: string | null;
@@ -14,7 +14,7 @@ export interface Vehicle {
 export interface VehicleInsert {
   id?: string;
   user_id: string;
-  vin: string;
+  vin: string | null;
   year?: number | null;
   make?: string | null;
   model?: string | null;

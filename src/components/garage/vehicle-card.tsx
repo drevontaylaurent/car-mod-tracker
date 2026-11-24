@@ -60,7 +60,7 @@ export function VehicleCard({
           </p>
           <p className="vehicle-panel__vin">
             <span className="technical-label">VIN / </span>
-            {vehicle.vin}
+            {vehicle.vin ?? "Not provided"}
           </p>
         </div>
 
