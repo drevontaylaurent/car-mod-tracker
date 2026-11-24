@@ -101,6 +101,7 @@ export function VehicleFields({
       </div>
       {shouldShowVehicleDetails && (
         <VehicleDetailFields
+          enableSuggestions={mode === "manual"}
           year={year}
           make={make}
           model={model}

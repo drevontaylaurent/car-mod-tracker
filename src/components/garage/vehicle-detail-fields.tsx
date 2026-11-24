@@ -1,4 +1,8 @@
+import { VehicleSuggestionCombobox } from "@/components/garage/vehicle-suggestion-combobox";
+import { useVehicleSuggestions } from "@/components/garage/use-vehicle-suggestions";
+
 interface VehicleDetailFieldsProps {
+  enableSuggestions: boolean;
   year: string;
   make: string;
   model: string;
@@ -13,6 +17,7 @@ interface VehicleDetailFieldsProps {
 }
 
 export function VehicleDetailFields({
+  enableSuggestions,
   year,
   make,
   model,
@@ -25,6 +30,8 @@ export function VehicleDetailFields({
   onTrimChange,
   onNicknameChange,
 }: VehicleDetailFieldsProps) {
+  const suggestions = useVehicleSuggestions(year, make, enableSuggestions);
+
   return (
     <>
       <label className="space-y-2">
@@ -40,39 +47,84 @@ export function VehicleDetailFields({
           className="field-control"
         />
       </label>
-      <label className="space-y-2">
-        <span className="field-label">Make</span>
-        <input
+      {enableSuggestions ? (
+        <VehicleSuggestionCombobox
+          id="vehicle-make"
+          label="Make"
           name="make"
-          maxLength={100}
-          placeholder="e.g. Toyota"
           value={make}
-          onChange={(event) => onMakeChange(event.target.value)}
-          className="field-control"
-        />
-      </label>
-      <label className="space-y-2">
-        <span className="field-label">Model</span>
-        <input
-          name="model"
+          placeholder="e.g. Toyota"
           maxLength={100}
-          placeholder="e.g. GR86"
-          value={model}
-          onChange={(event) => onModelChange(event.target.value)}
-          className="field-control"
+          minQueryLength={2}
+          suggestions={suggestions.make.suggestions}
+          status={suggestions.make.status}
+          onChange={onMakeChange}
         />
-      </label>
-      <label className="space-y-2">
-        <span className="field-label">Trim</span>
+      ) : (
+        <label className="space-y-2">
+          <span className="field-label">Make</span>
+          <input
+            name="make"
+            maxLength={100}
+            placeholder="e.g. Toyota"
+            value={make}
+            onChange={(event) => onMakeChange(event.target.value)}
+            className="field-control"
+          />
+        </label>
+      )}
+      {enableSuggestions ? (
+        <VehicleSuggestionCombobox
+          id="vehicle-model"
+          label="Model"
+          name="model"
+          value={model}
+          placeholder="e.g. Camry"
+          maxLength={100}
+          minQueryLength={1}
+          suggestions={suggestions.model.suggestions}
+          status={suggestions.model.status}
+          onChange={onModelChange}
+        />
+      ) : (
+        <label className="space-y-2">
+          <span className="field-label">Model</span>
+          <input
+            name="model"
+            maxLength={100}
+            placeholder="e.g. GR86"
+            value={model}
+            onChange={(event) => onModelChange(event.target.value)}
+            className="field-control"
+          />
+        </label>
+      )}
+      <div className="space-y-2">
+        <label htmlFor="vehicle-trim" className="field-label">
+          Trim
+        </label>
         <input
+          id="vehicle-trim"
           name="trim"
           maxLength={100}
           placeholder="e.g. Premium"
           value={trim}
+          aria-describedby={
+            enableSuggestions ? "vehicle-trim-guidance" : undefined
+          }
           onChange={(event) => onTrimChange(event.target.value)}
           className="field-control"
         />
-      </label>
+        {enableSuggestions && (
+          <p
+            id="vehicle-trim-guidance"
+            className="text-sm text-zinc-400"
+          >
+            NHTSA does not provide reliable Trim suggestions for this vehicle.
+            Enter it manually.
+          </p>
+        )}
+      </div>
       <label className="space-y-2 sm:col-span-2">
         <span className="field-label">Nickname</span>
         <input

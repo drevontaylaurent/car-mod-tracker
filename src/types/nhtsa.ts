@@ -15,3 +15,19 @@ export interface NhtsaVinDecodeResult {
 export interface NhtsaVinDecodeResponse {
   Results: NhtsaVinDecodeResult[];
 }
+
+export interface NhtsaMakeResult {
+  Make_ID: number;
+  Make_Name: string;
+}
+
+export interface NhtsaModelResult {
+  Make_ID: number;
+  Make_Name: string;
+  Model_ID: number;
+  Model_Name: string;
+}
+
+export type ManualVehicleSuggestionRequest =
+  | { type: "make"; query: string }
+  | { type: "model"; year: number; make: string };

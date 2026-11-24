@@ -27,6 +27,29 @@ export function AddVehicleModal({ onClose }: AddVehicleModalProps) {
     setMode(nextMode);
   }
 
+  function handleYearChange(value: string) {
+    setYear(value);
+    if (mode === "manual") {
+      setModel("");
+      setTrim("");
+    }
+  }
+
+  function handleMakeChange(value: string) {
+    setMake(value);
+    if (mode === "manual") {
+      setModel("");
+      setTrim("");
+    }
+  }
+
+  function handleModelChange(value: string) {
+    setModel(value);
+    if (mode === "manual") {
+      setTrim("");
+    }
+  }
+
   function handleDecodeVin() {
     setDecodeError("");
     setDecodeMessage("");
@@ -103,9 +126,9 @@ export function AddVehicleModal({ onClose }: AddVehicleModalProps) {
               setDecodeError("");
               setDecodeMessage("");
             }}
-            onYearChange={setYear}
-            onMakeChange={setMake}
-            onModelChange={setModel}
+            onYearChange={handleYearChange}
+            onMakeChange={handleMakeChange}
+            onModelChange={handleModelChange}
             onTrimChange={setTrim}
             onNicknameChange={setNickname}
             onDecode={handleDecodeVin}
