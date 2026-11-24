@@ -4,13 +4,22 @@ import { revalidatePath } from "next/cache";
 import { decodeVin } from "@/lib/nhtsa";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/types/actions";
-import type { Vehicle, VehicleInsert } from "@/types/database";
+import type { Vehicle, VehicleInsert, VehicleUpdate } from "@/types/database";
 import type { DecodedVehicleInfo } from "@/types/nhtsa";
 
 type VehicleFormState = ActionResult<Vehicle> | undefined;
 type DeleteVehicleFormState = ActionResult<null> | undefined;
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+interface VehicleDetails {
+  vin: string | null;
+  year: number | null;
+  make: string | null;
+  model: string | null;
+  trim: string | null;
+  nickname: string | null;
+}
 
 export async function lookupVinAction(
   vin: string,
@@ -69,15 +78,10 @@ function readOptionalText(
   return { success: true, data: normalizedValue || null };
 }
 
-export async function createVehicle(
-  _previousState: VehicleFormState,
+function readVehicleDetails(
   formData: FormData,
-): Promise<ActionResult<Vehicle>> {
-  const entryMode = formData.get("entryMode");
-  if (entryMode !== "vin" && entryMode !== "manual") {
-    return { success: false, error: "Choose how to add this vehicle." };
-  }
-
+  vinRequired: boolean,
+): ActionResult<VehicleDetails> {
   const vinValue = formData.get("vin");
   if (vinValue !== null && typeof vinValue !== "string") {
     return { success: false, error: "Enter a valid 17-character VIN." };
@@ -87,12 +91,11 @@ export async function createVehicle(
     typeof vinValue === "string" ? vinValue.trim().toUpperCase() : "";
   const hasValidVin = /^[A-HJ-NPR-Z0-9]{17}$/.test(normalizedVin);
   if (
-    (entryMode === "vin" && !hasValidVin) ||
+    (vinRequired && !hasValidVin) ||
     (normalizedVin.length > 0 && !hasValidVin)
   ) {
     return { success: false, error: "Enter a valid 17-character VIN." };
   }
-  const vin = normalizedVin || null;
 
   const yearValue = formData.get("year");
   if (yearValue !== null && typeof yearValue !== "string") {
@@ -129,14 +132,32 @@ export async function createVehicle(
     return nickname;
   }
 
-  const vehicleDetails = {
-    vin,
-    year,
-    make: make.data,
-    model: model.data,
-    trim: trim.data,
-    nickname: nickname.data,
+  return {
+    success: true,
+    data: {
+      vin: normalizedVin || null,
+      year,
+      make: make.data,
+      model: model.data,
+      trim: trim.data,
+      nickname: nickname.data,
+    },
   };
+}
+
+export async function createVehicle(
+  _previousState: VehicleFormState,
+  formData: FormData,
+): Promise<ActionResult<Vehicle>> {
+  const entryMode = formData.get("entryMode");
+  if (entryMode !== "vin" && entryMode !== "manual") {
+    return { success: false, error: "Choose how to add this vehicle." };
+  }
+
+  const vehicleDetails = readVehicleDetails(formData, entryMode === "vin");
+  if (!vehicleDetails.success) {
+    return vehicleDetails;
+  }
 
   try {
     const supabase = await createClient();
@@ -156,7 +177,7 @@ export async function createVehicle(
 
     const { data, error } = await supabase
       .from("vehicles")
-      .insert({ ...vehicleDetails, user_id: user.id } satisfies VehicleInsert)
+      .insert({ ...vehicleDetails.data, user_id: user.id } satisfies VehicleInsert)
       .select("*")
       .single();
 
@@ -205,6 +226,93 @@ export async function createVehicle(
   } catch (error) {
     console.error("Vehicle creation failed.", error);
     return { success: false, error: "Could not add this vehicle. Please try again." };
+  }
+}
+
+export async function updateVehicle(
+  _previousState: VehicleFormState,
+  formData: FormData,
+): Promise<ActionResult<Vehicle>> {
+  const vehicleId = formData.get("vehicleId");
+  if (typeof vehicleId !== "string" || !UUID_PATTERN.test(vehicleId.trim())) {
+    return { success: false, error: "Select a valid vehicle to update." };
+  }
+
+  const vehicleDetails = readVehicleDetails(formData, false);
+  if (!vehicleDetails.success) {
+    return vehicleDetails;
+  }
+
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError) {
+      console.error("Could not verify the current user for vehicle update.", {
+        code: authError.code,
+      });
+      return {
+        success: false,
+        error: "Unable to verify your session. Please try again.",
+      };
+    }
+
+    if (!user) {
+      return { success: false, error: "Sign in to update a vehicle." };
+    }
+
+    const updateData = {
+      ...vehicleDetails.data,
+      updated_at: new Date().toISOString(),
+    } satisfies VehicleUpdate;
+    const { data, error } = await supabase
+      .from("vehicles")
+      .update(updateData)
+      .eq("id", vehicleId.trim())
+      .eq("user_id", user.id)
+      .select("*")
+      .maybeSingle();
+
+    if (error) {
+      console.error("Could not update vehicle.", { code: error.code });
+      if (error.code === "23505") {
+        return {
+          success: false,
+          error: "This vehicle is already in your garage.",
+        };
+      }
+      if (error.code === "23514") {
+        return {
+          success: false,
+          error:
+            "Vehicle details did not pass storage validation. Check the VIN and model year.",
+        };
+      }
+      return {
+        success: false,
+        error: "Could not update this vehicle. Please try again.",
+      };
+    }
+
+    if (!data) {
+      return {
+        success: false,
+        error: "Vehicle not found in your garage.",
+      };
+    }
+
+    revalidatePath("/garage");
+    revalidatePath(`/garage/${vehicleId.trim()}`);
+    return { success: true, data };
+  } catch (error) {
+    console.error("Vehicle update failed.", error);
+    return {
+      success: false,
+      error: "Could not update this vehicle. Please try again.",
+    };
   }
 }
 
