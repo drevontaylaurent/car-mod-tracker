@@ -639,15 +639,584 @@
     font-family: var(--font-geist-mono), monospace;
     font-size: 1.25rem;
   }
+
+  .build-page__container {
+    max-width: 90rem;
+  }
+
+  .build-experience {
+    min-width: 0;
+  }
+
+  .build-tabs {
+    position: sticky;
+    top: 0.5rem;
+    z-index: 20;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.25rem;
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-primary);
+    padding: 0.25rem;
+  }
+
+  .build-tab {
+    display: flex;
+    min-width: 0;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    background: transparent;
+    padding: 0.5rem 0.25rem;
+    color: var(--text-secondary);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.625rem;
+    font-weight: 650;
+    line-height: 1rem;
+    text-align: center;
+  }
+
+  .build-tab[aria-selected="true"] {
+    border-color: var(--border-strong);
+    background: var(--surface-secondary);
+    box-shadow: inset 0 -2px var(--accent);
+    color: var(--foreground);
+  }
+
+  .build-tab__index,
+  .build-tab__label--desktop {
+    display: none;
+  }
+
+  .build-tab__label--mobile {
+    display: block;
+    white-space: nowrap;
+  }
+
+  .build-experience__layout {
+    display: grid;
+    min-width: 0;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+
+  .build-experience__stage,
+  .build-experience__panels {
+    min-width: 0;
+  }
+
+  .build-experience__panels {
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .build-experience__panel {
+    min-width: 0;
+    padding-block: 1rem;
+  }
+
+  .build-experience__panel[hidden] {
+    display: none;
+  }
+
+  .build-profile-panel {
+    min-width: 0;
+  }
+
+  .build-profile-panel__title {
+    margin-top: 0.625rem;
+    overflow-wrap: anywhere;
+    color: var(--foreground);
+    font-size: clamp(1.75rem, 8vw, 3rem);
+    font-weight: 650;
+    letter-spacing: -0.06em;
+    line-height: 1;
+  }
+
+  .build-profile-panel__identity {
+    margin-top: 0.625rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .build-profile-panel__specifications {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+
+  .build-profile-panel__specifications > div {
+    min-width: 0;
+  }
+
+  .build-profile-panel__specifications dd {
+    margin-top: 0.375rem;
+    overflow-wrap: anywhere;
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+  }
+
+  .build-profile-panel__vin {
+    grid-column: 1 / -1;
+  }
+
+  .build-profile-panel__vin dd {
+    font-family: var(--font-geist-mono), monospace;
+    letter-spacing: 0.04em;
+  }
+
+  .build-profile-panel__progress {
+    margin-top: 1.25rem;
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 1rem;
+  }
+
+  .build-breadcrumb {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .build-breadcrumb__link {
+    justify-content: flex-start;
+    padding-inline: 0;
+    text-decoration: none;
+  }
+
+  .build-breadcrumb__link span {
+    font-size: 1.125rem;
+  }
+
+  .build-stage {
+    min-width: 0;
+    margin: 0;
+  }
+
+  .build-stage__viewport {
+    position: relative;
+    display: grid;
+    min-width: 0;
+    min-height: clamp(14rem, 58vw, 20rem);
+    overflow: hidden;
+    border: 1px solid var(--border-strong);
+    background: var(--surface-inset);
+  }
+
+  .vehicle-visual--build {
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+    aspect-ratio: auto;
+    border: 0;
+    background-size: 48px 48px;
+  }
+
+  .build-stage__caption {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    border: 1px solid var(--border-subtle);
+    border-top: 0;
+    background: var(--surface-primary);
+    padding: 0.75rem 1rem;
+    color: var(--text-secondary);
+    font-size: 0.6875rem;
+  }
+
+  .build-stage__caption span:last-child {
+    overflow-wrap: anywhere;
+    text-align: right;
+  }
+
+  .build-telemetry {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .build-telemetry__heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .build-telemetry__tracked {
+    color: var(--text-muted);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.6875rem;
+    white-space: nowrap;
+  }
+
+  .build-telemetry__status-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .build-telemetry__status {
+    min-width: 0;
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-inset);
+    padding: 0.625rem 0.25rem;
+    text-align: center;
+  }
+
+  .build-telemetry__status dt {
+    display: flex;
+    justify-content: center;
+  }
+
+  .build-telemetry__status dd {
+    margin-top: 0.5rem;
+    color: var(--foreground);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 1.5rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+  }
+
+  .build-telemetry__investment {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 1.125rem;
+  }
+
+  .build-telemetry__amount {
+    margin-top: 0.375rem;
+    color: var(--foreground);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: clamp(1.25rem, 5vw, 1.875rem);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    letter-spacing: -0.06em;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+
+  .build-telemetry__amount--installed {
+    color: var(--status-success);
+  }
+
+  .build-telemetry__caption {
+    margin-top: 0.375rem;
+    color: var(--text-muted);
+    font-size: 0.6875rem;
+    line-height: 1.4;
+  }
+
+  .build-telemetry__progress {
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 1.125rem;
+  }
+
+  .build-telemetry__percent {
+    color: var(--accent);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.875rem;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .build-telemetry__track {
+    height: 0.5rem;
+    overflow: hidden;
+    margin-top: 0.75rem;
+    background: var(--surface-secondary);
+  }
+
+  .build-telemetry__track span {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+    transition: width 180ms ease;
+  }
+
+  .build-mod-list {
+    min-width: 0;
+  }
+
+  .build-mod-list__heading {
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 0.875rem;
+  }
+
+  .build-mod-list__title {
+    color: var(--foreground);
+    font-size: 1.125rem;
+    font-weight: 650;
+  }
+
+  .build-mod-filters {
+    display: grid;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-block: 1rem;
+  }
+
+  .build-category-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin-top: 0.625rem;
+  }
+
+  .build-category-nav__item {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-inset);
+    padding: 0.5rem 0.75rem;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    line-height: 1rem;
+    transition:
+      background-color 140ms ease,
+      border-color 140ms ease,
+      color 140ms ease;
+  }
+
+  .build-category-nav__item:hover,
+  .build-category-nav__item[aria-pressed="true"] {
+    border-color: var(--accent);
+    background: rgb(201 243 65 / 8%);
+    color: var(--foreground);
+  }
+
+  .build-status-filter {
+    display: block;
+    max-width: 18rem;
+  }
+
+  .build-mod-list__entries {
+    display: grid;
+  }
+
+  .build-mod-entry {
+    min-width: 0;
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 1.125rem 0;
+  }
+
+  .build-mod-entry__top,
+  .build-mod-entry__identity {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .build-mod-entry__top {
+    justify-content: space-between;
+    gap: 0.75rem 1rem;
+  }
+
+  .build-mod-entry__name {
+    overflow-wrap: anywhere;
+    color: var(--foreground);
+    font-size: 1rem;
+    font-weight: 650;
+  }
+
+  .build-mod-entry__metadata {
+    margin-top: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+  }
+
+  .build-mod-entry__cost {
+    color: var(--foreground);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 1rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .build-mod-entry__date {
+    margin-top: 0.875rem;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+  }
+
+  .build-mod-entry__notes {
+    margin-top: 0.75rem;
+    overflow-wrap: anywhere;
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+  }
+
+  .build-mod-entry__controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 0.75rem;
+    border-top: 1px solid var(--border-subtle);
+    margin-top: 1rem;
+    padding-top: 0.875rem;
+  }
+
+  .build-mod-entry__status {
+    display: grid;
+    min-width: min(100%, 12rem);
+    gap: 0.5rem;
+    color: var(--text-secondary);
+  }
+
+  .build-mod-entry__delete {
+    color: var(--status-danger);
+  }
+
+  .build-empty-state {
+    margin-top: 1rem;
+    border: 1px dashed var(--border-strong);
+    background: rgb(255 255 255 / 2%);
+    padding: 2rem 1rem;
+    text-align: center;
+  }
+
+  .build-add-form {
+    min-width: 0;
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-primary);
+    padding: 1.125rem;
+  }
+
+  .build-add-form__fields {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+
+  .build-add-form__notes textarea {
+    min-height: 6rem;
+    resize: vertical;
+  }
+
+  .build-add-form__message,
+  .build-add-form__submit {
+    width: 100%;
+  }
 }
 
 @media (min-width: 640px) {
   .app-header__inner {
     padding-inline: 2rem;
   }
+
+  .build-breadcrumb {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+  }
+
+  .build-tabs {
+    display: flex;
+    width: fit-content;
+    gap: 0.375rem;
+    border: 0;
+    background: transparent;
+    padding: 0;
+  }
+
+  .build-tab {
+    min-width: 7rem;
+    justify-content: flex-start;
+    gap: 0.625rem;
+    border-color: var(--border-subtle);
+    background: var(--surface-primary);
+    padding-inline: 0.75rem;
+    font-size: 0.6875rem;
+    text-align: left;
+  }
+
+  .build-tab__index,
+  .build-tab__label--desktop {
+    display: inline;
+  }
+
+  .build-tab__index {
+    color: var(--text-muted);
+  }
+
+  .build-tab__label--mobile {
+    display: none;
+  }
+
+  .build-experience__layout {
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .build-profile-panel__specifications {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .build-add-form {
+    padding: 1.5rem;
+  }
+
+  .build-add-form__fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .build-add-form__notes,
+  .build-add-form__message,
+  .build-add-form__submit {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (min-width: 1024px) {
+  .build-experience__layout {
+    grid-template-columns: minmax(0, 1.4fr) minmax(20rem, 0.8fr);
+    align-items: start;
+    gap: clamp(1.5rem, 3vw, 3rem);
+  }
+
+  .build-stage__viewport {
+    min-height: clamp(30rem, 62vh, 42rem);
+  }
+
+  .build-experience__stage {
+    position: sticky;
+    top: 5rem;
+    align-self: start;
+  }
+
+  .build-experience__panels {
+    border-left: 1px solid var(--border-subtle);
+    border-top: 0;
+    padding-left: clamp(1.25rem, 2vw, 2rem);
+  }
+
+  .build-experience__panel {
+    min-height: clamp(30rem, 62vh, 42rem);
+    padding-block: 0.5rem;
+  }
+
+  .build-experience__panel[data-panel="parts"],
+  .build-experience__panel[data-panel="add"] {
+    max-height: min(74vh, 52rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
   .vehicle-panel {
     grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
   }

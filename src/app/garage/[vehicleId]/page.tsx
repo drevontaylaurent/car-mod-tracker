@@ -7,8 +7,8 @@ import { SignOutControl } from "@/components/auth/sign-out-control";
 import { ApplicationHeader } from "@/components/layout/application-header";
 import { AddModForm } from "@/components/mods/add-mod-form";
 import { BuildSummary } from "@/components/mods/build-summary";
-import { ModList } from "@/components/mods/mod-list";
-import type { Vehicle } from "@/types/database";
+import { VehicleBuildWorkspace } from "@/components/garage/vehicle-build-workspace";
+import { VehicleProfilePanel } from "@/components/garage/vehicle-profile-panel";
 
 export default function VehicleBuildPage({
   params,
@@ -39,60 +39,46 @@ async function VehicleBuildContent({
     return <BuildError message={modsResult.error} />;
   }
 
-  return (
-    <main className="min-h-screen bg-background text-foreground">
-      <ApplicationHeader />
-      <div className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-12">
-        <VehicleDetails vehicle={vehicleResult.data} />
-        <div className="mt-8">
-          <BuildSummary mods={modsResult.data} />
-        </div>
-        <div className="mt-8">
-          <AddModForm vehicleId={vehicleResult.data.id} />
-        </div>
-        <div className="mt-10">
-          <ModList mods={modsResult.data} />
-        </div>
-      </div>
-    </main>
-  );
-}
-
-function VehicleDetails({ vehicle }: { vehicle: Vehicle }) {
-  const title =
+  const vehicle = vehicleResult.data;
+  const mods = modsResult.data;
+  const vehicleName =
     vehicle.nickname ||
     [vehicle.year, vehicle.make, vehicle.model].filter(Boolean).join(" ") ||
     "Vehicle build";
 
   return (
-    <header className="mt-6 rounded-2xl border border-white/10 bg-[#131819] p-5 sm:p-7">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-lime-300">
-        Vehicle build
-      </p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-        {title}
-      </h1>
-      <p className="mt-2 text-sm text-zinc-300">
-        {[vehicle.year, vehicle.make, vehicle.model, vehicle.trim]
-          .filter(Boolean)
-          .join(" ") || "Build details coming soon"}
-      </p>
-      <div className="mt-5 border-t border-white/5 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-          VIN
-        </p>
-        <p className="mt-1 break-all font-mono text-sm tracking-wide text-zinc-300">
-          {vehicle.vin}
-        </p>
+    <main className="min-h-screen bg-background text-foreground">
+      <ApplicationHeader />
+      <div className="build-page__container mx-auto px-5 py-6 sm:px-8 sm:py-10">
+        <div className="build-breadcrumb">
+          <Link href="/garage" className="button-ghost build-breadcrumb__link">
+            <span aria-hidden="true">←</span> Back to Garage
+          </Link>
+          <p className="technical-label">Garage / Vehicle build</p>
+        </div>
+        <VehicleBuildWorkspace
+          vehicleId={vehicle.id}
+          vehicleName={vehicleName}
+          mods={mods}
+          profile={
+            <VehicleProfilePanel
+              vehicle={vehicle}
+              vehicleName={vehicleName}
+              mods={mods}
+            />
+          }
+          build={<BuildSummary mods={mods} />}
+          addMod={<AddModForm vehicleId={vehicle.id} />}
+        />
       </div>
-    </header>
+    </main>
   );
 }
 
 function BuildError({ message }: { message: string }) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#0b0e0f] px-5 text-white">
-      <section className="max-w-md rounded-2xl border border-white/10 bg-[#131819] p-8 text-center">
+    <main className="flex min-h-screen items-center justify-center bg-background px-5 text-foreground">
+      <section className="surface-primary max-w-md p-8 text-center">
         <div className="mb-5 flex justify-end">
           <SignOutControl />
         </div>
@@ -102,7 +88,7 @@ function BuildError({ message }: { message: string }) {
         </p>
         <Link
           href="/garage"
-          className="mt-6 inline-flex h-11 items-center rounded-lg bg-lime-400 px-5 text-sm font-semibold text-[#111513] transition hover:bg-lime-300"
+          className="button-primary mt-6"
         >
           Return to garage
         </Link>
@@ -115,7 +101,7 @@ function BuildLoading() {
   return (
     <main
       role="status"
-      className="flex min-h-screen items-center justify-center bg-[#0b0e0f] text-sm text-zinc-400"
+      className="flex min-h-screen items-center justify-center bg-background text-sm text-text-secondary"
     >
       Loading vehicle build...
     </main>

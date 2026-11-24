@@ -65,40 +65,41 @@ export function ModCard({ mod }: ModCardProps) {
   }
 
   return (
-    <article className="rounded-2xl border border-white/10 bg-[#131819] p-5">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-lg font-semibold text-white">{mod.part_name}</h3>
+    <article className="build-mod-entry">
+      <div className="build-mod-entry__top">
+        <div className="min-w-0">
+          <div className="build-mod-entry__identity">
+            <h4 className="build-mod-entry__name">{mod.part_name}</h4>
             <StatusBadge status={status} />
           </div>
-          <p className="mt-1 text-sm text-zinc-400">
+          <p className="build-mod-entry__metadata">
             {[mod.brand, mod.category].filter(Boolean).join(" · ")}
           </p>
         </div>
-        <p className="text-lg font-semibold text-white">
+        <p className="build-mod-entry__cost">
           {currencyFormatter.format(mod.cost)}
         </p>
       </div>
       {mod.install_date && (
-        <p className="mt-4 text-sm text-zinc-400">
-          Install date: <time dateTime={mod.install_date}>{mod.install_date}</time>
+        <p className="build-mod-entry__date">
+          <span className="technical-label">Install date / </span>
+          <time dateTime={mod.install_date}>{mod.install_date}</time>
         </p>
       )}
       {mod.notes && (
-        <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-zinc-300">
+        <p className="build-mod-entry__notes">
           {mod.notes}
         </p>
       )}
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-white/5 pt-4">
-        <label className="flex items-center gap-2 text-sm text-zinc-400">
-          Status
+      <div className="build-mod-entry__controls">
+        <label className="build-mod-entry__status">
+          <span className="technical-label">Update status</span>
           <select
             aria-label={`Change status for ${mod.part_name}`}
             value={status}
             disabled={isPending}
             onChange={(event) => void handleStatusChange(event.currentTarget.value)}
-            className="h-9 rounded-lg border border-white/10 bg-[#0b0e0f] px-2 text-sm text-white outline-none focus:border-lime-400 disabled:opacity-60"
+            className="field-control"
           >
             {MOD_STATUSES.map((option) => (
               <option key={option} value={option}>
@@ -111,13 +112,13 @@ export function ModCard({ mod }: ModCardProps) {
           type="button"
           onClick={() => void handleDelete()}
           disabled={isPending}
-          className="text-sm font-medium text-zinc-500 transition hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-50"
+          className="button-ghost build-mod-entry__delete"
         >
           {isPending ? "Saving..." : "Delete"}
         </button>
       </div>
       {errorMessage && (
-        <p role="alert" className="mt-3 text-sm text-red-300">
+        <p role="alert" className="state-message mt-3" data-tone="error">
           {errorMessage}
         </p>
       )}

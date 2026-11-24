@@ -1,4 +1,6 @@
+import { getBuildTelemetry } from "@/lib/build-telemetry";
 import type { Mod } from "@/types/database";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 interface BuildSummaryProps {
   mods: Mod[];
@@ -10,30 +12,76 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
 });
 
 export function BuildSummary({ mods }: BuildSummaryProps) {
-  const installedCost = mods
-    .filter((mod) => mod.status === "Installed")
-    .reduce((total, mod) => total + mod.cost, 0);
-  const wishlistCost = mods
-    .filter((mod) => mod.status === "Wishlist")
-    .reduce((total, mod) => total + mod.cost, 0);
+  const {
+    totalModCount,
+    installedCount,
+    orderedCount,
+    wishlistCount,
+    installedCost,
+    plannedCost,
+    progress,
+  } = getBuildTelemetry(mods);
 
   return (
-    <section
-      aria-label="Build cost summary"
-      className="grid gap-4 sm:grid-cols-2"
-    >
-      <article className="rounded-2xl border border-white/10 bg-[#131819] p-5">
-        <p className="text-sm font-medium text-zinc-400">Installed Cost</p>
-        <p className="mt-2 text-2xl font-semibold text-lime-300">
-          {currencyFormatter.format(installedCost)}
+    <section className="build-telemetry" aria-label="Vehicle build telemetry">
+      <div>
+        <div className="build-telemetry__heading">
+          <h2 className="technical-label">Modification status</h2>
+          <span className="build-telemetry__tracked">{totalModCount} tracked</span>
+        </div>
+        <dl className="build-telemetry__status-grid">
+          <div className="build-telemetry__status">
+            <dt><StatusBadge status="Installed" /></dt>
+            <dd>{installedCount}</dd>
+          </div>
+          <div className="build-telemetry__status">
+            <dt><StatusBadge status="Ordered" /></dt>
+            <dd>{orderedCount}</dd>
+          </div>
+          <div className="build-telemetry__status">
+            <dt><StatusBadge status="Wishlist" /></dt>
+            <dd>{wishlistCount}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <dl className="build-telemetry__investment">
+        <div>
+          <dt className="technical-label">Installed cost</dt>
+          <dd className="build-telemetry__amount build-telemetry__amount--installed">
+            {currencyFormatter.format(installedCost)}
+          </dd>
+        </div>
+        <div>
+          <dt className="technical-label">Planned cost</dt>
+          <dd className="build-telemetry__amount">
+            {currencyFormatter.format(plannedCost)}
+          </dd>
+          <dd className="build-telemetry__caption">Ordered + wishlist</dd>
+        </div>
+      </dl>
+
+      <div className="build-telemetry__progress">
+        <div className="build-telemetry__heading">
+          <h2 className="technical-label">Tracked build progress</h2>
+          <span className="build-telemetry__percent">{progress}%</span>
+        </div>
+        <div
+          className="build-telemetry__track"
+          role="progressbar"
+          aria-label="Tracked modifications installed"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={progress}
+        >
+          <span style={{ width: `${progress}%` }} />
+        </div>
+        <p className="build-telemetry__caption">
+          {totalModCount === 0
+            ? "No tracked parts yet. This is not mechanical completeness."
+            : `${installedCount} of ${totalModCount} tracked parts installed; not mechanical completeness.`}
         </p>
-      </article>
-      <article className="rounded-2xl border border-white/10 bg-[#131819] p-5">
-        <p className="text-sm font-medium text-zinc-400">Wishlist Cost</p>
-        <p className="mt-2 text-2xl font-semibold text-white">
-          {currencyFormatter.format(wishlistCost)}
-        </p>
-      </article>
+      </div>
     </section>
   );
 }

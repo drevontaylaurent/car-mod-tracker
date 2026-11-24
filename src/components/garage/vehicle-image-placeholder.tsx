@@ -1,15 +1,17 @@
 interface VehicleImagePlaceholderProps {
   vehicleName: string;
+  variant?: "garage" | "build";
 }
 
 export function VehicleImagePlaceholder({
   vehicleName,
+  variant = "garage",
 }: VehicleImagePlaceholderProps) {
   return (
     <div
       role="img"
       aria-label={`Vehicle photo placeholder for ${vehicleName}`}
-      className="vehicle-visual"
+      className={`vehicle-visual${variant === "build" ? " vehicle-visual--build" : ""}`}
     >
       <div className="vehicle-visual__frame" aria-hidden="true" />
       <div className="vehicle-visual__topline">

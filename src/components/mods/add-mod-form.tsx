@@ -8,42 +8,42 @@ interface AddModFormProps {
   vehicleId: string;
 }
 
-const inputClassName =
-  "mt-2 h-11 w-full rounded-lg border border-white/10 bg-[#0b0e0f] px-3 text-sm text-white outline-none transition focus:border-lime-400";
-
 export function AddModForm({ vehicleId }: AddModFormProps) {
   const [state, formAction, isPending] = useActionState(createMod, undefined);
 
   return (
-    <section className="rounded-2xl border border-white/10 bg-[#131819] p-5 sm:p-6">
-      <h2 className="text-xl font-semibold text-white">Add a modification</h2>
-      <p className="mt-1 text-sm text-zinc-400">
+    <section className="build-add-form" aria-labelledby="add-mod-heading">
+      <p className="technical-label text-accent">Build system / 03</p>
+      <h2 id="add-mod-heading" className="mt-2 text-xl font-semibold text-foreground">
+        Add a modification
+      </h2>
+      <p className="mt-1 text-sm text-text-secondary">
         Record a part for this vehicle&apos;s build.
       </p>
-      <form action={formAction} className="mt-5 grid gap-4 sm:grid-cols-2">
+      <form action={formAction} className="build-add-form__fields">
         <input type="hidden" name="vehicleId" value={vehicleId} />
-        <label className="text-sm font-medium text-zinc-300">
-          Part Name
+        <label className="field-label">
+          Part name
           <input
             required
             maxLength={150}
             name="part_name"
-            className={inputClassName}
+            className="field-control mt-2"
             placeholder="Cold air intake"
           />
         </label>
-        <label className="text-sm font-medium text-zinc-300">
+        <label className="field-label">
           Brand
           <input
             maxLength={100}
             name="brand"
-            className={inputClassName}
+            className="field-control mt-2"
             placeholder="Brand name"
           />
         </label>
-        <label className="text-sm font-medium text-zinc-300">
+        <label className="field-label">
           Category
-          <select required name="category" defaultValue="" className={inputClassName}>
+          <select required name="category" defaultValue="" className="field-control mt-2">
             <option value="" disabled>
               Select a category
             </option>
@@ -54,13 +54,13 @@ export function AddModForm({ vehicleId }: AddModFormProps) {
             ))}
           </select>
         </label>
-        <label className="text-sm font-medium text-zinc-300">
+        <label className="field-label">
           Status
           <select
             required
             name="status"
             defaultValue="Wishlist"
-            className={inputClassName}
+            className="field-control mt-2"
           >
             {MOD_STATUSES.map((status) => (
               <option key={status} value={status}>
@@ -69,7 +69,7 @@ export function AddModForm({ vehicleId }: AddModFormProps) {
             ))}
           </select>
         </label>
-        <label className="text-sm font-medium text-zinc-300">
+        <label className="field-label">
           Cost
           <input
             required
@@ -77,30 +77,29 @@ export function AddModForm({ vehicleId }: AddModFormProps) {
             step="0.01"
             type="number"
             name="cost"
-            className={inputClassName}
+            className="field-control mt-2"
             placeholder="0.00"
           />
         </label>
-        <label className="text-sm font-medium text-zinc-300">
-          Install Date
-          <input type="date" name="install_date" className={inputClassName} />
+        <label className="field-label">
+          Install date
+          <input type="date" name="install_date" className="field-control mt-2" />
         </label>
-        <label className="text-sm font-medium text-zinc-300 sm:col-span-2">
+        <label className="field-label build-add-form__notes">
           Notes
           <textarea
             maxLength={2000}
             name="notes"
             rows={3}
-            className="mt-2 w-full rounded-lg border border-white/10 bg-[#0b0e0f] px-3 py-2 text-sm text-white outline-none transition focus:border-lime-400"
+            className="field-control mt-2"
             placeholder="Installation details, links, or reminders"
           />
         </label>
         {state && (
           <p
             role={state.success ? "status" : "alert"}
-            className={`text-sm sm:col-span-2 ${
-              state.success ? "text-lime-300" : "text-red-300"
-            }`}
+            className="state-message build-add-form__message"
+            data-tone={state.success ? "success" : "error"}
           >
             {state.success ? "Modification added to this build." : state.error}
           </p>
@@ -108,7 +107,7 @@ export function AddModForm({ vehicleId }: AddModFormProps) {
         <button
           type="submit"
           disabled={isPending}
-          className="h-11 rounded-lg bg-lime-400 px-5 text-sm font-semibold text-[#111513] transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-60 sm:col-span-2 sm:justify-self-start"
+          className="button-primary build-add-form__submit"
         >
           {isPending ? "Saving..." : "Add Modification"}
         </button>
