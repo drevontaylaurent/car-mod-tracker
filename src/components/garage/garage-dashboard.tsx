@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Vehicle } from "@/types/database";
-import { VehicleCard } from "@/components/garage/vehicle-card";
+import { GarageVehicleCarousel } from "@/components/garage/garage-vehicle-carousel";
 import { AddVehicleModal } from "@/components/garage/add-vehicle-modal";
 import { ApplicationHeader } from "@/components/layout/application-header";
 import type { GarageModSummary } from "@/types/garage";
@@ -13,15 +13,42 @@ interface GarageDashboardProps {
   summaryError?: string;
 }
 
+interface VehicleSelection {
+  vehicleId: string;
+  index: number;
+}
+
 export function GarageDashboard({
   vehicles,
   modSummaries = [],
   summaryError,
 }: GarageDashboardProps) {
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const summariesByVehicleId = new Map(
-    modSummaries.map((summary) => [summary.vehicleId, summary]),
+  const [selection, setSelection] = useState<VehicleSelection>({
+    vehicleId: vehicles[0]?.id ?? "",
+    index: 0,
+  });
+  const matchingIndex = vehicles.findIndex(
+    (vehicle) => vehicle.id === selection.vehicleId,
   );
+  const selectedIndex =
+    matchingIndex >= 0
+      ? matchingIndex
+      : Math.min(selection.index, Math.max(vehicles.length - 1, 0));
+  const selectedVehicle = vehicles[selectedIndex];
+  const selectedVehicleId = selectedVehicle?.id ?? "";
+
+  const handleBeforeDelete = (vehicleId?: string) => {
+    if (!selectedVehicle) return;
+    const deletedIndex = vehicleId
+      ? vehicles.findIndex((vehicle) => vehicle.id === vehicleId)
+      : selectedIndex;
+    const nextIndex =
+      deletedIndex >= 0 && deletedIndex < selectedIndex
+        ? selectedIndex - 1
+        : selectedIndex;
+    setSelection({ vehicleId: selectedVehicle.id, index: nextIndex });
+  };
 
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -52,19 +79,21 @@ export function GarageDashboard({
           <AddVehicleModal onClose={() => setIsFormOpen(false)} />
         )}
 
-        {vehicles.length > 0 ? (
-          <section
-            aria-label="Your vehicles"
-            className="mt-8 grid gap-6"
-          >
-            {vehicles.map((vehicle) => (
-              <VehicleCard
-                key={vehicle.id}
-                vehicle={vehicle}
-                summary={summariesByVehicleId.get(vehicle.id)}
-                summaryError={summaryError}
-              />
-            ))}
+        {selectedVehicle ? (
+          <section aria-label="Your vehicles" className="garage-stage mt-8">
+            <GarageVehicleCarousel
+              vehicles={vehicles}
+              selectedVehicleId={selectedVehicleId}
+              modSummaries={modSummaries}
+              summaryError={summaryError}
+              onBeforeDelete={handleBeforeDelete}
+              onSelectVehicle={(vehicleId) => {
+                const index = vehicles.findIndex(
+                  (vehicle) => vehicle.id === vehicleId,
+                );
+                if (index >= 0) setSelection({ vehicleId, index });
+              }}
+            />
           </section>
         ) : (
           <section className="garage-empty-state mt-8">

@@ -12,12 +12,14 @@ interface VehicleCardProps {
   vehicle: Vehicle;
   summary?: GarageModSummary;
   summaryError?: string;
+  onBeforeDelete?: () => void;
 }
 
 export function VehicleCard({
   vehicle,
   summary,
   summaryError,
+  onBeforeDelete,
 }: VehicleCardProps) {
   const [state, formAction, isPending] = useActionState(deleteVehicle, undefined);
   const specs = [
@@ -71,7 +73,7 @@ export function VehicleCard({
           >
             Open Build <span aria-hidden="true">→</span>
           </Link>
-          <form action={formAction}>
+          <form action={formAction} onSubmit={onBeforeDelete}>
             <input type="hidden" name="vehicleId" value={vehicle.id} />
             <button
               type="submit"
