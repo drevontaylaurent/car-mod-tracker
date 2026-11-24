@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import type { KeyboardEvent, ReactNode } from "react";
+import { AddModDialog } from "@/components/mods/add-mod-dialog";
 import { ModList } from "@/components/mods/mod-list";
 import type { Mod, ModCategory } from "@/types/database";
 import { VehicleMediaStage, type VehicleBuildTab } from "@/components/garage/vehicle-media-stage";
@@ -12,38 +13,29 @@ interface VehicleBuildWorkspaceProps {
   mods: Mod[];
   profile: ReactNode;
   build: ReactNode;
-  addMod: ReactNode;
 }
 
 const TABS: { id: VehicleBuildTab; label: string; mobileLabel: string }[] = [
   { id: "profile", label: "PROFILE", mobileLabel: "Profile" },
   { id: "build", label: "BUILD", mobileLabel: "Build" },
   { id: "parts", label: "PARTS", mobileLabel: "Parts" },
-  { id: "add", label: "+ ADD MOD", mobileLabel: "+ Add" },
 ];
-
 export function VehicleBuildWorkspace({
   vehicleId,
   vehicleName,
   mods,
   profile,
   build,
-  addMod,
 }: VehicleBuildWorkspaceProps) {
   const [activeTab, setActiveTab] = useState<VehicleBuildTab>("profile");
   const [selectedSystem, setSelectedSystem] = useState<ModCategory | null>(null);
+  const [isAddModOpen, setIsAddModOpen] = useState(false);
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const idPrefix = `vehicle-build-${vehicleId}`;
   const panels: Record<VehicleBuildTab, ReactNode> = {
     profile,
     build,
-    parts: (
-      <ModList
-        mods={mods}
-        onCategoryChange={setSelectedSystem}
-      />
-    ),
-    add: addMod,
+    parts: <ModList mods={mods} onCategoryChange={setSelectedSystem} />,
   };
 
   function handleTabKeyDown(
@@ -75,6 +67,25 @@ export function VehicleBuildWorkspace({
   return (
     <section className="build-experience" aria-label={`Build experience for ${vehicleName}`}>
       <h1 className="sr-only">Vehicle build: {vehicleName}</h1>
+      <div className="build-experience__toolbar">
+        <p className="technical-label">Vehicle / Actions</p>
+        <button
+          type="button"
+          className="button-primary build-add-mod-trigger"
+          aria-haspopup="dialog"
+          aria-expanded={isAddModOpen}
+          aria-controls={isAddModOpen ? "add-mod-dialog" : undefined}
+          onClick={() => setIsAddModOpen(true)}
+        >
+          + ADD MOD
+        </button>
+      </div>
+      {isAddModOpen && (
+        <AddModDialog
+          vehicleId={vehicleId}
+          onClose={() => setIsAddModOpen(false)}
+        />
+      )}
       <div className="build-tabs" role="tablist" aria-label="Vehicle build sections">
         {TABS.map((tab, index) => {
           const tabId = `${idPrefix}-tab-${tab.id}`;

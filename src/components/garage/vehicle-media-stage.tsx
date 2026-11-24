@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { VehicleImagePlaceholder } from "@/components/garage/vehicle-image-placeholder";
 import type { ModCategory } from "@/types/database";
 
-export type VehicleBuildTab = "profile" | "build" | "parts" | "add";
+export type VehicleBuildTab = "profile" | "build" | "parts";
 
 interface VehicleMediaStageProps {
   vehicleName: string;

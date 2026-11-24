@@ -5,7 +5,6 @@ import { getVehicleMods } from "@/actions/mods";
 import { getUserVehicle } from "@/actions/vehicles";
 import { SignOutControl } from "@/components/auth/sign-out-control";
 import { ApplicationHeader } from "@/components/layout/application-header";
-import { AddModForm } from "@/components/mods/add-mod-form";
 import { BuildSummary } from "@/components/mods/build-summary";
 import { VehicleBuildWorkspace } from "@/components/garage/vehicle-build-workspace";
 import { VehicleProfilePanel } from "@/components/garage/vehicle-profile-panel";
@@ -68,7 +67,6 @@ async function VehicleBuildContent({
             />
           }
           build={<BuildSummary mods={mods} />}
-          addMod={<AddModForm vehicleId={vehicle.id} />}
         />
       </div>
     </main>

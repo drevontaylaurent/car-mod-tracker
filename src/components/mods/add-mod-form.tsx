@@ -1,15 +1,23 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { createMod } from "@/actions/mods";
 import { MOD_CATEGORIES, MOD_STATUSES } from "@/types/database";
 
 interface AddModFormProps {
   vehicleId: string;
+  onCancel: () => void;
 }
 
-export function AddModForm({ vehicleId }: AddModFormProps) {
+export function AddModForm({ vehicleId, onCancel }: AddModFormProps) {
   const [state, formAction, isPending] = useActionState(createMod, undefined);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (state?.success) {
+      formRef.current?.reset();
+    }
+  }, [state]);
 
   return (
     <section className="build-add-form" aria-labelledby="add-mod-heading">
@@ -20,7 +28,11 @@ export function AddModForm({ vehicleId }: AddModFormProps) {
       <p className="mt-1 text-sm text-text-secondary">
         Record a part for this vehicle&apos;s build.
       </p>
-      <form action={formAction} className="build-add-form__fields">
+      <form
+        ref={formRef}
+        action={formAction}
+        className="build-add-form__fields"
+      >
         <input type="hidden" name="vehicleId" value={vehicleId} />
         <label className="field-label">
           Part name
@@ -104,13 +116,23 @@ export function AddModForm({ vehicleId }: AddModFormProps) {
             {state.success ? "Modification added to this build." : state.error}
           </p>
         )}
-        <button
-          type="submit"
-          disabled={isPending}
-          className="button-primary build-add-form__submit"
-        >
-          {isPending ? "Saving..." : "Add Modification"}
-        </button>
+        <div className="build-add-form__actions">
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={isPending}
+            className="button-secondary"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={isPending}
+            className="button-primary build-add-form__submit"
+          >
+            {isPending ? "Saving..." : "Add Modification"}
+          </button>
+        </div>
       </form>
     </section>
   );

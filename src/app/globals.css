@@ -836,11 +836,22 @@
     top: 0.5rem;
     z-index: 20;
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.25rem;
     border: 1px solid var(--border-subtle);
     background: var(--surface-primary);
     padding: 0.25rem;
+  }
+
+  .build-experience__toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .build-add-mod-trigger {
+    width: 100%;
   }
 
   .build-tab {
@@ -1290,8 +1301,17 @@
     resize: vertical;
   }
 
-  .build-add-form__message,
-  .build-add-form__submit {
+  .build-add-form__message {
+    width: 100%;
+  }
+
+  .build-add-form__actions {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+  }
+
+  .build-add-form__actions > button {
     width: 100%;
   }
 }
@@ -1316,6 +1336,17 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 1.25rem;
+  }
+
+  .build-experience__toolbar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .build-add-mod-trigger {
+    width: auto;
   }
 
   .build-tabs {
@@ -1370,8 +1401,17 @@
 
   .build-add-form__notes,
   .build-add-form__message,
-  .build-add-form__submit {
+  .build-add-form__actions {
     grid-column: 1 / -1;
+  }
+
+  .build-add-form__actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  .build-add-form__actions > button {
+    width: auto;
   }
 }
 
@@ -1403,8 +1443,7 @@
     padding-block: 0.5rem;
   }
 
-  .build-experience__panel[data-panel="parts"],
-  .build-experience__panel[data-panel="add"] {
+  .build-experience__panel[data-panel="parts"] {
     max-height: min(74vh, 52rem);
     overflow-y: auto;
     overscroll-behavior: contain;
