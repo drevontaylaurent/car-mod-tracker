@@ -5,13 +5,23 @@ import type { Vehicle } from "@/types/database";
 import { VehicleCard } from "@/components/garage/vehicle-card";
 import { AddVehicleModal } from "@/components/garage/add-vehicle-modal";
 import { ApplicationHeader } from "@/components/layout/application-header";
+import type { GarageModSummary } from "@/types/garage";
 
 interface GarageDashboardProps {
   vehicles: Vehicle[];
+  modSummaries?: GarageModSummary[];
+  summaryError?: string;
 }
 
-export function GarageDashboard({ vehicles }: GarageDashboardProps) {
+export function GarageDashboard({
+  vehicles,
+  modSummaries = [],
+  summaryError,
+}: GarageDashboardProps) {
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const summariesByVehicleId = new Map(
+    modSummaries.map((summary) => [summary.vehicleId, summary]),
+  );
 
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -19,27 +29,23 @@ export function GarageDashboard({ vehicles }: GarageDashboardProps) {
       <div className="mx-auto max-w-6xl px-5 py-10 sm:px-8 sm:py-14">
         <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-lime-300">
-              Car Mod Tracker
-            </p>
+            <p className="technical-label text-accent">Garage / Command center</p>
             <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-              Your garage
+              My Garage
             </h1>
             <p className="mt-2 text-sm text-zinc-400">
               {vehicles.length === 1
-                ? "1 vehicle in your collection"
-                : `${vehicles.length} vehicles in your collection`}
+                ? "01 vehicle in your collection"
+                : `${String(vehicles.length).padStart(2, "0")} vehicles in your collection`}
             </p>
           </div>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <button
-              type="button"
-              onClick={() => setIsFormOpen((isOpen) => !isOpen)}
-              className="button-primary"
-            >
-              {isFormOpen ? "Close form" : "Add Vehicle"}
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => setIsFormOpen((isOpen) => !isOpen)}
+            className="button-primary w-full sm:w-auto"
+          >
+            {isFormOpen ? "Close form" : "Add Vehicle"}
+          </button>
         </header>
 
         {isFormOpen && (
@@ -49,33 +55,39 @@ export function GarageDashboard({ vehicles }: GarageDashboardProps) {
         {vehicles.length > 0 ? (
           <section
             aria-label="Your vehicles"
-            className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
+            className="mt-8 grid gap-6"
           >
             {vehicles.map((vehicle) => (
-              <VehicleCard key={vehicle.id} vehicle={vehicle} />
+              <VehicleCard
+                key={vehicle.id}
+                vehicle={vehicle}
+                summary={summariesByVehicleId.get(vehicle.id)}
+                summaryError={summaryError}
+              />
             ))}
           </section>
         ) : (
-          <section className="mt-8 rounded-2xl border border-dashed border-white/15 bg-white/[0.02] px-6 py-16 text-center sm:py-20">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-lime-400/20 bg-lime-400/10 text-2xl text-lime-300">
-              +
+          <section className="garage-empty-state mt-8">
+            <div className="garage-empty-state__mark" aria-hidden="true">
+              01
             </div>
-            <h2 className="mt-5 text-xl font-semibold text-white">
-              Your garage is ready
+            <p className="technical-label mt-6 text-accent">
+              Vehicle profile / ready
+            </p>
+            <h2 className="mt-3 text-xl font-semibold text-white sm:text-2xl">
+              No vehicles in your garage
             </h2>
             <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-zinc-400">
-              Add your first vehicle to keep its build details, upgrades, and
-              notes all in one place.
+              Add your first vehicle to start a build profile. VIN decoding can
+              help fill in its year, make, model, and trim.
             </p>
-            {!isFormOpen && (
-              <button
-                type="button"
-                onClick={() => setIsFormOpen(true)}
-                className="button-primary mt-6"
-              >
-                Add Vehicle
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => setIsFormOpen(true)}
+              className="button-primary mt-6 w-full sm:w-auto"
+            >
+              Add your first vehicle
+            </button>
           </section>
         )}
       </div>

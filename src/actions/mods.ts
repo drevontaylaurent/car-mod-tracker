@@ -10,6 +10,7 @@ import {
   type ModInsert,
   type ModStatus,
 } from "@/types/database";
+import type { GarageModSummary } from "@/types/garage";
 
 type ModFormState = ActionResult<Mod> | undefined;
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
@@ -227,6 +228,71 @@ export async function getVehicleMods(
   } catch (error) {
     console.error("Modification lookup failed.", error);
     return { success: false, error: "Could not load modifications. Please try again." };
+  }
+}
+
+export async function getGarageModSummaries(): Promise<
+  ActionResult<GarageModSummary[]>
+> {
+  try {
+    const auth = await getAuthContext();
+    if (!auth.success) {
+      return { success: false, error: auth.error };
+    }
+
+    const { data, error } = await auth.data.supabase
+      .from("mods")
+      .select("vehicle_id,status,cost")
+      .eq("user_id", auth.data.userId);
+
+    if (error) {
+      console.error("Could not load garage modification summaries.", error);
+      return {
+        success: false,
+        error: "Modification summaries are unavailable. Please try again.",
+      };
+    }
+
+    const summaries = new Map<string, GarageModSummary>();
+
+    for (const mod of data) {
+      let summary = summaries.get(mod.vehicle_id);
+      if (!summary) {
+        summary = {
+          vehicleId: mod.vehicle_id,
+          totalModCount: 0,
+          installedCount: 0,
+          orderedCount: 0,
+          wishlistCount: 0,
+          installedCost: 0,
+          orderedCost: 0,
+          wishlistCost: 0,
+          plannedCost: 0,
+        };
+        summaries.set(mod.vehicle_id, summary);
+      }
+
+      summary.totalModCount += 1;
+      if (mod.status === "Installed") {
+        summary.installedCount += 1;
+        summary.installedCost += mod.cost;
+      } else if (mod.status === "Ordered") {
+        summary.orderedCount += 1;
+        summary.orderedCost += mod.cost;
+      } else {
+        summary.wishlistCount += 1;
+        summary.wishlistCost += mod.cost;
+      }
+      summary.plannedCost = summary.orderedCost + summary.wishlistCost;
+    }
+
+    return { success: true, data: Array.from(summaries.values()) };
+  } catch (error) {
+    console.error("Garage modification summary lookup failed.", error);
+    return {
+      success: false,
+      error: "Modification summaries are unavailable. Please try again.",
+    };
   }
 }
 

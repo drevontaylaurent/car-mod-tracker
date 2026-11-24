@@ -3,78 +3,91 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { deleteVehicle } from "@/actions/vehicles";
+import { VehicleBuildSummary } from "@/components/garage/vehicle-build-summary";
+import { VehicleImagePlaceholder } from "@/components/garage/vehicle-image-placeholder";
 import type { Vehicle } from "@/types/database";
+import type { GarageModSummary } from "@/types/garage";
 
 interface VehicleCardProps {
   vehicle: Vehicle;
+  summary?: GarageModSummary;
+  summaryError?: string;
 }
 
-export function VehicleCard({ vehicle }: VehicleCardProps) {
+export function VehicleCard({
+  vehicle,
+  summary,
+  summaryError,
+}: VehicleCardProps) {
   const [state, formAction, isPending] = useActionState(deleteVehicle, undefined);
+  const specs = [
+    vehicle.year,
+    vehicle.make,
+    vehicle.model,
+    vehicle.trim,
+  ].filter(Boolean);
   const title =
     vehicle.nickname ||
     [vehicle.year, vehicle.make, vehicle.model].filter(Boolean).join(" ") ||
-    "Vehicle";
+    "Vehicle profile";
 
   return (
-    <article className="flex min-h-56 flex-col rounded-2xl border border-white/10 bg-[#131819] p-5 transition hover:border-lime-400/30 sm:p-6">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-lime-300">
-            Vehicle
-          </p>
-          <h2 className="mt-2 text-xl font-semibold text-white">
+    <article className="vehicle-panel">
+      <VehicleImagePlaceholder vehicleName={title} />
+
+      <div className="vehicle-panel__content">
+        <div className="vehicle-panel__identity">
+          <div className="flex items-center justify-between gap-3">
+            <p className="technical-label">Vehicle / profile</p>
+            <span className="vehicle-panel__year">
+              {vehicle.year ?? "YEAR —"}
+            </span>
+          </div>
+          <h2 className="vehicle-panel__name">
             <Link
               href={`/garage/${vehicle.id}`}
-              className="transition hover:text-lime-300"
+              className="transition hover:text-accent"
             >
               {title}
             </Link>
           </h2>
-          {vehicle.nickname && (
-            <p className="mt-1 text-sm text-zinc-400">
-              {[vehicle.year, vehicle.make, vehicle.model, vehicle.trim]
-                .filter(Boolean)
-                .join(" ") || "Build details coming soon"}
-            </p>
-          )}
+          <p className="vehicle-panel__specs">
+            {vehicle.nickname
+              ? specs.join(" ") || "Vehicle specifications not set"
+              : vehicle.trim || "Vehicle build profile"}
+          </p>
+          <p className="vehicle-panel__vin">
+            <span className="technical-label">VIN / </span>
+            {vehicle.vin}
+          </p>
         </div>
-        <span className="rounded-full border border-white/10 px-2.5 py-1 text-xs text-zinc-400">
-          {vehicle.year ?? "Year N/A"}
-        </span>
-      </div>
 
-      <div className="mt-6 border-t border-white/5 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-          VIN
-        </p>
-        <p className="mt-1 break-all font-mono text-sm tracking-wide text-zinc-300">
-          {vehicle.vin}
-        </p>
-      </div>
+        <VehicleBuildSummary summary={summary} error={summaryError} />
 
-      <div className="mt-auto pt-5">
-        <Link
-          href={`/garage/${vehicle.id}`}
-          className="mb-4 inline-flex text-sm font-semibold text-lime-300 transition hover:text-lime-200"
-        >
-          Open build
-        </Link>
+        <div className="vehicle-panel__actions">
+          <Link
+            href={`/garage/${vehicle.id}`}
+            className="button-primary vehicle-panel__open-build"
+          >
+            Open Build <span aria-hidden="true">→</span>
+          </Link>
+          <form action={formAction}>
+            <input type="hidden" name="vehicleId" value={vehicle.id} />
+            <button
+              type="submit"
+              disabled={isPending}
+              aria-label={`Remove ${title} from garage`}
+              className="vehicle-panel__delete disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isPending ? "Removing..." : "Remove"}
+            </button>
+          </form>
+        </div>
         {state && !state.success && (
-          <p role="alert" className="mb-3 text-sm text-red-300">
+          <p role="alert" className="state-message" data-tone="error">
             {state.error}
           </p>
         )}
-        <form action={formAction}>
-          <input type="hidden" name="vehicleId" value={vehicle.id} />
-          <button
-            type="submit"
-            disabled={isPending}
-            className="text-sm font-medium text-zinc-500 transition hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isPending ? "Removing..." : "Remove vehicle"}
-          </button>
-        </form>
       </div>
     </article>
   );

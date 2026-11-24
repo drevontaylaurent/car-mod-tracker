@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
+import { getGarageModSummaries } from "@/actions/mods";
 import { getUserVehicles } from "@/actions/vehicles";
 import { GarageDashboard } from "@/components/garage/garage-dashboard";
 
@@ -14,19 +15,22 @@ export default function GaragePage() {
 
 async function GarageContent() {
   await connection();
-  const result = await getUserVehicles();
+  const [result, summaryResult] = await Promise.all([
+    getUserVehicles(),
+    getGarageModSummaries(),
+  ]);
 
   if (!result.success) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#0b0e0f] px-5 text-white">
-        <section className="max-w-md rounded-2xl border border-white/10 bg-[#131819] p-8 text-center">
+      <main className="flex min-h-screen items-center justify-center bg-background px-5 text-white">
+        <section className="surface-primary max-w-md p-8 text-center">
           <h1 className="text-xl font-semibold">Your garage isn&apos;t available</h1>
           <p role="alert" className="mt-3 text-sm leading-6 text-zinc-400">
             {result.error}
           </p>
           <Link
             href="/login"
-            className="mt-6 inline-flex h-11 items-center rounded-lg bg-lime-400 px-5 text-sm font-semibold text-[#111513] transition hover:bg-lime-300"
+            className="button-primary mt-6"
           >
             Return to sign in
           </Link>
@@ -35,14 +39,20 @@ async function GarageContent() {
     );
   }
 
-  return <GarageDashboard vehicles={result.data} />;
+  return (
+    <GarageDashboard
+      vehicles={result.data}
+      modSummaries={summaryResult.success ? summaryResult.data : []}
+      summaryError={summaryResult.success ? undefined : summaryResult.error}
+    />
+  );
 }
 
 function GarageLoading() {
   return (
     <main
       role="status"
-      className="flex min-h-screen items-center justify-center bg-[#0b0e0f] text-sm text-zinc-400"
+      className="flex min-h-screen items-center justify-center bg-background text-sm text-zinc-400"
     >
       Loading your garage...
     </main>

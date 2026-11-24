@@ -44,7 +44,7 @@ export function AddVehicleModal({ onClose }: AddVehicleModalProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="add-vehicle-heading"
-        className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-white/10 bg-[#131819] p-5 shadow-2xl shadow-black/50 sm:p-7"
+        className="surface-primary max-h-[90vh] w-full max-w-2xl overflow-y-auto p-5 sm:p-7"
       >
         <div className="mb-6 flex items-start justify-between gap-4">
           <div>
@@ -62,7 +62,7 @@ export function AddVehicleModal({ onClose }: AddVehicleModalProps) {
             type="button"
             onClick={onClose}
             aria-label="Close add vehicle dialog"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 text-zinc-400 transition hover:bg-white/5 hover:text-white"
+            className="button-ghost h-11 w-11 shrink-0 p-0 text-lg"
           >
             ×
           </button>
@@ -93,12 +93,12 @@ export function AddVehicleModal({ onClose }: AddVehicleModalProps) {
           />
 
           {state && !state.success && (
-            <p role="alert" className="mt-4 text-sm text-red-300">
+            <p role="alert" className="state-message mt-4" data-tone="error">
               {state.error}
             </p>
           )}
           {state?.success && (
-            <p role="status" className="mt-4 text-sm text-lime-300">
+            <p role="status" className="state-message mt-4" data-tone="success">
               Vehicle added to your garage.
             </p>
           )}
@@ -107,14 +107,14 @@ export function AddVehicleModal({ onClose }: AddVehicleModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="h-11 rounded-lg border border-white/10 px-4 text-sm font-medium text-zinc-300 transition hover:bg-white/5"
+              className="button-secondary"
             >
               Close
             </button>
             <button
               type="submit"
               disabled={isPending}
-              className="h-11 rounded-lg bg-lime-400 px-5 text-sm font-semibold text-[#111513] transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-60"
+              className="button-primary"
             >
               {isPending ? "Adding vehicle..." : "Save vehicle"}
             </button>
