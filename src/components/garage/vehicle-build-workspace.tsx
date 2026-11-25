@@ -10,6 +10,7 @@ import { VehicleMediaStage, type VehicleBuildTab } from "@/components/garage/veh
 interface VehicleBuildWorkspaceProps {
   vehicleId: string;
   vehicleName: string;
+  vehiclePhotoUrl: string | null;
   mods: Mod[];
   profile: ReactNode;
   build: ReactNode;
@@ -23,6 +24,7 @@ const TABS: { id: VehicleBuildTab; label: string; mobileLabel: string }[] = [
 export function VehicleBuildWorkspace({
   vehicleId,
   vehicleName,
+  vehiclePhotoUrl,
   mods,
   profile,
   build,
@@ -128,6 +130,7 @@ export function VehicleBuildWorkspace({
             vehicleName={vehicleName}
             activeTab={activeTab}
             selectedSystem={selectedSystem}
+            photoUrl={vehiclePhotoUrl}
           />
         </div>
         <div className="build-experience__panels">

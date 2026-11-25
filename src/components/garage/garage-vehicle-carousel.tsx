@@ -1,12 +1,12 @@
 "use client";
 
-import type { Vehicle } from "@/types/database";
 import type { GarageModSummary } from "@/types/garage";
 import { VehicleCarouselSlide } from "@/components/garage/vehicle-carousel-slide";
 import { useGarageVehicleCarousel } from "@/components/garage/use-garage-vehicle-carousel";
+import type { VehicleWithMedia } from "@/types/vehicle-media";
 
 interface GarageVehicleCarouselProps {
-  vehicles: Vehicle[];
+  vehicles: VehicleWithMedia[];
   selectedVehicleId: string;
   modSummaries: GarageModSummary[];
   summaryError?: string;

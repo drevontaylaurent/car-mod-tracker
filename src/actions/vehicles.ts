@@ -2,10 +2,15 @@
 
 import { revalidatePath } from "next/cache";
 import { decodeVin } from "@/lib/nhtsa";
+import {
+  removeVehiclePhotoObject,
+  withVehiclePhotoUrl,
+} from "@/lib/vehicle-media";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/types/actions";
 import type { Vehicle, VehicleInsert, VehicleUpdate } from "@/types/database";
 import type { DecodedVehicleInfo } from "@/types/nhtsa";
+import type { VehicleWithMedia } from "@/types/vehicle-media";
 
 type VehicleFormState = ActionResult<Vehicle> | undefined;
 type DeleteVehicleFormState = ActionResult<null> | undefined;
@@ -316,7 +321,7 @@ export async function updateVehicle(
   }
 }
 
-export async function getUserVehicles(): Promise<ActionResult<Vehicle[]>> {
+export async function getUserVehicles(): Promise<ActionResult<VehicleWithMedia[]>> {
   try {
     const supabase = await createClient();
     const {
@@ -350,7 +355,10 @@ export async function getUserVehicles(): Promise<ActionResult<Vehicle[]>> {
       return { success: false, error: "Could not load your vehicles. Please try again." };
     }
 
-    return { success: true, data };
+    const vehiclesWithMedia = await Promise.all(
+      data.map((vehicle) => withVehiclePhotoUrl(supabase, vehicle)),
+    );
+    return { success: true, data: vehiclesWithMedia };
   } catch (error) {
     console.error("Vehicle lookup failed.", error);
     return { success: false, error: "Could not load your vehicles. Please try again." };
@@ -359,7 +367,7 @@ export async function getUserVehicles(): Promise<ActionResult<Vehicle[]>> {
 
 export async function getUserVehicle(
   vehicleId: string,
-): Promise<ActionResult<Vehicle>> {
+): Promise<ActionResult<VehicleWithMedia>> {
   if (typeof vehicleId !== "string" || !UUID_PATTERN.test(vehicleId.trim())) {
     return { success: false, error: "Vehicle not found in your garage." };
   }
@@ -396,7 +404,10 @@ export async function getUserVehicle(
       return { success: false, error: "Vehicle not found in your garage." };
     }
 
-    return { success: true, data };
+    return {
+      success: true,
+      data: await withVehiclePhotoUrl(supabase, data),
+    };
   } catch (error) {
     console.error("Vehicle detail lookup failed.", error);
     return { success: false, error: "Could not load this vehicle. Please try again." };
@@ -407,10 +418,14 @@ export async function deleteVehicle(
   _previousState: DeleteVehicleFormState,
   formData: FormData,
 ): Promise<ActionResult<null>> {
-  const vehicleId = formData.get("vehicleId");
-  if (typeof vehicleId !== "string" || vehicleId.trim().length === 0) {
+  const vehicleIdValue = formData.get("vehicleId");
+  if (
+    typeof vehicleIdValue !== "string" ||
+    !UUID_PATTERN.test(vehicleIdValue.trim())
+  ) {
     return { success: false, error: "Select a valid vehicle to delete." };
   }
+  const vehicleId = vehicleIdValue.trim();
 
   try {
     const supabase = await createClient();
@@ -428,23 +443,123 @@ export async function deleteVehicle(
       return { success: false, error: "Sign in to delete a vehicle." };
     }
 
-    const { data, error } = await supabase
+    const { data: vehicle, error: vehicleError } = await supabase
       .from("vehicles")
-      .delete()
-      .eq("id", vehicleId.trim())
+      .select("id, photo_path")
+      .eq("id", vehicleId)
       .eq("user_id", user.id)
-      .select("id");
+      .maybeSingle();
 
-    if (error) {
-      console.error("Could not delete vehicle.", error);
+    let photoPath: string | null = null;
+    let photoColumnAvailable = true;
+    if (vehicleError) {
+      console.error("Could not load vehicle media before deletion.", {
+        code: vehicleError.code,
+      });
+      if (vehicleError.code === "PGRST204" || vehicleError.code === "42703") {
+        photoColumnAvailable = false;
+      } else {
+        return {
+          success: false,
+          error: "Could not verify this vehicle. Please try again.",
+        };
+      }
+    } else if (!vehicle) {
+      return { success: false, error: "Vehicle not found or already deleted." };
+    } else {
+      photoPath = vehicle.photo_path;
+    }
+
+    if (photoPath) {
+      const photoRemoval = await removeVehiclePhotoObject(supabase, photoPath);
+      if (!photoRemoval.success) {
+        return {
+          success: false,
+          error:
+            "Could not remove this vehicle's photo, so the vehicle was not deleted. Please try again.",
+        };
+      }
+    }
+
+    const deleteResult = photoColumnAvailable
+      ? photoPath
+        ? await supabase
+            .from("vehicles")
+            .delete()
+            .eq("id", vehicleId)
+            .eq("user_id", user.id)
+            .eq("photo_path", photoPath)
+            .select("id")
+        : await supabase
+            .from("vehicles")
+            .delete()
+            .eq("id", vehicleId)
+            .eq("user_id", user.id)
+            .is("photo_path", null)
+            .select("id")
+      : await supabase
+          .from("vehicles")
+          .delete()
+          .eq("id", vehicleId)
+          .eq("user_id", user.id)
+          .select("id");
+
+    if (deleteResult.error) {
+      console.error("Could not delete vehicle.", deleteResult.error);
+      if (photoPath) {
+        const { error: clearPhotoError } = await supabase
+          .from("vehicles")
+          .update({
+            photo_path: null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", vehicleId)
+          .eq("user_id", user.id)
+          .eq("photo_path", photoPath);
+        if (clearPhotoError) {
+          console.error("Could not clear the deleted vehicle photo reference.", {
+            code: clearPhotoError.code,
+          });
+        }
+        revalidatePath("/garage");
+        revalidatePath(`/garage/${vehicleId}`);
+        return {
+          success: false,
+          error:
+            "The photo was removed, but the vehicle could not be deleted. Please try again.",
+        };
+      }
       return { success: false, error: "Could not delete this vehicle. Please try again." };
     }
 
-    if (data.length === 0) {
-      return { success: false, error: "Vehicle not found or already deleted." };
+    if (deleteResult.data.length === 0) {
+      if (photoPath) {
+        const { error: clearPhotoError } = await supabase
+          .from("vehicles")
+          .update({
+            photo_path: null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", vehicleId)
+          .eq("user_id", user.id)
+          .eq("photo_path", photoPath);
+        if (clearPhotoError) {
+          console.error("Could not clear the deleted vehicle photo reference.", {
+            code: clearPhotoError.code,
+          });
+        }
+        revalidatePath("/garage");
+        revalidatePath(`/garage/${vehicleId}`);
+      }
+      return {
+        success: false,
+        error:
+          "Vehicle not found or its photo changed. Refresh your garage and try again.",
+      };
     }
 
     revalidatePath("/garage");
+    revalidatePath(`/garage/${vehicleId}`);
     return { success: true, data: null };
   } catch (error) {
     console.error("Vehicle deletion failed.", error);

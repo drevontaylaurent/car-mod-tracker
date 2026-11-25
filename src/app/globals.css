@@ -1003,7 +1003,7 @@
   .vehicle-visual--build {
     width: 100%;
     height: 100%;
-    min-height: inherit;
+    min-height: 13rem;
     aspect-ratio: auto;
     border: 0;
     background-size: 48px 48px;
@@ -1491,6 +1491,132 @@
 
   .app-nav__link {
     padding-inline: 0.5rem;
+  }
+}
+
+@layer components {
+  .vehicle-visual--photo {
+    display: block;
+    border: 0;
+  }
+
+  .vehicle-visual__loading-fallback {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+  }
+
+  .vehicle-visual__loading-fallback > .vehicle-visual {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    aspect-ratio: auto;
+    border: 0;
+  }
+
+  .vehicle-visual__photo {
+    z-index: 1;
+    object-fit: cover;
+    object-position: center;
+    opacity: 0;
+    transition: opacity 180ms ease;
+  }
+
+  .vehicle-visual--photo[data-photo-loaded="true"] .vehicle-visual__photo {
+    opacity: 1;
+  }
+
+  .vehicle-photo-manager {
+    display: grid;
+    min-width: 0;
+    gap: 1rem;
+    border-top: 1px solid var(--border-subtle);
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+  }
+
+  .vehicle-photo-manager__heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .vehicle-photo-manager__heading h3 {
+    margin-top: 0.375rem;
+    color: var(--foreground);
+    font-size: 0.9375rem;
+    font-weight: 650;
+  }
+
+  .vehicle-photo-manager__heading p:last-child {
+    margin-top: 0.25rem;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .vehicle-photo-manager__status {
+    color: var(--text-muted);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.5625rem;
+    letter-spacing: 0.08em;
+  }
+
+  .vehicle-photo-manager__preview {
+    height: 9rem;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--border-subtle);
+  }
+
+  .vehicle-photo-manager__preview > .vehicle-visual {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    aspect-ratio: auto;
+    border: 0;
+  }
+
+  .vehicle-photo-manager__upload {
+    display: grid;
+    min-width: 0;
+    gap: 0.625rem;
+  }
+
+  .vehicle-photo-manager__file {
+    min-width: 0;
+    max-width: 100%;
+    padding: 0.375rem;
+    font-size: 0.75rem;
+  }
+
+  .vehicle-photo-manager__file::file-selector-button {
+    min-height: 40px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface-secondary);
+    margin-right: 0.5rem;
+    padding: 0.375rem 0.625rem;
+    color: var(--foreground);
+    font: inherit;
+  }
+
+  .vehicle-photo-manager__action {
+    min-height: 44px;
+  }
+
+  .vehicle-photo-manager__remove {
+    min-height: 44px;
+    justify-content: flex-start;
+    padding-inline: 0;
+    color: var(--text-muted);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .vehicle-photo-manager__remove:hover {
+    color: var(--status-danger);
   }
 }
 

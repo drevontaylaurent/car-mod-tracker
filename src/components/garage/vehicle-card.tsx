@@ -5,12 +5,12 @@ import Link from "next/link";
 import { deleteVehicle } from "@/actions/vehicles";
 import { VehicleBuildSummary } from "@/components/garage/vehicle-build-summary";
 import { EditVehicleModal } from "@/components/garage/edit-vehicle-modal";
-import { VehicleImagePlaceholder } from "@/components/garage/vehicle-image-placeholder";
-import type { Vehicle } from "@/types/database";
+import { VehicleVisual } from "@/components/garage/vehicle-visual";
 import type { GarageModSummary } from "@/types/garage";
+import type { VehicleWithMedia } from "@/types/vehicle-media";
 
 interface VehicleCardProps {
-  vehicle: Vehicle;
+  vehicle: VehicleWithMedia;
   summary?: GarageModSummary;
   summaryError?: string;
   onBeforeDelete?: () => void;
@@ -38,7 +38,7 @@ export function VehicleCard({
   return (
     <>
       <article className="vehicle-panel">
-        <VehicleImagePlaceholder vehicleName={title} />
+        <VehicleVisual vehicleName={title} photoUrl={vehicle.photoUrl} />
 
         <div className="vehicle-panel__content">
           <div className="vehicle-panel__identity">

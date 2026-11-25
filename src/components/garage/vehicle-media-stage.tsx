@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { VehicleImagePlaceholder } from "@/components/garage/vehicle-image-placeholder";
+import { VehicleVisual } from "@/components/garage/vehicle-visual";
 import type { ModCategory } from "@/types/database";
 
 export type VehicleBuildTab = "profile" | "build" | "parts";
@@ -10,6 +10,7 @@ interface VehicleMediaStageProps {
   vehicleName: string;
   activeTab: VehicleBuildTab;
   selectedSystem: ModCategory | null;
+  photoUrl: string | null;
   visual?: ReactNode;
 }
 
@@ -17,6 +18,7 @@ export function VehicleMediaStage({
   vehicleName,
   activeTab,
   selectedSystem,
+  photoUrl,
   visual,
 }: VehicleMediaStageProps) {
   return (
@@ -28,7 +30,11 @@ export function VehicleMediaStage({
     >
       <div className="build-stage__viewport" data-vehicle-media-stage>
         {visual ?? (
-          <VehicleImagePlaceholder vehicleName={vehicleName} variant="build" />
+          <VehicleVisual
+            vehicleName={vehicleName}
+            photoUrl={photoUrl}
+            variant="build"
+          />
         )}
       </div>
       <figcaption className="build-stage__caption">

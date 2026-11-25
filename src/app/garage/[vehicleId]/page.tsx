@@ -58,6 +58,7 @@ async function VehicleBuildContent({
         <VehicleBuildWorkspace
           vehicleId={vehicle.id}
           vehicleName={vehicleName}
+          vehiclePhotoUrl={vehicle.photoUrl}
           mods={mods}
           profile={
             <VehicleProfilePanel

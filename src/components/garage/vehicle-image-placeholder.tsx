@@ -1,22 +1,37 @@
 interface VehicleImagePlaceholderProps {
   vehicleName: string;
   variant?: "garage" | "build";
+  state?: "empty" | "loading" | "unavailable";
 }
 
 export function VehicleImagePlaceholder({
   vehicleName,
   variant = "garage",
+  state = "empty",
 }: VehicleImagePlaceholderProps) {
+  const isLoading = state === "loading";
+  const isUnavailable = state === "unavailable";
+
   return (
     <div
       role="img"
-      aria-label={`Vehicle photo placeholder for ${vehicleName}`}
+      aria-label={
+        isUnavailable
+          ? `Vehicle photo unavailable for ${vehicleName}; showing fallback`
+          : `Vehicle photo ${isLoading ? "loading" : "placeholder"} for ${vehicleName}`
+      }
       className={`vehicle-visual${variant === "build" ? " vehicle-visual--build" : ""}`}
     >
       <div className="vehicle-visual__frame" aria-hidden="true" />
       <div className="vehicle-visual__topline">
         <span>VISUAL / 01</span>
-        <span>PHOTO SLOT OPEN</span>
+        <span>
+          {isLoading
+            ? "PHOTO LOADING"
+            : isUnavailable
+              ? "PHOTO UNAVAILABLE"
+              : "PHOTO SLOT OPEN"}
+        </span>
       </div>
       <div className="vehicle-visual__center">
         <svg
@@ -33,11 +48,21 @@ export function VehicleImagePlaceholder({
         </svg>
         <span className="technical-label">Vehicle image slot</span>
         <span className="vehicle-visual__hint">
-          Personal vehicle photography ready
+          {isLoading
+            ? "Loading vehicle photo"
+            : isUnavailable
+              ? "Futuristic visual fallback active"
+              : "Personal vehicle photography ready"}
         </span>
       </div>
       <div className="vehicle-visual__baseline" aria-hidden="true">
-        <span>NO PHOTO ADDED</span>
+        <span>
+          {isLoading
+            ? "LOADING IMAGE"
+            : isUnavailable
+              ? "FALLBACK ACTIVE"
+              : "NO PHOTO ADDED"}
+        </span>
         <span>PROFILE VISUAL</span>
       </div>
     </div>

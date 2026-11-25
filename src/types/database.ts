@@ -7,6 +7,7 @@ export interface Vehicle {
   model: string | null;
   trim: string | null;
   nickname: string | null;
+  photo_path: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -20,6 +21,7 @@ export interface VehicleInsert {
   model?: string | null;
   trim?: string | null;
   nickname?: string | null;
+  photo_path?: string | null;
   created_at?: string;
   updated_at?: string;
 }

@@ -3,10 +3,11 @@
 import { useActionState, useState } from "react";
 import { updateVehicle } from "@/actions/vehicles";
 import { VehicleFields } from "@/components/garage/vehicle-fields";
-import type { Vehicle } from "@/types/database";
+import { VehiclePhotoManager } from "@/components/garage/vehicle-photo-manager";
+import type { VehicleWithMedia } from "@/types/vehicle-media";
 
 interface EditVehicleModalProps {
-  vehicle: Vehicle;
+  vehicle: VehicleWithMedia;
   onClose: () => void;
 }
 
@@ -23,6 +24,10 @@ export function EditVehicleModal({
   const [model, setModel] = useState(vehicle.model ?? "");
   const [trim, setTrim] = useState(vehicle.trim ?? "");
   const [nickname, setNickname] = useState(vehicle.nickname ?? "");
+  const vehicleName =
+    vehicle.nickname ||
+    [vehicle.year, vehicle.make, vehicle.model].filter(Boolean).join(" ") ||
+    "Vehicle profile";
 
   function handleYearChange(value: string) {
     setYear(value);
@@ -127,6 +132,13 @@ export function EditVehicleModal({
             </button>
           </div>
         </form>
+        <VehiclePhotoManager
+          key={`${vehicle.id}:${vehicle.photo_path ?? "none"}`}
+          vehicleId={vehicle.id}
+          vehicleName={vehicleName}
+          hasPhoto={Boolean(vehicle.photo_path)}
+          photoUrl={vehicle.photoUrl}
+        />
       </section>
     </div>
   );

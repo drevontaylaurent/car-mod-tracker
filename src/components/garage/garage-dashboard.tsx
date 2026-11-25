@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import type { Vehicle } from "@/types/database";
 import { GarageVehicleCarousel } from "@/components/garage/garage-vehicle-carousel";
 import { AddVehicleModal } from "@/components/garage/add-vehicle-modal";
 import { ApplicationHeader } from "@/components/layout/application-header";
 import type { GarageModSummary } from "@/types/garage";
+import type { VehicleWithMedia } from "@/types/vehicle-media";
 
 interface GarageDashboardProps {
-  vehicles: Vehicle[];
+  vehicles: VehicleWithMedia[];
   modSummaries?: GarageModSummary[];
   summaryError?: string;
 }

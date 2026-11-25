@@ -1,9 +1,9 @@
 import { VehicleCard } from "@/components/garage/vehicle-card";
-import type { Vehicle } from "@/types/database";
 import type { GarageModSummary } from "@/types/garage";
+import type { VehicleWithMedia } from "@/types/vehicle-media";
 
 interface VehicleCarouselSlideProps {
-  vehicle: Vehicle;
+  vehicle: VehicleWithMedia;
   position: number;
   total: number;
   summary?: GarageModSummary;
