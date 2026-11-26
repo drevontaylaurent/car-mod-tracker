@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { updateVehicleDiagnostic } from "@/actions/diagnostics";
+import { SheetDialog } from "@/components/ui/sheet-dialog";
 import {
   DIAGNOSTIC_SEVERITIES,
-  type DiagnosticSeverity,
+  DIAGNOSTIC_STATUSES,
   type UpdateDiagnosticInput,
   type VehicleDiagnostic,
 } from "@/types/diagnostics";
@@ -13,31 +14,40 @@ import {
 interface DiagnosticEditFormProps {
   vehicleId: string;
   diagnostic: VehicleDiagnostic;
+  onClose: () => void;
+}
+
+function capitalize(value: string): string {
+  return value[0].toUpperCase() + value.slice(1);
 }
 
 export function DiagnosticEditForm({
   vehicleId,
   diagnostic,
+  onClose,
 }: DiagnosticEditFormProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [code, setCode] = useState(diagnostic.code);
-  const [severity, setSeverity] = useState<DiagnosticSeverity>(
-    diagnostic.severity,
-  );
   const router = useRouter();
-
-  function handleCodeChange(event: ChangeEvent<HTMLInputElement>) {
-    setCode(event.currentTarget.value.toUpperCase());
-  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const submittedCode = formData.get("code");
+    const code = formData.get("code");
     const notes = formData.get("notes");
-    if (typeof submittedCode !== "string" || typeof notes !== "string") {
-      setErrorMessage("Enter a diagnostic code and valid notes.");
+    const severity = DIAGNOSTIC_SEVERITIES.find(
+      (option) => option === formData.get("severity"),
+    );
+    const status = DIAGNOSTIC_STATUSES.find(
+      (option) => option === formData.get("status"),
+    );
+    if (
+      typeof code !== "string" ||
+      typeof notes !== "string" ||
+      !severity ||
+      !status
+    ) {
+      setErrorMessage("Enter a diagnostic code and valid details.");
       return;
     }
 
@@ -47,9 +57,10 @@ export function DiagnosticEditForm({
       const input: UpdateDiagnosticInput = {
         vehicleId,
         diagnosticId: diagnostic.id,
-        code: submittedCode,
+        code: code.trim().toUpperCase(),
         severity,
         notes,
+        ...(status !== diagnostic.status ? { status } : {}),
       };
       const result = await updateVehicleDiagnostic(input);
       if (!result.success) {
@@ -57,6 +68,7 @@ export function DiagnosticEditForm({
         return;
       }
       router.refresh();
+      onClose();
     } catch (error) {
       console.error("Diagnostic details update request failed.", error);
       setErrorMessage("Could not update this diagnostic. Please try again.");
@@ -66,59 +78,77 @@ export function DiagnosticEditForm({
   }
 
   return (
-    <form className="open-build__diagnostic-edit" onSubmit={handleSubmit}>
-      <label>
-        <span>Diagnostic code</span>
-        <input
-          name="code"
-          value={code}
-          onChange={handleCodeChange}
-          onBlur={() => setCode((currentCode) => currentCode.trim().toUpperCase())}
-          required
-          maxLength={32}
-          autoCapitalize="characters"
-          spellCheck={false}
-        />
-      </label>
-      <label>
-        <span>Severity</span>
-        <select
-          name="severity"
-          value={severity}
-          onChange={(event) => {
-            const selected = DIAGNOSTIC_SEVERITIES.find(
-              (option) => option === event.currentTarget.value,
-            );
-            if (selected) {
-              setSeverity(selected);
-            }
-          }}
-          required
-        >
-          {DIAGNOSTIC_SEVERITIES.map((option) => (
-            <option key={option} value={option}>
-              {option[0].toUpperCase() + option.slice(1)}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label>
-        <span>Notes</span>
-        <textarea
-          name="notes"
-          defaultValue={diagnostic.notes ?? ""}
-          maxLength={2000}
-          rows={2}
-        />
-      </label>
-      {errorMessage && (
-        <p role="alert" className="open-build__diagnostic-error">
-          {errorMessage}
-        </p>
-      )}
-      <button type="submit" className="button-secondary" disabled={isSaving}>
-        {isSaving ? "SAVING..." : "SAVE DETAILS"}
-      </button>
-    </form>
+    <SheetDialog eyebrow="OBD-II" title="Edit Diagnostic" onClose={onClose}>
+      <form onSubmit={handleSubmit} className="add-mod__form edit-sheet__form">
+        <label className="field-label add-mod__label add-mod__wide">
+          Diagnostic code *
+          <input
+            name="code"
+            defaultValue={diagnostic.code}
+            required
+            maxLength={32}
+            autoCapitalize="characters"
+            spellCheck={false}
+            className="field-control mt-2"
+          />
+        </label>
+        <label className="field-label add-mod__label">
+          Severity
+          <select
+            name="severity"
+            defaultValue={diagnostic.severity}
+            className="field-control mt-2"
+          >
+            {DIAGNOSTIC_SEVERITIES.map((option) => (
+              <option key={option} value={option}>
+                {capitalize(option)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="field-label add-mod__label">
+          Status
+          <select
+            name="status"
+            defaultValue={diagnostic.status}
+            className="field-control mt-2"
+          >
+            {DIAGNOSTIC_STATUSES.map((option) => (
+              <option key={option} value={option}>
+                {option === "resolved" ? "Fixed" : capitalize(option)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="field-label add-mod__label add-mod__wide">
+          Notes (optional)
+          <textarea
+            name="notes"
+            defaultValue={diagnostic.notes ?? ""}
+            maxLength={2000}
+            rows={3}
+            className="field-control mt-2"
+          />
+        </label>
+        {errorMessage && (
+          <p role="alert" className="state-message add-mod__wide" data-tone="error">
+            {errorMessage}
+          </p>
+        )}
+        <div className="add-mod__actions add-mod__wide">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isSaving}
+            className="button-secondary"
+          >
+            Cancel
+          </button>
+          <button type="submit" disabled={isSaving} className="button-primary">
+            {isSaving ? "Saving..." : "Save Changes"}
+          </button>
+        </div>
+      </form>
+    </SheetDialog>
   );
 }

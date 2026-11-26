@@ -55,6 +55,7 @@ export function BuildPhaseCard({
               {phase.status === "completed" ? "Total Cost" : "Est. Cost"}
             </span>
           </div>
+          <BuildPhaseManagement vehicleId={vehicleId} phase={phase} />
           <button
             type="button"
             className="build-timeline__toggle"
@@ -124,7 +125,6 @@ export function BuildPhaseCard({
           phaseId={phase.id}
           availableMods={availableMods}
         />
-        <BuildPhaseManagement vehicleId={vehicleId} phase={phase} />
         </div>
       </article>
     </li>

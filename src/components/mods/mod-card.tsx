@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { deleteMod, updateModStatus } from "@/actions/mods";
 import { MOD_STATUSES, type Mod } from "@/types/database";
 import { getSafePurchaseUrl } from "@/lib/purchase-url";
-import { ModPurchaseLinkEditor } from "./mod-purchase-link-editor";
+import { ActionMenu } from "@/components/ui/action-menu";
+import { EditModSheet } from "./edit-mod-sheet";
 
 interface ModCardProps {
   mod: Mod;
@@ -21,9 +22,8 @@ export function ModCard({ mod }: ModCardProps) {
   const [status, setStatus] = useState(mod.status);
   const [isPending, setIsPending] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [purchaseUrl, setPurchaseUrl] = useState(mod.purchase_url);
-  const [isLinkEditorOpen, setIsLinkEditorOpen] = useState(false);
-  const safePurchaseUrl = getSafePurchaseUrl(purchaseUrl);
+  const [isEditing, setIsEditing] = useState(false);
+  const safePurchaseUrl = getSafePurchaseUrl(mod.purchase_url);
 
   async function handleStatusChange(value: string) {
     const nextStatus = MOD_STATUSES.find((candidate) => candidate === value);
@@ -80,43 +80,19 @@ export function ModCard({ mod }: ModCardProps) {
         <p className="open-build__part-cost">
           {currencyFormatter.format(mod.cost)}
         </p>
-        <button
-          type="button"
-          onClick={() => setIsLinkEditorOpen((isOpen) => !isOpen)}
+        <ActionMenu
+          label={`More actions for ${mod.part_name}`}
           disabled={isPending}
-          aria-expanded={isLinkEditorOpen}
-          aria-label={`${purchaseUrl ? "Edit" : "Add"} purchase link for ${mod.part_name}`}
-          className="open-build__icon-button"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true" className="open-build__icon">
-            <path
-              d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
-        <button
-          type="button"
-          onClick={() => void handleDelete()}
-          disabled={isPending}
-          aria-label={`Delete ${mod.part_name}`}
-          className="open-build__icon-button open-build__delete"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true" className="open-build__icon">
-            <path
-              d="M4 7h16M9 7V4.5h6V7m-8 0 1 13h8l1-13M10 11v6m4-6v6"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
+          items={[
+            { key: "edit", label: "Edit", onSelect: () => setIsEditing(true) },
+            {
+              key: "delete",
+              label: "Delete",
+              destructive: true,
+              onSelect: () => void handleDelete(),
+            },
+          ]}
+        />
       </div>
       <p className="open-build__part-metadata">
         {mod.brand && <span className="open-build__part-brand">{mod.brand}</span>}
@@ -160,14 +136,10 @@ export function ModCard({ mod }: ModCardProps) {
         {mod.notes && (
           <p className="open-build__part-notes">{mod.notes}</p>
         )}
-        <ModPurchaseLinkEditor
-          mod={{ ...mod, purchase_url: purchaseUrl }}
-          disabled={isPending}
-          isOpen={isLinkEditorOpen}
-          onClose={() => setIsLinkEditorOpen(false)}
-          onSaved={setPurchaseUrl}
-        />
       </div>
+      {isEditing && (
+        <EditModSheet mod={mod} onClose={() => setIsEditing(false)} />
+      )}
       {errorMessage && (
         <p role="alert" className="state-message open-build__mod-error" data-tone="error">
           {errorMessage}

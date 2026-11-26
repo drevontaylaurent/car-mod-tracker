@@ -5,10 +5,12 @@ import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/types/actions";
 import {
   SELECTABLE_MOD_CATEGORIES,
+  MOD_CATEGORIES,
   MOD_STATUSES,
   type Mod,
   type ModInsert,
   type ModStatus,
+  type ModUpdate,
 } from "@/types/database";
 import type { GarageModSummary } from "@/types/garage";
 import { normalizePurchaseUrl } from "@/lib/purchase-url";
@@ -368,6 +370,85 @@ export async function createMod(
     return { success: true, data };
   } catch (error) {
     console.error("Modification creation failed.", error);
+    return { success: false, error: "Could not save this modification. Please try again." };
+  }
+}
+
+export async function updateMod(
+  _previousState: ModFormState,
+  formData: FormData,
+): Promise<ActionResult<Mod>> {
+  const modIdValue = formData.get("modId");
+  if (typeof modIdValue !== "string" || !isUuid(modIdValue.trim())) {
+    return { success: false, error: "Modification not found." };
+  }
+
+  const partName = readText(formData, "part_name", "Part name", 150, true);
+  const brand = readText(formData, "brand", "Brand", 100, false);
+  const category = readEnum(formData, "category", "Category", MOD_CATEGORIES);
+  const status = readEnum(formData, "status", "Status", MOD_STATUSES);
+  const cost = readCost(formData);
+  const installDate = readInstallDate(formData);
+  const notes = readText(formData, "notes", "Notes", 2000, false);
+  const purchaseUrl = normalizePurchaseUrl(formData.get("purchase_url"));
+
+  if (!partName.success) return partName;
+  if (!brand.success) return brand;
+  if (!category.success) return category;
+  if (!status.success) return status;
+  if (!cost.success) return cost;
+  if (!installDate.success) return installDate;
+  if (!notes.success) return notes;
+  if (!purchaseUrl.success) return purchaseUrl;
+
+  try {
+    const auth = await getAuthContext();
+    if (!auth.success) {
+      return auth;
+    }
+
+    const id = modIdValue.trim();
+    const ownership = await getOwnedModVehicleId(
+      auth.data.supabase,
+      id,
+      auth.data.userId,
+    );
+    if (!ownership.success) {
+      return ownership;
+    }
+
+    const { data, error } = await auth.data.supabase
+      .from("mods")
+      .update({
+        part_name: partName.data,
+        brand: brand.data,
+        category: category.data,
+        status: status.data,
+        cost: cost.data,
+        install_date: installDate.data,
+        notes: notes.data,
+        purchase_url: purchaseUrl.data,
+        updated_at: new Date().toISOString(),
+      } satisfies ModUpdate)
+      .eq("id", id)
+      .eq("vehicle_id", ownership.data)
+      .eq("user_id", auth.data.userId)
+      .select("*")
+      .maybeSingle();
+
+    if (error) {
+      console.error("Could not update vehicle modification.", error);
+      return { success: false, error: "Could not save this modification. Please try again." };
+    }
+    if (!data) {
+      return { success: false, error: "Modification not found." };
+    }
+
+    revalidatePath("/garage");
+    revalidatePath(`/garage/${ownership.data}`);
+    return { success: true, data };
+  } catch (error) {
+    console.error("Modification update failed.", error);
     return { success: false, error: "Could not save this modification. Please try again." };
   }
 }

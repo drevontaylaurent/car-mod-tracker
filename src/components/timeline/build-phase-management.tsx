@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { deleteBuildPhase } from "@/actions/build-timeline";
 import { EditBuildPhaseForm } from "@/components/timeline/edit-build-phase-form";
+import { ActionMenu } from "@/components/ui/action-menu";
 import type { BuildPhase } from "@/types/build-timeline";
 
 interface BuildPhaseManagementProps {
@@ -15,6 +16,7 @@ export function BuildPhaseManagement({
   vehicleId,
   phase,
 }: BuildPhaseManagementProps) {
+  const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
@@ -47,21 +49,30 @@ export function BuildPhaseManagement({
 
   return (
     <>
-      <div className="build-timeline__phase-actions">
-        <EditBuildPhaseForm vehicleId={vehicleId} phase={phase} />
-        <button
-          type="button"
-          className="build-timeline__delete-phase"
-          onClick={() => void handleDelete()}
-          disabled={isDeleting}
-        >
-          {isDeleting ? "DELETING..." : "DELETE PHASE"}
-        </button>
-      </div>
+      <ActionMenu
+        label={`More actions for phase ${phase.name}`}
+        disabled={isDeleting}
+        items={[
+          { key: "edit", label: "Edit Phase", onSelect: () => setIsEditing(true) },
+          {
+            key: "delete",
+            label: "Delete Phase",
+            destructive: true,
+            onSelect: () => void handleDelete(),
+          },
+        ]}
+      />
       {errorMessage && (
         <p role="alert" className="build-timeline__error">
           {errorMessage}
         </p>
+      )}
+      {isEditing && (
+        <EditBuildPhaseForm
+          vehicleId={vehicleId}
+          phase={phase}
+          onClose={() => setIsEditing(false)}
+        />
       )}
     </>
   );

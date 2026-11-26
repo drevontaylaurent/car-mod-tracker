@@ -1,4 +1,3 @@
-import { DiagnosticEditForm } from "@/components/diagnostics/diagnostic-edit-form";
 import { DiagnosticRowControls } from "@/components/diagnostics/diagnostic-row-controls";
 import type { VehicleDiagnostic } from "@/types/diagnostics";
 
@@ -29,7 +28,7 @@ export function DiagnosticRow({
           {diagnostic.code}
         </strong>
         <span className="open-build__diagnostic-notes">
-          {diagnostic.notes ?? statusLabel}
+          {diagnostic.notes ? `${statusLabel} · ${diagnostic.notes}` : statusLabel}
         </span>
         <span
           className="open-build__diagnostic-severity"
@@ -38,34 +37,16 @@ export function DiagnosticRow({
         >
           {diagnostic.status === "resolved" ? "Fixed" : severityLabel}
         </span>
+        <DiagnosticRowControls vehicleId={vehicleId} diagnostic={diagnostic} />
       </div>
-      <details className="open-build__diagnostic-manage">
-        <summary>
-          Manage
-          <span className="sr-only"> {diagnostic.code}</span>
-          {diagnostic.status !== "resolved" && (
-            <span className="open-build__diagnostic-state"> · {statusLabel}</span>
-          )}
-        </summary>
-        {diagnostic.status === "resolved" && diagnostic.resolved_at && (
-          <p className="open-build__diagnostic-resolved">
-            Marked fixed by the vehicle owner ·{" "}
-            <time dateTime={diagnostic.resolved_at}>
-              {diagnostic.resolved_at.slice(0, 10)}
-            </time>
-          </p>
-        )}
-        <div className="open-build__diagnostic-actions">
-          <DiagnosticRowControls vehicleId={vehicleId} diagnostic={diagnostic} />
-          <details className="open-build__diagnostic-details">
-            <summary>Edit details</summary>
-            <DiagnosticEditForm
-              vehicleId={vehicleId}
-              diagnostic={diagnostic}
-            />
-          </details>
-        </div>
-      </details>
+      {diagnostic.status === "resolved" && diagnostic.resolved_at && (
+        <p className="open-build__diagnostic-resolved">
+          Marked fixed ·{" "}
+          <time dateTime={diagnostic.resolved_at}>
+            {diagnostic.resolved_at.slice(0, 10)}
+          </time>
+        </p>
+      )}
     </li>
   );
 }

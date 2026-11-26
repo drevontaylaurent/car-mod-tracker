@@ -86,7 +86,9 @@ export function ModList({ mods, statusFilter, onResetStatusFilter }: ModListProp
 
       {filteredMods.length > 0 ? (
         <div className="open-build__mod-rows">
-          {filteredMods.map((mod) => <ModCard key={mod.id} mod={mod} />)}
+          {filteredMods.map((mod) => (
+            <ModCard key={`${mod.id}:${mod.updated_at}`} mod={mod} />
+          ))}
         </div>
       ) : (
         <div className="open-build__empty-state">

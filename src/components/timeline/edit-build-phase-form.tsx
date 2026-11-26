@@ -3,20 +3,22 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { updateBuildPhase } from "@/actions/build-timeline";
+import { SheetDialog } from "@/components/ui/sheet-dialog";
 import type { BuildPhase } from "@/types/build-timeline";
 
 interface EditBuildPhaseFormProps {
   vehicleId: string;
   phase: BuildPhase;
+  onClose: () => void;
 }
 
 export function EditBuildPhaseForm({
   vehicleId,
   phase,
+  onClose,
 }: EditBuildPhaseFormProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
   const router = useRouter();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -36,7 +38,6 @@ export function EditBuildPhaseForm({
 
     setIsSaving(true);
     setErrorMessage(null);
-    setSaved(false);
     try {
       const result = await updateBuildPhase({
         vehicleId,
@@ -49,8 +50,8 @@ export function EditBuildPhaseForm({
         setErrorMessage(result.error);
         return;
       }
-      setSaved(true);
       router.refresh();
+      onClose();
     } catch (error) {
       console.error("Build phase detail update request failed.", error);
       setErrorMessage("Could not save phase details. Please try again.");
@@ -60,9 +61,8 @@ export function EditBuildPhaseForm({
   }
 
   return (
-    <details className="build-timeline__edit-details">
-      <summary>Edit phase details</summary>
-      <form className="build-timeline__phase-form" onSubmit={handleSubmit}>
+    <SheetDialog eyebrow="BUILD TIMELINE" title="Edit Phase" onClose={onClose}>
+      <form className="build-timeline__phase-form edit-sheet__form" onSubmit={handleSubmit}>
         <label>
           <span>PHASE NAME</span>
           <input
@@ -95,15 +95,15 @@ export function EditBuildPhaseForm({
             {errorMessage}
           </p>
         )}
-        {saved && (
-          <p role="status" className="build-timeline__success">
-            Phase details saved.
-          </p>
-        )}
-        <button type="submit" className="button-secondary" disabled={isSaving}>
-          {isSaving ? "SAVING..." : "SAVE DETAILS"}
-        </button>
+        <div className="add-mod__actions">
+          <button type="button" className="button-secondary" onClick={onClose} disabled={isSaving}>
+            Cancel
+          </button>
+          <button type="submit" className="button-primary" disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save Changes"}
+          </button>
+        </div>
       </form>
-    </details>
+    </SheetDialog>
   );
 }

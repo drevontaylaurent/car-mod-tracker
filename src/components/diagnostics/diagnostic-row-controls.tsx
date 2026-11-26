@@ -1,17 +1,16 @@
 "use client";
 
-import { useState, type ChangeEvent } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   deleteVehicleDiagnostic,
   resolveVehicleDiagnostic,
   updateVehicleDiagnostic,
 } from "@/actions/diagnostics";
+import { DiagnosticEditForm } from "@/components/diagnostics/diagnostic-edit-form";
+import { ActionMenu, type ActionMenuItem } from "@/components/ui/action-menu";
 import type { ActionResult } from "@/types/actions";
-import {
-  DIAGNOSTIC_STATUSES,
-  type VehicleDiagnostic,
-} from "@/types/diagnostics";
+import type { VehicleDiagnostic } from "@/types/diagnostics";
 
 interface DiagnosticRowControlsProps {
   vehicleId: string;
@@ -23,8 +22,10 @@ export function DiagnosticRowControls({
   diagnostic,
 }: DiagnosticRowControlsProps) {
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
+  const isResolved = diagnostic.status === "resolved";
 
   async function runAction<T>(
     action: () => Promise<ActionResult<T>>,
@@ -47,30 +48,6 @@ export function DiagnosticRowControls({
     }
   }
 
-  function handleStatusChange(event: ChangeEvent<HTMLSelectElement>) {
-    const status = DIAGNOSTIC_STATUSES.find(
-      (candidate) => candidate === event.currentTarget.value,
-    );
-    if (status) {
-      void runAction(
-        () =>
-          updateVehicleDiagnostic({
-            vehicleId,
-            diagnosticId: diagnostic.id,
-            status,
-          }),
-        "Could not update this diagnostic. Please try again.",
-      );
-    }
-  }
-
-  function handleResolve() {
-    void runAction(
-      () => resolveVehicleDiagnostic(vehicleId, diagnostic.id),
-      "Could not mark this diagnostic fixed. Please try again.",
-    );
-  }
-
   function handleDelete() {
     if (!window.confirm(`Delete diagnostic ${diagnostic.code}?`)) {
       return;
@@ -81,47 +58,59 @@ export function DiagnosticRowControls({
     );
   }
 
+  const stateItem: ActionMenuItem = isResolved
+    ? {
+        key: "reopen",
+        label: "Reopen",
+        onSelect: () =>
+          void runAction(
+            () =>
+              updateVehicleDiagnostic({
+                vehicleId,
+                diagnosticId: diagnostic.id,
+                status: "active",
+              }),
+            "Could not reopen this diagnostic. Please try again.",
+          ),
+      }
+    : {
+        key: "fix",
+        label: "Mark Fixed",
+        onSelect: () =>
+          void runAction(
+            () => resolveVehicleDiagnostic(vehicleId, diagnostic.id),
+            "Could not mark this diagnostic fixed. Please try again.",
+          ),
+      };
+
   return (
-    <div className="open-build__diagnostic-controls" aria-busy={isUpdating}>
-      <label>
-        <span className="sr-only">Status for {diagnostic.code}</span>
-        <select
-          value={diagnostic.status}
-          onChange={handleStatusChange}
-          disabled={isUpdating}
-        >
-          {DIAGNOSTIC_STATUSES.map((status) => (
-            <option key={status} value={status}>
-              {status === "resolved"
-                ? "Fixed"
-                : status[0].toUpperCase() + status.slice(1)}
-            </option>
-          ))}
-        </select>
-      </label>
-      {diagnostic.status !== "resolved" && (
-        <button
-          type="button"
-          className="open-build__diagnostic-resolve"
-          onClick={handleResolve}
-          disabled={isUpdating}
-        >
-          MARK FIXED
-        </button>
-      )}
-      <button
-        type="button"
-        className="open-build__diagnostic-delete"
-        onClick={handleDelete}
+    <>
+      <ActionMenu
+        label={`More actions for diagnostic ${diagnostic.code}`}
         disabled={isUpdating}
-      >
-        DELETE
-      </button>
+        items={[
+          { key: "edit", label: "Edit", onSelect: () => setIsEditing(true) },
+          stateItem,
+          {
+            key: "delete",
+            label: "Delete",
+            destructive: true,
+            onSelect: handleDelete,
+          },
+        ]}
+      />
       {errorMessage && (
         <p role="alert" className="open-build__diagnostic-error">
           {errorMessage}
         </p>
       )}
-    </div>
+      {isEditing && (
+        <DiagnosticEditForm
+          vehicleId={vehicleId}
+          diagnostic={diagnostic}
+          onClose={() => setIsEditing(false)}
+        />
+      )}
+    </>
   );
 }
