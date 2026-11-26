@@ -1,31 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import {
-  type Mod,
-  type ModCategory,
-  type ModStatus,
-} from "@/types/database";
+import { type Mod, type ModStatus } from "@/types/database";
+import { MOD_CATEGORY_GROUPS, type ModCategoryGroupId } from "@/lib/mod-categories";
 import { ModCard } from "@/components/mods/mod-card";
 
-type CategoryGroupId = "power" | "interior" | "exterior" | "maintenance";
-
-interface CategoryGroup {
-  id: CategoryGroupId;
-  label: string;
-  categories: readonly ModCategory[];
-}
-
-const categoryGroups: readonly CategoryGroup[] = [
-  {
-    id: "power",
-    label: "POWER MODS",
-    categories: ["Engine", "Suspension", "Exhaust", "Wheels/Tires", "Electronics"],
-  },
-  { id: "interior", label: "INTERIOR", categories: ["Interior"] },
-  { id: "exterior", label: "EXTERIOR", categories: ["Exterior"] },
-  { id: "maintenance", label: "MAINTENANCE PARTS", categories: [] },
-];
+const categoryGroups = MOD_CATEGORY_GROUPS;
 
 interface ModListProps {
   mods: Mod[];
@@ -33,7 +13,7 @@ interface ModListProps {
 }
 
 export function ModList({ mods, statusFilter }: ModListProps) {
-  const [categoryFilter, setCategoryFilter] = useState<CategoryGroupId | "all">(
+  const [categoryFilter, setCategoryFilter] = useState<ModCategoryGroupId | "all">(
     "all",
   );
   const statusFilteredMods = mods.filter(
@@ -45,7 +25,7 @@ export function ModList({ mods, statusFilter }: ModListProps) {
   const filteredMods = statusFilteredMods.filter(
     (mod) => !selectedGroup || selectedGroup.categories.includes(mod.category),
   );
-  const categoryGroupCounts = new Map<CategoryGroupId, number>();
+  const categoryGroupCounts = new Map<ModCategoryGroupId, number>();
   for (const group of categoryGroups) {
     categoryGroupCounts.set(
       group.id,
@@ -87,7 +67,7 @@ export function ModList({ mods, statusFilter }: ModListProps) {
             onClick={() => setCategoryFilter(group.id)}
             className="open-build__category-filter"
           >
-            <span>{group.label}</span>
+            <span>{group.label.toUpperCase()}</span>
             <span className="open-build__category-count">
               {categoryGroupCounts.get(group.id) ?? 0}
             </span>

@@ -9,29 +9,31 @@ interface AddModDialogProps {
 
 export function AddModDialog({ vehicleId, onClose }: AddModDialogProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4">
+    <div className="add-mod__backdrop">
       <section
         id="add-mod-dialog"
         role="dialog"
         aria-modal="true"
         aria-labelledby="add-mod-heading"
-        className="surface-primary max-h-[90vh] w-full max-w-3xl overflow-y-auto p-4 sm:p-6"
+        className="add-mod__sheet"
       >
-        <div className="mb-3 flex justify-end">
+        <header className="add-mod__header">
+          <div>
+            <p className="technical-label text-accent">Vehicle / Actions</p>
+            <h2 id="add-mod-heading" className="add-mod__title">
+              Add Modification to Build
+            </h2>
+          </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close Add Modification form"
-            className="button-ghost h-11 w-11 p-0 text-lg"
+            className="add-mod__close"
           >
-            ×
+            <span aria-hidden="true">×</span>
           </button>
-        </div>
-        <AddModForm
-          vehicleId={vehicleId}
-          onCancel={onClose}
-          onSuccess={onClose}
-        />
+        </header>
+        <AddModForm vehicleId={vehicleId} onCancel={onClose} onSuccess={onClose} />
       </section>
     </div>
   );

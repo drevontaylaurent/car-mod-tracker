@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/types/actions";
 import {
-  MOD_CATEGORIES,
+  SELECTABLE_MOD_CATEGORIES,
   MOD_STATUSES,
   type Mod,
   type ModInsert,
@@ -308,7 +308,7 @@ export async function createMod(
 
   const partName = readText(formData, "part_name", "Part name", 150, true);
   const brand = readText(formData, "brand", "Brand", 100, false);
-  const category = readEnum(formData, "category", "Category", MOD_CATEGORIES);
+  const category = readEnum(formData, "category", "Category", SELECTABLE_MOD_CATEGORIES);
   const status = readEnum(formData, "status", "Status", MOD_STATUSES);
   const cost = readCost(formData);
   const installDate = readInstallDate(formData);

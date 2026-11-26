@@ -47,9 +47,21 @@ export const MOD_CATEGORIES = [
   "Interior",
   "Wheels/Tires",
   "Electronics",
+  "Power Mods",
+  "Maintenance Parts",
 ] as const;
 
 export type ModCategory = (typeof MOD_CATEGORIES)[number];
+
+// Categories offered for new modifications; legacy values remain valid for stored rows.
+export const SELECTABLE_MOD_CATEGORIES = [
+  "Power Mods",
+  "Interior",
+  "Exterior",
+  "Maintenance Parts",
+] as const satisfies readonly ModCategory[];
+
+export type SelectableModCategory = (typeof SELECTABLE_MOD_CATEGORIES)[number];
 
 export const MOD_STATUSES = ["Wishlist", "Ordered", "Installed"] as const;
 
