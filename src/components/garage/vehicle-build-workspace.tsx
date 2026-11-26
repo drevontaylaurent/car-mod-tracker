@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { BuildHeader } from "@/components/garage/build-header";
+import { BuildStatusPill } from "@/components/garage/build-status-pill";
 import { AddModDialog } from "@/components/mods/add-mod-dialog";
 import { ModList } from "@/components/mods/mod-list";
 import { BuildSummary } from "@/components/mods/build-summary";
@@ -69,20 +70,18 @@ export function VehicleBuildWorkspace({
           photoUrl={vehicle.photoUrl}
         />
         <div className="open-build__identity">
-          <p className="technical-label text-accent">Vehicle / Open build</p>
+          <BuildStatusPill mods={mods} />
           <h2 className="open-build__title">{vehicleName}</h2>
-          {vehicle.nickname && (
+          {vehicle.nickname && vehicleSpecifications.length > 0 && (
             <p className="open-build__specifications">
-              {vehicleSpecifications.join(" / ") || "Vehicle specifications not set"}
+              {vehicleSpecifications.join(" ")}
             </p>
-          )}
-          {!vehicle.nickname && vehicle.trim && (
-            <p className="open-build__specifications">Trim / {vehicle.trim}</p>
           )}
           <VehicleProfilePanel
             vehicle={vehicle}
             diagnostics={diagnostics}
             diagnosticsError={diagnosticsError}
+            onOpenDiagnostics={() => setActiveSection("diagnostics")}
           />
         </div>
       </div>

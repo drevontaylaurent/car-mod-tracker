@@ -2189,14 +2189,14 @@
 @layer components {
   .open-build__hero {
     display: grid;
-    grid-template-columns: minmax(6rem, 0.7fr) minmax(0, 1.3fr);
+    grid-template-columns: 5rem minmax(0, 1fr);
     align-items: center;
     min-width: 0;
-    gap: 0.625rem;
+    gap: 0.875rem;
     border: 1px solid var(--border-subtle);
     border-radius: 1rem;
     background: var(--surface-primary);
-    padding: 0.625rem;
+    padding: 0.875rem;
   }
 
   .open-build__visual {
@@ -2207,7 +2207,7 @@
   .open-build__visual-frame {
     position: relative;
     min-width: 0;
-    height: clamp(6.25rem, 27vw, 8rem);
+    height: 5rem;
     overflow: hidden;
     border: 1px solid var(--border-strong);
     border-radius: 0.75rem;
@@ -2223,15 +2223,13 @@
   }
 
   .open-build__visual-caption {
-    border: 1px solid var(--border-subtle);
-    border-top: 0;
-    background: var(--surface-primary);
-    padding: 0.45rem 0.65rem;
+    margin-top: 0.3rem;
     color: var(--text-muted);
     font-family: var(--font-geist-mono), monospace;
-    font-size: 0.56rem;
-    letter-spacing: 0.06em;
-    line-height: 1.4;
+    font-size: 0.5rem;
+    letter-spacing: 0.05em;
+    line-height: 1.3;
+    text-align: center;
     text-transform: uppercase;
   }
 
@@ -2239,109 +2237,146 @@
     min-width: 0;
   }
 
-  .open-build__title {
-    margin-top: 0.5rem;
-    overflow-wrap: anywhere;
-    color: var(--foreground);
-    font-size: clamp(1.05rem, 5vw, 1.65rem);
-    font-weight: 650;
-    letter-spacing: -0.06em;
-    line-height: 1;
-  }
-
-  .open-build__specifications {
-    margin-top: 0.5rem;
-    overflow-wrap: anywhere;
-    color: var(--text-secondary);
-    font-size: 0.8125rem;
-    line-height: 1.5;
-  }
-
-  .open-build__profile {
-    display: grid;
-    min-width: 0;
-    gap: 0.5rem;
-    margin-top: 0.625rem;
-  }
-
-  .open-build__profile-tools {
-    display: grid;
-    min-width: 0;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
-    gap: 0.5rem;
-  }
-
-  .open-build__specs {
-    min-width: 0;
-    border: 1px solid var(--border-subtle);
-    background: var(--surface-primary);
-  }
-
-  .open-build__obd-status {
-    display: flex;
-    min-width: 0;
-    min-height: 44px;
+  .open-build__status-pill {
+    display: inline-flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-    border: 1px solid var(--border-subtle);
-    background: var(--surface-primary);
-    padding: 0.45rem 0.65rem;
+    gap: 0.4rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
     color: var(--text-secondary);
     font-family: var(--font-geist-mono), monospace;
     font-size: 0.58rem;
     font-weight: 650;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
-  .open-build__obd-state {
-    max-width: 70%;
-    color: var(--text-muted);
-    font-size: 0.52rem;
+  .open-build__status-dot {
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 999px;
+    background: var(--status-neutral);
+  }
+
+  .open-build__status-pill[data-status="in-progress"],
+  .open-build__status-pill[data-status="complete"] {
+    border-color: color-mix(in srgb, var(--status-success) 55%, transparent);
+    color: var(--status-success);
+  }
+
+  .open-build__status-pill[data-status="in-progress"] .open-build__status-dot,
+  .open-build__status-pill[data-status="complete"] .open-build__status-dot {
+    background: var(--status-success);
+  }
+
+  .open-build__title {
+    margin-top: 0.4rem;
     overflow-wrap: anywhere;
-    text-align: right;
+    color: var(--foreground);
+    font-size: clamp(1rem, 4.4vw, 1.9rem);
+    font-weight: 750;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+    text-transform: uppercase;
   }
 
-  .open-build__obd-status[data-severity="critical"] .open-build__obd-state {
-    color: var(--status-danger);
+  .open-build__specifications {
+    margin-top: 0.3rem;
+    overflow-wrap: anywhere;
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+    line-height: 1.4;
   }
 
-  .open-build__obd-status[data-severity="minor"] .open-build__obd-state {
-    color: var(--status-warning);
-  }
-
-  .open-build__obd-divider {
-    color: var(--text-muted);
-  }
-
-  .open-build__specs-trigger {
+  .open-build__profile {
     display: flex;
-    min-height: 44px;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+    margin-top: 0.6rem;
+  }
+
+  .open-build__chip {
+    display: inline-flex;
+    min-height: 36px;
     align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    padding: 0.625rem 0.75rem;
+    gap: 0.45rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 0.6rem;
+    background: var(--surface-secondary);
+    padding: 0.3rem 0.65rem;
     color: var(--foreground);
     cursor: pointer;
     font-family: var(--font-geist-mono), monospace;
-    font-size: 0.65rem;
-    font-weight: 650;
-    letter-spacing: 0.08em;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
     list-style: none;
   }
 
-  .open-build__specs-trigger::-webkit-details-marker {
+  .open-build__chip::-webkit-details-marker {
     display: none;
   }
 
-  .open-build__specs-indicator {
+  .open-build__chip-icon {
+    width: 0.9rem;
+    height: 0.9rem;
     color: var(--accent);
-    font-size: 1rem;
-    line-height: 1;
   }
 
-  .open-build__specs[open] .open-build__specs-indicator {
-    transform: rotate(45deg);
+  .open-build__specs {
+    min-width: 0;
+  }
+
+  .open-build__specs[open] {
+    align-self: stretch;
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.5rem;
+    background: var(--surface-primary);
+  }
+
+  .open-build__specs[open] > .open-build__specs-trigger {
+    border-color: transparent;
+    background: transparent;
+  }
+
+  .open-build__obd-dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 999px;
+    background: var(--status-success);
+  }
+
+  .open-build__obd-chip[data-severity="none"] .open-build__obd-dot {
+    background: var(--status-neutral);
+  }
+
+  .open-build__obd-chip[data-severity="critical"] .open-build__obd-dot {
+    background: var(--status-danger);
+  }
+
+  .open-build__obd-chip[data-severity="minor"] .open-build__obd-dot {
+    background: var(--status-warning);
+  }
+
+  .open-build__obd-badge {
+    border-radius: 0.3rem;
+    padding: 0.1rem 0.4rem;
+    background: var(--surface-inset);
+    color: var(--text-muted);
+    font-size: 0.65rem;
+  }
+
+  .open-build__obd-chip[data-severity="critical"] .open-build__obd-badge {
+    background: color-mix(in srgb, var(--status-danger) 20%, transparent);
+    color: var(--status-danger);
+  }
+
+  .open-build__obd-chip[data-severity="minor"] .open-build__obd-badge {
+    background: color-mix(in srgb, var(--status-warning) 20%, transparent);
+    color: var(--status-warning);
   }
 
   .open-build__spec-grid {
@@ -3911,14 +3946,13 @@
 
   @media (min-width: 640px) {
     .open-build__hero {
-      grid-template-columns: minmax(0, 1.1fr) minmax(17rem, 0.9fr);
-      align-items: center;
-      gap: clamp(1.25rem, 3vw, 2.5rem);
+      grid-template-columns: 9rem minmax(0, 1fr);
+      gap: 1.5rem;
+      padding: 1.25rem;
     }
 
     .open-build__visual-frame {
-        height: clamp(10rem, 21vw, 14rem);
-        aspect-ratio: 1.35;
+      height: 7rem;
     }
 
     .open-build__profile {
@@ -3942,12 +3976,11 @@
 
   @media (min-width: 1024px) {
     .open-build__hero {
-      grid-template-columns: minmax(0, 1.2fr) minmax(19rem, 0.8fr);
-      gap: clamp(2rem, 4vw, 4rem);
+      grid-template-columns: 14rem minmax(0, 1fr);
     }
 
     .open-build__visual-frame {
-      height: clamp(19rem, 32vw, 25rem);
+      height: 10rem;
     }
 
     .open-build__telemetry {

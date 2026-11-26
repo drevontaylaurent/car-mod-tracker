@@ -28,9 +28,11 @@ export function VehicleMediaStage({
           />
         )}
       </div>
-      <figcaption className="open-build__visual-caption">
-        Owner photo when available · illustrative fallback otherwise
-      </figcaption>
+      {!photoUrl && (
+        <figcaption className="open-build__visual-caption">
+          Representative visual
+        </figcaption>
+      )}
     </figure>
   );
 }
