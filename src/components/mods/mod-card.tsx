@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { deleteMod, updateModStatus } from "@/actions/mods";
 import { MOD_STATUSES, type Mod } from "@/types/database";
+import { getSafePurchaseUrl } from "@/lib/purchase-url";
+import { ModPurchaseLinkEditor } from "./mod-purchase-link-editor";
 
 interface ModCardProps {
   mod: Mod;
@@ -19,6 +21,8 @@ export function ModCard({ mod }: ModCardProps) {
   const [status, setStatus] = useState(mod.status);
   const [isPending, setIsPending] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [purchaseUrl, setPurchaseUrl] = useState(mod.purchase_url);
+  const safePurchaseUrl = getSafePurchaseUrl(purchaseUrl);
 
   async function handleStatusChange(value: string) {
     const nextStatus = MOD_STATUSES.find((candidate) => candidate === value);
@@ -83,12 +87,28 @@ export function ModCard({ mod }: ModCardProps) {
           {mod.notes && (
             <p className="open-build__part-notes">{mod.notes}</p>
           )}
+          <ModPurchaseLinkEditor
+            mod={{ ...mod, purchase_url: purchaseUrl }}
+            disabled={isPending}
+            onSaved={setPurchaseUrl}
+          />
         </div>
       </div>
       <div className="open-build__mod-actions">
         <p className="open-build__part-cost">
           {currencyFormatter.format(mod.cost)}
         </p>
+        {safePurchaseUrl && (
+          <a
+            href={safePurchaseUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Buy ${mod.part_name} (opens in a new tab)`}
+            className="open-build__buy"
+          >
+            Buy
+          </a>
+        )}
         <label className="open-build__status-select-label">
           <span className="sr-only">Update status for {mod.part_name}</span>
           <select

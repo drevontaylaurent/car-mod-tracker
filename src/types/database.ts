@@ -67,6 +67,7 @@ export interface Mod {
   cost: number;
   install_date: string | null;
   notes: string | null;
+  purchase_url: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -83,6 +84,7 @@ export interface ModInsert {
   cost?: number;
   install_date?: string | null;
   notes?: string | null;
+  purchase_url?: string | null;
   created_at?: string;
   updated_at?: string;
 }

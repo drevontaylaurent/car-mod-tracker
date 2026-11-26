@@ -3599,6 +3599,44 @@
     color: var(--status-danger);
   }
 
+  .open-build__buy {
+    display: inline-flex;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--accent);
+    padding: 0 0.85rem;
+    color: var(--accent);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.68rem;
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .open-build__buy:hover {
+    background: var(--accent);
+    color: var(--background);
+  }
+
+  .open-build__buy:focus-visible {
+    outline: 2px solid var(--foreground);
+    outline-offset: 2px;
+  }
+
+  .open-build__link-form {
+    display: grid;
+    min-width: 0;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .open-build__link-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
   .open-build__mod-error {
     grid-column: 1 / -1;
     margin-top: 0.25rem;

@@ -100,6 +100,20 @@ export function AddModForm({ vehicleId, onCancel, onSuccess }: AddModFormProps) 
           <input type="date" name="install_date" className="field-control mt-2" />
         </label>
         <label className="field-label build-add-form__notes">
+          Purchase URL (optional)
+          <input
+            type="url"
+            maxLength={2048}
+            name="purchase_url"
+            inputMode="url"
+            className="field-control mt-2"
+            placeholder="https://"
+          />
+          <span className="mt-1 block text-xs text-text-secondary">
+            Link to the part or product page.
+          </span>
+        </label>
+        <label className="field-label build-add-form__notes">
           Notes
           <textarea
             maxLength={2000}

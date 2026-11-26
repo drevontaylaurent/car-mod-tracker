@@ -11,6 +11,7 @@ import {
   type ModStatus,
 } from "@/types/database";
 import type { GarageModSummary } from "@/types/garage";
+import { normalizePurchaseUrl } from "@/lib/purchase-url";
 
 type ModFormState = ActionResult<Mod> | undefined;
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
@@ -312,6 +313,8 @@ export async function createMod(
   const cost = readCost(formData);
   const installDate = readInstallDate(formData);
   const notes = readText(formData, "notes", "Notes", 2000, false);
+  const rawPurchaseUrl = formData.get("purchase_url");
+  const purchaseUrl = normalizePurchaseUrl(rawPurchaseUrl);
 
   if (!partName.success) return partName;
   if (!brand.success) return brand;
@@ -320,6 +323,7 @@ export async function createMod(
   if (!cost.success) return cost;
   if (!installDate.success) return installDate;
   if (!notes.success) return notes;
+  if (!purchaseUrl.success) return purchaseUrl;
 
   try {
     const auth = await getAuthContext();
@@ -349,6 +353,7 @@ export async function createMod(
         cost: cost.data,
         install_date: installDate.data,
         notes: notes.data,
+        purchase_url: purchaseUrl.data,
       } satisfies ModInsert)
       .select("*")
       .single();
@@ -416,6 +421,62 @@ export async function updateModStatus(
   } catch (error) {
     console.error("Modification status update failed.", error);
     return { success: false, error: "Could not update this status. Please try again." };
+  }
+}
+
+export async function updateModPurchaseUrl(
+  modId: string,
+  purchaseUrl: string,
+): Promise<ActionResult<Mod>> {
+  if (typeof modId !== "string" || !isUuid(modId.trim())) {
+    return { success: false, error: "Modification not found." };
+  }
+  const normalized = normalizePurchaseUrl(purchaseUrl);
+  if (!normalized.success) {
+    return normalized;
+  }
+
+  try {
+    const auth = await getAuthContext();
+    if (!auth.success) {
+      return auth;
+    }
+
+    const id = modId.trim();
+    const ownership = await getOwnedModVehicleId(
+      auth.data.supabase,
+      id,
+      auth.data.userId,
+    );
+    if (!ownership.success) {
+      return ownership;
+    }
+
+    const { data, error } = await auth.data.supabase
+      .from("mods")
+      .update({
+        purchase_url: normalized.data,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id)
+      .eq("vehicle_id", ownership.data)
+      .eq("user_id", auth.data.userId)
+      .select("*")
+      .maybeSingle();
+
+    if (error) {
+      console.error("Could not update modification purchase link.", error);
+      return { success: false, error: "Could not save this link. Please try again." };
+    }
+    if (!data) {
+      return { success: false, error: "Modification not found." };
+    }
+
+    revalidatePath(`/garage/${ownership.data}`);
+    return { success: true, data };
+  } catch (error) {
+    console.error("Modification purchase link update failed.", error);
+    return { success: false, error: "Could not save this link. Please try again." };
   }
 }
 
