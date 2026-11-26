@@ -144,9 +144,40 @@ export interface Database {
         Update: VehicleDiagnosticUpdate & Record<string, unknown>;
         Relationships: [];
       };
+      build_shares: {
+        Row: {
+          id: string;
+          vehicle_id: string;
+          user_id: string;
+          share_token: string;
+          is_enabled: boolean;
+          created_at: string;
+          updated_at: string;
+        } & Record<string, unknown>;
+        Insert: {
+          id?: string;
+          vehicle_id: string;
+          user_id: string;
+          share_token?: string;
+          is_enabled?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        } & Record<string, unknown>;
+        Update: Partial<{
+          share_token: string;
+          is_enabled: boolean;
+          updated_at: string;
+        }> & Record<string, unknown>;
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
-    Functions: { [_ in never]: never };
+    Functions: {
+      get_shared_build: {
+        Args: { p_token: string };
+        Returns: unknown;
+      };
+    };
     Enums: { [_ in never]: never };
     CompositeTypes: { [_ in never]: never };
   };

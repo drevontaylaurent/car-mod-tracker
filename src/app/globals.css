@@ -1681,6 +1681,649 @@
 }
 
 @layer components {
+  .profile-page,
+  .shared-build-page {
+    min-height: 100dvh;
+    overflow-x: hidden;
+    background: var(--background);
+    color: var(--foreground);
+  }
+
+  .profile-page {
+    padding-bottom: 8rem;
+  }
+
+  .profile-page--centered {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-inline: 1rem;
+  }
+
+  .profile-header,
+  .shared-build-header {
+    display: flex;
+    min-height: 5.25rem;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0.9rem 1rem;
+  }
+
+  .profile-header__brand-mark {
+    display: grid;
+    width: 2.6rem;
+    height: 2.6rem;
+    flex: none;
+    place-items: center;
+    border-radius: 0.55rem;
+    background: var(--accent);
+    color: var(--accent-foreground);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.72rem;
+    font-weight: 750;
+  }
+
+  .profile-header p,
+  .shared-build-header p {
+    font-size: 0.75rem;
+    font-weight: 750;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .profile-header span,
+  .shared-build-header span {
+    color: var(--text-muted);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .profile-content {
+    width: min(100%, 48rem);
+    margin-inline: auto;
+    padding: 1.15rem 1rem 0;
+  }
+
+  .profile-identity {
+    border: 1px solid var(--border-strong);
+    border-radius: 1rem;
+    background:
+      linear-gradient(145deg, rgb(201 243 65 / 5%), transparent 52%),
+      var(--surface-primary);
+    padding: 1.35rem 1rem 1rem;
+  }
+
+  .profile-identity__summary {
+    display: grid;
+    grid-template-columns: 4.75rem minmax(0, 1fr);
+    align-items: center;
+    gap: 0.9rem;
+  }
+
+  .profile-identity__avatar {
+    position: relative;
+    display: grid;
+    width: 4.75rem;
+    height: 4.75rem;
+    place-items: center;
+    border: 1px solid rgb(201 243 65 / 35%);
+    border-radius: 1.1rem;
+    background: var(--surface-inset);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -0.06em;
+  }
+
+  .profile-identity__avatar > span {
+    position: absolute;
+    right: -0.15rem;
+    bottom: -0.15rem;
+    width: 0.85rem;
+    height: 0.85rem;
+    border: 0.15rem solid var(--surface-primary);
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .profile-identity h1 {
+    overflow-wrap: anywhere;
+    margin-top: 0.55rem;
+    font-size: clamp(1.45rem, 7vw, 2rem);
+    font-weight: 700;
+    letter-spacing: -0.065em;
+    line-height: 1;
+  }
+
+  .profile-identity__count {
+    display: inline-flex;
+    margin-top: 0.55rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: 999px;
+    background: var(--surface-inset);
+    padding: 0.3rem 0.55rem;
+    color: var(--text-muted);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .profile-identity__actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+    border-top: 1px solid var(--border-subtle);
+    margin-top: 1.1rem;
+    padding-top: 0.85rem;
+  }
+
+  .profile-identity__actions > button {
+    display: flex;
+    min-height: 3.5rem;
+    min-width: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 0.7rem;
+    background: var(--surface-inset);
+    padding: 0.6rem;
+    color: var(--foreground);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.06em;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  .profile-identity__actions > button:first-child {
+    border-color: rgb(201 243 65 / 25%);
+    background: rgb(201 243 65 / 5%);
+  }
+
+  .profile-identity__actions > button > span:first-child {
+    color: var(--accent);
+  }
+
+  .profile-identity__actions small {
+    display: block;
+    overflow-wrap: anywhere;
+    margin-top: 0.2rem;
+    color: var(--text-muted);
+    font-size: 0.48rem;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .profile-identity__actions button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .profile-identity__empty {
+    margin-top: 0.75rem;
+    color: var(--text-muted);
+    font-size: 0.68rem;
+    text-align: center;
+  }
+
+  .profile-telemetry {
+    border: 1px solid var(--border-subtle);
+    border-radius: 1rem;
+    margin-top: 1rem;
+    background: var(--surface-primary);
+    padding: 1rem;
+  }
+
+  .profile-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .profile-section-heading h2 {
+    color: var(--text-secondary);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.64rem;
+    font-weight: 650;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .profile-section-heading > span {
+    color: var(--text-muted);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+  }
+
+  .profile-section-heading > button {
+    min-height: 2.25rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 0.5rem;
+    background: var(--surface-inset);
+    padding-inline: 0.65rem;
+    color: var(--text-secondary);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .profile-telemetry__totals {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+    margin-top: 0.75rem;
+  }
+
+  .profile-telemetry__totals > div {
+    min-width: 0;
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.7rem;
+    background: var(--surface-inset);
+    padding: 1rem 0.85rem;
+  }
+
+  .profile-telemetry__totals p {
+    color: var(--text-muted);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.56rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .profile-telemetry__totals strong {
+    display: block;
+    overflow-wrap: anywhere;
+    margin-top: 0.4rem;
+    color: var(--foreground);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: clamp(1.15rem, 6vw, 1.65rem);
+    font-weight: 650;
+    letter-spacing: -0.06em;
+    line-height: 1.1;
+  }
+
+  .profile-telemetry__totals > div:first-child strong {
+    color: var(--accent);
+  }
+
+  .profile-telemetry__totals > div > span {
+    display: block;
+    margin-top: 0.3rem;
+    color: var(--text-muted);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.56rem;
+  }
+
+  .profile-error {
+    margin-top: 0.75rem;
+    color: var(--status-danger);
+    font-size: 0.75rem;
+  }
+
+  .profile-actions {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .profile-actions > div,
+  .profile-actions > div > form,
+  .profile-actions > div > form > button {
+    width: 100%;
+  }
+
+  .profile-actions > p {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    text-align: center;
+  }
+
+  .profile-community {
+    margin-top: 1.35rem;
+  }
+
+  .profile-community__future {
+    display: flex;
+    min-height: 4.75rem;
+    align-items: center;
+    gap: 0.85rem;
+    border: 1px dashed var(--border-strong);
+    border-radius: 0.8rem;
+    background: rgb(255 255 255 / 1.5%);
+    margin-top: 0.7rem;
+    padding: 0.85rem;
+  }
+
+  .profile-community__future > span {
+    display: grid;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex: none;
+    place-items: center;
+    border: 1px solid rgb(201 243 65 / 25%);
+    border-radius: 50%;
+    color: var(--accent);
+    font-family: var(--font-geist-mono), monospace;
+  }
+
+  .profile-community__future strong {
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  .profile-community__future p {
+    margin-top: 0.25rem;
+    color: var(--text-muted);
+    font-size: 0.65rem;
+    line-height: 1.4;
+  }
+
+  .profile-sheet-backdrop {
+    position: fixed;
+    z-index: 50;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    background: rgb(0 0 0 / 78%);
+    padding: 0.75rem 0.75rem max(0.75rem, env(safe-area-inset-bottom));
+  }
+
+  .profile-sheet {
+    display: grid;
+    width: min(100%, 34rem);
+    max-height: calc(100dvh - 1.5rem);
+    overflow-y: auto;
+    gap: 1rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 1rem;
+    background: var(--surface-primary);
+    padding: 1rem;
+  }
+
+  .profile-sheet > header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .profile-sheet h2 {
+    margin-top: 0.35rem;
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+  }
+
+  .profile-sheet > header p:last-child {
+    margin-top: 0.25rem;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    line-height: 1.4;
+  }
+
+  .profile-sheet__vehicles {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .profile-sheet__vehicles > button {
+    display: grid;
+    min-height: 5.25rem;
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    align-items: center;
+    gap: 0.75rem;
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-inset);
+    padding: 0.45rem;
+    text-align: left;
+  }
+
+  .profile-sheet__vehicles > button[aria-checked="true"] {
+    border-color: var(--accent);
+    background: rgb(201 243 65 / 5%);
+  }
+
+  .profile-sheet__vehicles .vehicle-visual {
+    width: 5.5rem;
+    height: 4rem;
+    min-height: 0;
+    aspect-ratio: auto;
+    border: 0;
+  }
+
+  .profile-sheet__vehicles strong,
+  .profile-sheet__vehicles small {
+    display: block;
+    overflow-wrap: anywhere;
+  }
+
+  .profile-sheet__vehicles strong {
+    font-size: 0.9rem;
+  }
+
+  .profile-sheet__vehicles small {
+    margin-top: 0.25rem;
+    color: var(--text-muted);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.58rem;
+    line-height: 1.4;
+  }
+
+  .profile-sheet__privacy {
+    border-left: 2px solid var(--accent);
+    background: var(--surface-inset);
+    padding: 0.7rem;
+    color: var(--text-muted);
+    font-size: 0.68rem;
+    line-height: 1.45;
+  }
+
+  .profile-sheet__privacy > span {
+    margin-right: 0.4rem;
+    color: var(--accent);
+  }
+
+  .profile-sheet__copy {
+    width: 100%;
+    text-transform: uppercase;
+  }
+
+  .shared-build-page {
+    padding-bottom: 2rem;
+  }
+
+  .shared-build-card {
+    width: min(calc(100% - 2rem), 64rem);
+    margin: 1rem auto 0;
+    overflow: hidden;
+    border: 1px solid var(--border-strong);
+    border-radius: 1rem;
+    background: var(--surface-primary);
+  }
+
+  .shared-build-card__visual .vehicle-visual {
+    min-height: 13rem;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .shared-build-card__content {
+    padding: 1rem;
+  }
+
+  .shared-build-card h1 {
+    overflow-wrap: anywhere;
+    margin-top: 0.45rem;
+    font-size: clamp(1.8rem, 9vw, 3rem);
+    font-weight: 700;
+    letter-spacing: -0.06em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .shared-build-card__identity {
+    margin-top: 0.55rem;
+    color: var(--text-secondary);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.65rem;
+    line-height: 1.5;
+  }
+
+  .shared-build-progress {
+    margin-top: 1.25rem;
+  }
+
+  .shared-build-progress > div:first-child {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .shared-build-progress > div:first-child span {
+    color: var(--text-muted);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+  }
+
+  .shared-build-progress strong {
+    color: var(--accent);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.85rem;
+  }
+
+  .shared-build-progress [role="progressbar"] {
+    height: 0.35rem;
+    overflow: hidden;
+    margin-top: 0.65rem;
+    border-radius: 999px;
+    background: var(--surface-secondary);
+  }
+
+  .shared-build-progress [role="progressbar"] span {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+  }
+
+  .shared-build-progress > p {
+    margin-top: 0.45rem;
+    color: var(--text-muted);
+    font-size: 0.68rem;
+  }
+
+  .shared-build-mods {
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 1rem;
+  }
+
+  .shared-build-mods ul {
+    display: grid;
+    margin-top: 0.75rem;
+  }
+
+  .shared-build-mods li {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border-top: 1px solid var(--border-subtle);
+    padding-block: 0.8rem;
+  }
+
+  .shared-build-mods li:first-child {
+    border-top: 0;
+  }
+
+  .shared-build-mods li > div {
+    min-width: 0;
+  }
+
+  .shared-build-mods li strong,
+  .shared-build-mods li div span {
+    display: block;
+    overflow-wrap: anywhere;
+  }
+
+  .shared-build-mods li strong {
+    font-size: 0.82rem;
+  }
+
+  .shared-build-mods li div span {
+    margin-top: 0.2rem;
+    color: var(--text-muted);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.56rem;
+    text-transform: uppercase;
+  }
+
+  .shared-build-mods li > span {
+    flex: none;
+    color: var(--text-secondary);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.56rem;
+    text-transform: uppercase;
+  }
+
+  .shared-build-mods li > span[data-status="installed"] {
+    color: var(--status-success);
+  }
+
+  .shared-build-mods li > span[data-status="ordered"] {
+    color: var(--status-warning);
+  }
+
+  .shared-build-mods__empty {
+    margin-top: 0.75rem;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+  }
+
+  .shared-build-card__privacy {
+    border-top: 1px solid var(--border-subtle);
+    margin-top: 1rem;
+    padding-top: 1rem;
+    color: var(--text-muted);
+    font-size: 0.68rem;
+    line-height: 1.5;
+  }
+
+  @media (min-width: 768px) {
+    .profile-header,
+    .shared-build-header {
+      padding-inline: max(1.5rem, calc((100vw - 48rem) / 2 + 1rem));
+    }
+
+    .shared-build-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(20rem, 0.85fr);
+      margin-top: 2rem;
+    }
+
+    .shared-build-card__visual .vehicle-visual {
+      height: 100%;
+      min-height: 36rem;
+      border-right: 1px solid var(--border-subtle);
+      border-bottom: 0;
+    }
+
+    .shared-build-card__content {
+      padding: 2rem;
+    }
+  }
+
   .garage-hub {
     min-height: 100dvh;
     overflow-x: hidden;
@@ -2195,6 +2838,10 @@
     letter-spacing: 0.12em;
     text-decoration: none;
     text-transform: uppercase;
+  }
+
+  .garage-home-nav > a {
+    pointer-events: auto;
   }
 
   .garage-home-nav [aria-current="page"] {

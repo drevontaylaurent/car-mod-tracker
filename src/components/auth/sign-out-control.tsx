@@ -6,7 +6,13 @@ import type { AuthFormState } from "@/types/auth";
 
 const initialState: AuthFormState = { success: true };
 
-export function SignOutControl() {
+interface SignOutControlProps {
+  label?: string;
+}
+
+export function SignOutControl({
+  label = "Sign out",
+}: SignOutControlProps) {
   const [state, formAction, isPending] = useActionState(signOut, initialState);
 
   return (
@@ -17,7 +23,7 @@ export function SignOutControl() {
           disabled={isPending}
           className="button-secondary"
         >
-          {isPending ? "Signing out..." : "Sign out"}
+          {isPending ? "Signing out..." : label}
         </button>
       </form>
       {!state.success && (
