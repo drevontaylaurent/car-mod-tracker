@@ -2327,20 +2327,8 @@
     color: var(--accent);
   }
 
-  .open-build__specs {
+  .open-build__specs-trigger {
     min-width: 0;
-  }
-
-  .open-build__specs[open] {
-    align-self: stretch;
-    border: 1px solid var(--border-subtle);
-    border-radius: 0.5rem;
-    background: var(--surface-primary);
-  }
-
-  .open-build__specs[open] > .open-build__specs-trigger {
-    border-color: transparent;
-    background: transparent;
   }
 
   .open-build__obd-dot {
@@ -2380,45 +2368,194 @@
     color: var(--status-warning);
   }
 
-  .open-build__spec-grid {
+  .specs-sheet__backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    background: rgb(0 0 0 / 0.72);
+    backdrop-filter: blur(4px);
+  }
+
+  .specs-sheet {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    max-width: 32rem;
+    max-height: 92dvh;
     gap: 0.75rem;
-    border-top: 1px solid var(--border-subtle);
-    padding: 0.75rem;
+    overflow-y: auto;
+    border: 1px solid var(--border-subtle);
+    border-bottom: 0;
+    border-radius: 1.25rem 1.25rem 0 0;
+    background: var(--surface-primary);
+    padding: 1.1rem 1rem calc(1rem + env(safe-area-inset-bottom));
   }
 
-  .open-build__spec-grid > div {
-    min-width: 0;
+  .specs-sheet__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 0.8rem;
   }
 
-  .open-build__spec-grid > div:last-child {
-    grid-column: 1 / -1;
-  }
-
-  .open-build__spec-label {
-    color: var(--text-muted);
+  .specs-sheet__eyebrow {
+    color: var(--accent);
     font-family: var(--font-geist-mono), monospace;
-    font-size: 0.58rem;
+    font-size: 0.7rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
-  .open-build__spec-value {
+  .specs-sheet__title {
     margin-top: 0.25rem;
+    color: var(--foreground);
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .specs-sheet__close {
+    display: inline-flex;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-strong);
+    border-radius: 0.6rem;
+    background: var(--surface-secondary);
+    color: var(--text-secondary);
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+
+  .specs-sheet__vin,
+  .specs-sheet__tile {
+    min-width: 0;
+    border: 1px solid var(--border-strong);
+    border-radius: 0.8rem;
+    background: var(--surface-inset);
+    padding: 0.8rem 0.9rem;
+  }
+
+  .specs-sheet__label {
+    color: var(--text-muted);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .specs-sheet__vin-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .specs-sheet__vin-value {
+    min-width: 0;
     overflow-wrap: anywhere;
     color: var(--foreground);
-    font-size: 0.75rem;
-  }
-
-  .open-build__spec-grid > div:last-child .open-build__spec-value {
     font-family: var(--font-geist-mono), monospace;
-    letter-spacing: 0.035em;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
   }
 
-  .open-build__edit-vehicle {
+  .specs-sheet__vin-actions {
+    display: flex;
+    flex: none;
+    gap: 0.4rem;
+  }
+
+  .specs-sheet__icon-button,
+  .specs-sheet__copy,
+  .specs-sheet__edit,
+  .specs-sheet__done {
     min-height: 44px;
-    font-size: 0.65rem;
+    border-radius: 0.6rem;
+    padding: 0 0.9rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .specs-sheet__icon-button {
+    display: inline-flex;
+    width: 44px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid var(--border-strong);
+    background: var(--surface-secondary);
+    color: var(--foreground);
+  }
+
+  .specs-sheet__copy {
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: #0a0a0a;
+  }
+
+  .specs-sheet__empty,
+  .specs-sheet__value {
+    margin-top: 0.35rem;
+    overflow-wrap: anywhere;
+    color: var(--foreground);
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  .specs-sheet__empty {
+    color: var(--text-secondary);
+  }
+
+  .specs-sheet__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  .specs-sheet__actions {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .specs-sheet__edit {
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    font-family: var(--font-geist-mono), monospace;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .specs-sheet__done {
+    border: 1px solid var(--border-strong);
+    background: var(--surface-secondary);
+    color: var(--foreground);
+  }
+
+  .specs-sheet :is(button):focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  @media (min-width: 640px) {
+    .specs-sheet__backdrop {
+      align-items: center;
+      padding: 1rem;
+    }
+
+    .specs-sheet {
+      border-bottom: 1px solid var(--border-subtle);
+      border-radius: 1.25rem;
+    }
   }
 
   .open-build__telemetry {

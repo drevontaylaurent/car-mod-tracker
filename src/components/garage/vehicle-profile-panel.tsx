@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { EditVehicleModal } from "@/components/garage/edit-vehicle-modal";
+import { VehicleSpecsSheet } from "@/components/garage/vehicle-specs-sheet";
 import { VehicleObdChip } from "@/components/garage/vehicle-obd-chip";
 import type { VehicleDiagnostic } from "@/types/diagnostics";
 import type { VehicleWithMedia } from "@/types/vehicle-media";
@@ -19,13 +20,18 @@ export function VehicleProfilePanel({
   diagnosticsError,
   onOpenDiagnostics,
 }: VehicleProfilePanelProps) {
-  const [isEditing, setIsEditing] = useState(false);
+  const [panel, setPanel] = useState<"closed" | "specs" | "edit">("closed");
+  const closePanel = useCallback(() => setPanel("closed"), []);
 
   return (
     <>
       <section className="open-build__profile" aria-label="Vehicle details">
-        <details className="open-build__specs">
-          <summary className="open-build__chip open-build__specs-trigger">
+        <button
+          type="button"
+          aria-haspopup="dialog"
+          onClick={() => setPanel("specs")}
+          className="open-build__chip open-build__specs-trigger"
+        >
             <svg
               className="open-build__chip-icon"
               viewBox="0 0 16 16"
@@ -40,49 +46,23 @@ export function VehicleProfilePanel({
               />
             </svg>
             <span>Specs &amp; VIN</span>
-          </summary>
-          <dl className="open-build__spec-grid">
-            <Specification label="Year" value={vehicle.year?.toString()} />
-            <Specification label="Make" value={vehicle.make} />
-            <Specification label="Model" value={vehicle.model} />
-            <Specification label="Trim" value={vehicle.trim} />
-            <Specification label="VIN" value={vehicle.vin} />
-          </dl>
-          <button
-            type="button"
-            onClick={() => setIsEditing(true)}
-            className="button-secondary open-build__edit-vehicle"
-          >
-            EDIT VEHICLE
-          </button>
-        </details>
+        </button>
         <VehicleObdChip
           diagnostics={diagnostics}
           diagnosticsError={diagnosticsError}
           onOpenDiagnostics={onOpenDiagnostics}
         />
       </section>
-      {isEditing && (
-        <EditVehicleModal
+      {panel === "specs" && (
+        <VehicleSpecsSheet
           vehicle={vehicle}
-          onClose={() => setIsEditing(false)}
+          onClose={closePanel}
+          onEdit={() => setPanel("edit")}
         />
       )}
+      {panel === "edit" && (
+        <EditVehicleModal vehicle={vehicle} onClose={closePanel} />
+      )}
     </>
-  );
-}
-
-function Specification({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | null | undefined;
-}) {
-  return (
-    <div>
-      <dt className="open-build__spec-label">{label}</dt>
-      <dd className="open-build__spec-value">{value || "Not provided"}</dd>
-    </div>
   );
 }
