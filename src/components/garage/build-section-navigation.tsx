@@ -14,9 +14,9 @@ const sections: readonly {
   id: ActiveBuildSection;
   label: string;
 }[] = [
-  { id: "inventory", label: "MOD INVENTORY" },
+  { id: "inventory", label: "Mod Inventory" },
   { id: "diagnostics", label: "OBD-II" },
-  { id: "timeline", label: "BUILD TIMELINE" },
+  { id: "timeline", label: "Build Timeline" },
 ];
 
 const sectionIds: readonly ActiveBuildSection[] = [
@@ -72,10 +72,7 @@ export function BuildSectionNavigation({
           onClick={() => onActiveSectionChange(section.id)}
           onKeyDown={(event) => handleKeyDown(event, section.id)}
         >
-          <span>{section.label}</span>
-          <span className="open-build__nav-state">
-            {activeSection === section.id ? "ACTIVE" : "OPEN"}
-          </span>
+          {section.label}
         </button>
       ))}
     </div>

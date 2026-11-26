@@ -6,7 +6,6 @@ import { getVehicleDiagnostics } from "@/actions/diagnostics";
 import { getVehicleMods } from "@/actions/mods";
 import { getUserVehicle } from "@/actions/vehicles";
 import { SignOutControl } from "@/components/auth/sign-out-control";
-import { ApplicationHeader } from "@/components/layout/application-header";
 import { VehicleBuildWorkspace } from "@/components/garage/vehicle-build-workspace";
 
 export default function VehicleBuildPage({
@@ -54,23 +53,14 @@ async function VehicleBuildContent({
 
   return (
     <main className="min-h-screen bg-background text-foreground">
-      <ApplicationHeader />
-      <div className="build-page__container mx-auto px-5 py-6 sm:px-8 sm:py-10">
-        <div className="build-breadcrumb">
-          <Link href="/garage" className="button-ghost build-breadcrumb__link">
-            <span aria-hidden="true">←</span> Back to Garage
-          </Link>
-          <p className="technical-label">Garage / Vehicle build</p>
-        </div>
-        <VehicleBuildWorkspace
-          vehicle={vehicle}
-          mods={mods}
-          diagnostics={diagnostics}
-          diagnosticsError={diagnosticsError}
-          phases={phases}
-          timelineError={timelineError}
-        />
-      </div>
+      <VehicleBuildWorkspace
+        vehicle={vehicle}
+        mods={mods}
+        diagnostics={diagnostics}
+        diagnosticsError={diagnosticsError}
+        phases={phases}
+        timelineError={timelineError}
+      />
     </main>
   );
 }

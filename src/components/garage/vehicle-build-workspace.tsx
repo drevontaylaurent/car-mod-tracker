@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { BuildHeader } from "@/components/garage/build-header";
 import { AddModDialog } from "@/components/mods/add-mod-dialog";
 import { ModList } from "@/components/mods/mod-list";
 import { BuildSummary } from "@/components/mods/build-summary";
@@ -51,6 +52,12 @@ export function VehicleBuildWorkspace({
   const closeAddMod = useCallback(() => setIsAddModOpen(false), []);
 
   return (
+    <>
+    <BuildHeader
+      isAddModOpen={isAddModOpen}
+      onAddMod={() => setIsAddModOpen(true)}
+    />
+    <div className="build-page__container mx-auto px-5 py-6 sm:px-8 sm:py-10">
     <section
       className="build-experience"
       aria-label={`Build experience for ${vehicleName}`}
@@ -100,18 +107,6 @@ export function VehicleBuildWorkspace({
         tabIndex={0}
         hidden={activeSection !== "inventory"}
       >
-        <div className="open-build__actions">
-          <button
-            type="button"
-            className="button-primary open-build__add-mod"
-            aria-haspopup="dialog"
-            aria-expanded={isAddModOpen}
-            aria-controls={isAddModOpen ? "add-mod-dialog" : undefined}
-            onClick={() => setIsAddModOpen(true)}
-          >
-            + ADD MOD
-          </button>
-        </div>
         <section
           id="open-build-mod-inventory"
           className="open-build__inventory"
@@ -159,5 +154,7 @@ export function VehicleBuildWorkspace({
         />
       )}
     </section>
+    </div>
+    </>
   );
 }

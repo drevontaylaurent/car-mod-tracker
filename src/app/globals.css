@@ -977,24 +977,6 @@
     margin-top: 1.25rem;
   }
 
-  .build-breadcrumb {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
-    margin-bottom: 1rem;
-  }
-
-  .build-breadcrumb__link {
-    justify-content: flex-start;
-    padding-inline: 0;
-    text-decoration: none;
-  }
-
-  .build-breadcrumb__link span {
-    font-size: 1.125rem;
-  }
-
   .build-stage {
     min-width: 0;
     margin: 0;
@@ -1520,13 +1502,6 @@
 
   .app-header__inner {
     padding-inline: 2rem;
-  }
-
-  .build-breadcrumb {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.25rem;
   }
 
   .build-experience__toolbar {
@@ -2568,39 +2543,48 @@
   .open-build__navigation {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0;
     overflow: hidden;
+    margin-top: 0.875rem;
     border: 1px solid var(--border-subtle);
     border-radius: 0.875rem;
     background: var(--surface-primary);
-    padding: 0.2rem;
-    margin-top: 0.875rem;
   }
 
   .open-build__nav-item {
-    display: flex;
+    position: relative;
     min-width: 0;
-    min-height: 3rem;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 0.2rem;
+    min-height: 2.75rem;
     border: 0;
-    border-radius: 0.625rem;
     background: transparent;
-    padding: 0.45rem 0.55rem;
-    color: var(--foreground);
+    padding: 0.5rem 0.25rem;
+    color: var(--text-secondary);
     font-family: var(--font-geist-mono), monospace;
-    font-size: 0.59rem;
-    font-weight: 650;
-    letter-spacing: 0.035em;
+    font-size: 0.75rem;
+    font-weight: 600;
     line-height: 1.2;
-    text-align: left;
+    text-align: center;
+    transition:
+      color 140ms ease,
+      background-color 140ms ease;
+  }
+
+  .open-build__nav-item:hover {
+    color: var(--foreground);
   }
 
   .open-build__nav-item[aria-selected="true"] {
-    box-shadow: inset 0 -2px var(--accent);
-    background: var(--surface-secondary);
+    background: rgb(255 255 255 / 5%);
+    color: var(--foreground);
+  }
+
+  .open-build__nav-item[aria-selected="true"]::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: var(--accent);
   }
 
   .open-build__nav-item:disabled {
@@ -2608,20 +2592,123 @@
     color: var(--text-muted);
   }
 
-  .open-build__nav-state {
-    color: var(--text-muted);
-    font-size: 0.5rem;
-    letter-spacing: 0.08em;
+  .build-header {
+    position: sticky;
+    z-index: 30;
+    top: 0;
+    border-bottom: 1px solid var(--border-subtle);
+    background: rgb(11 14 15 / 96%);
+    backdrop-filter: blur(8px);
   }
 
-  .open-build__nav-item[aria-selected="true"] .open-build__nav-state {
+  .build-header__inner {
+    display: flex;
+    min-height: 3.5rem;
+    max-width: 90rem;
+    align-items: center;
+    gap: 0.5rem;
+    margin-inline: auto;
+    padding: 0.5rem 1.25rem;
+  }
+
+  .build-header__back {
+    display: grid;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex: none;
+    place-items: center;
+    border: 1px solid var(--border-strong);
+    border-radius: 0.5rem;
+    background: var(--surface-primary);
+    color: var(--foreground);
+    font-size: 1rem;
+    text-decoration: none;
+  }
+
+  .build-header__back:hover {
+    border-color: var(--accent);
     color: var(--accent);
   }
 
-  .open-build__actions {
+  .build-header__brand {
     display: flex;
-    justify-content: flex-end;
-    margin-top: 0.5rem;
+    min-width: 0;
+    flex: 1;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .build-header__mark {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  .build-header__identity {
+    min-width: 0;
+  }
+
+  .build-header__name,
+  .build-header__context {
+    overflow: hidden;
+    font-family: var(--font-geist-mono), monospace;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .build-header__name {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+  }
+
+  .build-header__context {
+    margin-top: 0.2rem;
+    color: var(--text-muted);
+    font-size: 0.5625rem;
+    letter-spacing: 0.12em;
+  }
+
+  .build-header__add-mod {
+    min-height: 2.5rem;
+    flex: none;
+    border-radius: 0.5rem;
+    padding-inline: 0.75rem;
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 359px) {
+    .build-header__inner {
+      gap: 0.375rem;
+    }
+
+    .build-header__mark {
+      display: none;
+    }
+
+    .build-header__name {
+      letter-spacing: 0.06em;
+    }
+
+    .build-header__context {
+      letter-spacing: 0.04em;
+    }
+
+    .build-header__add-mod {
+      padding-inline: 0.5rem;
+      letter-spacing: 0.04em;
+    }
+  }
+
+  @media (min-width: 640px) {
+    .build-header__inner {
+      padding-inline: 2rem;
+    }
   }
 
     .open-build__diagnostics {
@@ -3536,13 +3623,6 @@
     }
   }
 
-  .open-build__add-mod {
-    width: 100%;
-    min-height: 2.875rem;
-    font-size: 0.7rem;
-    letter-spacing: 0.08em;
-  }
-
   .open-build__inventory {
     min-width: 0;
     margin-top: 0.75rem;
@@ -3845,25 +3925,6 @@
       margin-top: 0.75rem;
     }
 
-    .open-build__add-mod {
-      width: auto;
-      min-width: 9.5rem;
-    }
-
-    .open-build__nav-item {
-      min-height: 3.5rem;
-      align-items: center;
-      flex-direction: row;
-      justify-content: space-between;
-      gap: 0.5rem;
-      padding-inline: 0.75rem;
-      font-size: 0.65rem;
-    }
-
-    .open-build__nav-state {
-      white-space: nowrap;
-    }
-
     .open-build__mod-row {
       grid-template-columns: minmax(0, 1fr) 13rem;
     }
@@ -3912,10 +3973,6 @@
     .open-build__status-control {
       min-height: 3.5rem;
       padding-inline: 0.75rem;
-    }
-
-    .open-build__navigation {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .open-build__mod-row {
