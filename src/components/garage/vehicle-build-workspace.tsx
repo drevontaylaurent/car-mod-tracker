@@ -1,79 +1,73 @@
 "use client";
 
-import { useRef, useState } from "react";
-import type { KeyboardEvent, ReactNode } from "react";
+import { useCallback, useState } from "react";
 import { AddModDialog } from "@/components/mods/add-mod-dialog";
 import { ModList } from "@/components/mods/mod-list";
-import type { Mod, ModCategory } from "@/types/database";
-import { VehicleMediaStage, type VehicleBuildTab } from "@/components/garage/vehicle-media-stage";
+import { BuildSummary } from "@/components/mods/build-summary";
+import { BuildSectionNavigation } from "@/components/garage/build-section-navigation";
+import { VehicleMediaStage } from "@/components/garage/vehicle-media-stage";
+import { VehicleProfilePanel } from "@/components/garage/vehicle-profile-panel";
+import type { Mod, ModStatus } from "@/types/database";
+import type { VehicleWithMedia } from "@/types/vehicle-media";
 
 interface VehicleBuildWorkspaceProps {
-  vehicleId: string;
-  vehicleName: string;
-  vehiclePhotoUrl: string | null;
+  vehicle: VehicleWithMedia;
   mods: Mod[];
-  profile: ReactNode;
-  build: ReactNode;
 }
 
-const TABS: { id: VehicleBuildTab; label: string; mobileLabel: string }[] = [
-  { id: "profile", label: "PROFILE", mobileLabel: "Profile" },
-  { id: "build", label: "BUILD", mobileLabel: "Build" },
-  { id: "parts", label: "PARTS", mobileLabel: "Parts" },
-];
 export function VehicleBuildWorkspace({
-  vehicleId,
-  vehicleName,
-  vehiclePhotoUrl,
+  vehicle,
   mods,
-  profile,
-  build,
 }: VehicleBuildWorkspaceProps) {
-  const [activeTab, setActiveTab] = useState<VehicleBuildTab>("profile");
-  const [selectedSystem, setSelectedSystem] = useState<ModCategory | null>(null);
   const [isAddModOpen, setIsAddModOpen] = useState(false);
-  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const idPrefix = `vehicle-build-${vehicleId}`;
-  const panels: Record<VehicleBuildTab, ReactNode> = {
-    profile,
-    build,
-    parts: <ModList mods={mods} onCategoryChange={setSelectedSystem} />,
-  };
-
-  function handleTabKeyDown(
-    event: KeyboardEvent<HTMLButtonElement>,
-    currentIndex: number,
-  ) {
-    let nextIndex: number | undefined;
-
-    if (event.key === "ArrowRight") {
-      nextIndex = (currentIndex + 1) % TABS.length;
-    } else if (event.key === "ArrowLeft") {
-      nextIndex = (currentIndex - 1 + TABS.length) % TABS.length;
-    } else if (event.key === "Home") {
-      nextIndex = 0;
-    } else if (event.key === "End") {
-      nextIndex = TABS.length - 1;
-    }
-
-    if (nextIndex === undefined) {
-      return;
-    }
-
-    event.preventDefault();
-    const nextTab = TABS[nextIndex];
-    setActiveTab(nextTab.id);
-    tabRefs.current[nextIndex]?.focus();
-  }
+  const [statusFilter, setStatusFilter] = useState<ModStatus | null>(null);
+  const vehicleName =
+    vehicle.nickname ||
+    [vehicle.year, vehicle.make, vehicle.model].filter(Boolean).join(" ") ||
+    "Vehicle build";
+  const vehicleSpecifications = [
+    vehicle.year?.toString(),
+    vehicle.make,
+    vehicle.model,
+    vehicle.trim,
+  ].filter(Boolean);
+  const closeAddMod = useCallback(() => setIsAddModOpen(false), []);
 
   return (
     <section className="build-experience" aria-label={`Build experience for ${vehicleName}`}>
       <h1 className="sr-only">Vehicle build: {vehicleName}</h1>
-      <div className="build-experience__toolbar">
-        <p className="technical-label">Vehicle / Actions</p>
+      <div className="open-build__hero">
+        <VehicleMediaStage
+          vehicleName={vehicleName}
+          photoUrl={vehicle.photoUrl}
+        />
+        <div className="open-build__identity">
+          <p className="technical-label text-accent">Vehicle / Open build</p>
+          <h2 className="open-build__title">{vehicleName}</h2>
+          {vehicle.nickname && (
+            <p className="open-build__specifications">
+              {vehicleSpecifications.join(" / ") || "Vehicle specifications not set"}
+            </p>
+          )}
+          {!vehicle.nickname && vehicle.trim && (
+            <p className="open-build__specifications">Trim / {vehicle.trim}</p>
+          )}
+          <VehicleProfilePanel vehicle={vehicle} />
+        </div>
+      </div>
+
+      <BuildSummary
+        mods={mods}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+      />
+
+      <BuildSectionNavigation />
+
+      <div className="open-build__actions">
         <button
           type="button"
-          className="button-primary build-add-mod-trigger"
+          className="button-primary open-build__add-mod"
           aria-haspopup="dialog"
           aria-expanded={isAddModOpen}
           aria-controls={isAddModOpen ? "add-mod-dialog" : undefined}
@@ -82,80 +76,24 @@ export function VehicleBuildWorkspace({
           + ADD MOD
         </button>
       </div>
+
+      <section
+        id="open-build-mod-inventory"
+        className="open-build__inventory"
+        aria-labelledby="mod-list-heading"
+      >
+        <ModList
+          mods={mods}
+          statusFilter={statusFilter}
+        />
+      </section>
+
       {isAddModOpen && (
         <AddModDialog
-          vehicleId={vehicleId}
-          onClose={() => setIsAddModOpen(false)}
+          vehicleId={vehicle.id}
+          onClose={closeAddMod}
         />
       )}
-      <div className="build-tabs" role="tablist" aria-label="Vehicle build sections">
-        {TABS.map((tab, index) => {
-          const tabId = `${idPrefix}-tab-${tab.id}`;
-          const panelId = `${idPrefix}-panel-${tab.id}`;
-          const isSelected = activeTab === tab.id;
-
-          return (
-            <button
-              key={tab.id}
-              ref={(element) => {
-                tabRefs.current[index] = element;
-              }}
-              type="button"
-              id={tabId}
-              role="tab"
-              aria-selected={isSelected}
-              aria-controls={panelId}
-              tabIndex={isSelected ? 0 : -1}
-              className="build-tab"
-              onClick={() => setActiveTab(tab.id)}
-              onKeyDown={(event) => handleTabKeyDown(event, index)}
-            >
-              <span className="build-tab__index" aria-hidden="true">
-                0{index + 1}
-              </span>
-              <span className="build-tab__label--desktop">{tab.label}</span>
-              <span className="build-tab__label--mobile">{tab.mobileLabel}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      <div
-        className="build-experience__layout"
-        data-active-tab={activeTab}
-        data-selected-system={selectedSystem ?? "all"}
-      >
-        <div className="build-experience__stage">
-          <VehicleMediaStage
-            vehicleName={vehicleName}
-            activeTab={activeTab}
-            selectedSystem={selectedSystem}
-            photoUrl={vehiclePhotoUrl}
-          />
-        </div>
-        <div className="build-experience__panels">
-          {TABS.map((tab) => {
-            const tabId = `${idPrefix}-tab-${tab.id}`;
-            const panelId = `${idPrefix}-panel-${tab.id}`;
-            const isSelected = activeTab === tab.id;
-
-            return (
-              <section
-                key={tab.id}
-                id={panelId}
-                role="tabpanel"
-                aria-labelledby={tabId}
-                tabIndex={isSelected ? 0 : -1}
-                hidden={!isSelected}
-                data-panel={tab.id}
-                className="build-experience__panel"
-              >
-                {panels[tab.id]}
-              </section>
-            );
-          })}
-        </div>
-      </div>
     </section>
   );
 }

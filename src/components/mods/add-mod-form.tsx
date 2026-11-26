@@ -7,17 +7,19 @@ import { MOD_CATEGORIES, MOD_STATUSES } from "@/types/database";
 interface AddModFormProps {
   vehicleId: string;
   onCancel: () => void;
+  onSuccess: () => void;
 }
 
-export function AddModForm({ vehicleId, onCancel }: AddModFormProps) {
+export function AddModForm({ vehicleId, onCancel, onSuccess }: AddModFormProps) {
   const [state, formAction, isPending] = useActionState(createMod, undefined);
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     if (state?.success) {
       formRef.current?.reset();
+      onSuccess();
     }
-  }, [state]);
+  }, [onSuccess, state]);
 
   return (
     <section className="build-add-form" aria-labelledby="add-mod-heading">

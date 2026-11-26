@@ -5,9 +5,7 @@ import { getVehicleMods } from "@/actions/mods";
 import { getUserVehicle } from "@/actions/vehicles";
 import { SignOutControl } from "@/components/auth/sign-out-control";
 import { ApplicationHeader } from "@/components/layout/application-header";
-import { BuildSummary } from "@/components/mods/build-summary";
 import { VehicleBuildWorkspace } from "@/components/garage/vehicle-build-workspace";
-import { VehicleProfilePanel } from "@/components/garage/vehicle-profile-panel";
 
 export default function VehicleBuildPage({
   params,
@@ -40,10 +38,6 @@ async function VehicleBuildContent({
 
   const vehicle = vehicleResult.data;
   const mods = modsResult.data;
-  const vehicleName =
-    vehicle.nickname ||
-    [vehicle.year, vehicle.make, vehicle.model].filter(Boolean).join(" ") ||
-    "Vehicle build";
 
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -56,18 +50,8 @@ async function VehicleBuildContent({
           <p className="technical-label">Garage / Vehicle build</p>
         </div>
         <VehicleBuildWorkspace
-          vehicleId={vehicle.id}
-          vehicleName={vehicleName}
-          vehiclePhotoUrl={vehicle.photoUrl}
+          vehicle={vehicle}
           mods={mods}
-          profile={
-            <VehicleProfilePanel
-              vehicle={vehicle}
-              vehicleName={vehicleName}
-              mods={mods}
-            />
-          }
-          build={<BuildSummary mods={mods} />}
         />
       </div>
     </main>

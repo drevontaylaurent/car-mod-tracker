@@ -1,67 +1,61 @@
-import { getBuildTelemetry } from "@/lib/build-telemetry";
-import type { Mod, Vehicle } from "@/types/database";
+"use client";
+
+import { useState } from "react";
+import { EditVehicleModal } from "@/components/garage/edit-vehicle-modal";
+import type { VehicleWithMedia } from "@/types/vehicle-media";
 
 interface VehicleProfilePanelProps {
-  vehicle: Vehicle;
-  vehicleName: string;
-  mods: Mod[];
+  vehicle: VehicleWithMedia;
 }
 
-export function VehicleProfilePanel({
-  vehicle,
-  vehicleName,
-  mods,
-}: VehicleProfilePanelProps) {
-  const { installedCount, totalModCount, progress } = getBuildTelemetry(mods);
+export function VehicleProfilePanel({ vehicle }: VehicleProfilePanelProps) {
+  const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <section className="build-profile-panel" aria-labelledby="vehicle-profile-heading">
-      <p className="technical-label text-accent">Vehicle profile / 01</p>
-      <h2 id="vehicle-profile-heading" className="build-profile-panel__title">
-        {vehicleName}
-      </h2>
-      <p className="build-profile-panel__identity">
-        {[vehicle.year, vehicle.make, vehicle.model, vehicle.trim]
-          .filter(Boolean)
-          .join(" ") || "Vehicle specifications not set"}
-      </p>
-
-      <dl className="build-profile-panel__specifications">
-        <Specification label="Year" value={vehicle.year?.toString()} />
-        <Specification label="Make" value={vehicle.make} />
-        <Specification label="Model" value={vehicle.model} />
-        <Specification label="Trim" value={vehicle.trim} />
-        <div className="build-profile-panel__vin">
-          <dt className="technical-label">VIN</dt>
-          <dd>{vehicle.vin ?? "Not provided"}</dd>
+    <>
+      <section className="open-build__profile" aria-label="Vehicle details">
+        <div className="open-build__profile-tools">
+          <details className="open-build__specs">
+            <summary className="open-build__specs-trigger">
+              <span>SPECS &amp; VIN</span>
+              <span className="open-build__specs-indicator" aria-hidden="true">
+                +
+              </span>
+            </summary>
+            <dl className="open-build__spec-grid">
+              <Specification label="Year" value={vehicle.year?.toString()} />
+              <Specification label="Make" value={vehicle.make} />
+              <Specification label="Model" value={vehicle.model} />
+              <Specification label="Trim" value={vehicle.trim} />
+              <Specification label="VIN" value={vehicle.vin} />
+            </dl>
+          </details>
+          <div
+            className="open-build__obd-status"
+            aria-label="OBD-II diagnostics are not implemented yet"
+          >
+            <span>OBD-II</span>
+            <span className="open-build__obd-divider" aria-hidden="true">
+              /
+            </span>
+            <span className="open-build__obd-state">NOT IMPLEMENTED</span>
+          </div>
         </div>
-      </dl>
-
-      <section
-        className="build-profile-panel__progress"
-        aria-label="Tracked build progress"
-      >
-        <div className="build-telemetry__heading">
-          <h3 className="technical-label">Tracked build progress</h3>
-          <span className="build-telemetry__percent">{progress}%</span>
-        </div>
-        <div
-          className="build-telemetry__track"
-          role="progressbar"
-          aria-label="Tracked modifications installed"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={progress}
+        <button
+          type="button"
+          onClick={() => setIsEditing(true)}
+          className="button-secondary open-build__edit-vehicle"
         >
-          <span style={{ width: `${progress}%` }} />
-        </div>
-        <p className="build-telemetry__caption">
-          {totalModCount === 0
-            ? "No tracked parts yet. This is not mechanical completeness."
-            : `${installedCount} of ${totalModCount} tracked parts installed; not mechanical completeness.`}
-        </p>
+          EDIT VEHICLE
+        </button>
       </section>
-    </section>
+      {isEditing && (
+        <EditVehicleModal
+          vehicle={vehicle}
+          onClose={() => setIsEditing(false)}
+        />
+      )}
+    </>
   );
 }
 
@@ -74,8 +68,8 @@ function Specification({
 }) {
   return (
     <div>
-      <dt className="technical-label">{label}</dt>
-      <dd>{value || "—"}</dd>
+      <dt className="open-build__spec-label">{label}</dt>
+      <dd className="open-build__spec-value">{value || "Not provided"}</dd>
     </div>
   );
 }

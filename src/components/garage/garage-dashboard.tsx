@@ -37,6 +37,34 @@ export function GarageDashboard({
       : Math.min(selection.index, Math.max(vehicles.length - 1, 0));
   const selectedVehicle = vehicles[selectedIndex];
   const selectedVehicleId = selectedVehicle?.id ?? "";
+  const summariesByVehicleId = new Map(
+    modSummaries.map((summary) => [summary.vehicleId, summary]),
+  );
+  const totalInstalledInvestment = modSummaries.reduce(
+    (total, summary) => total + summary.installedCost,
+    0,
+  );
+  const averageBuildProgress =
+    vehicles.length === 0
+      ? 0
+      : Math.round(
+          vehicles.reduce((total, vehicle) => {
+            const summary = summariesByVehicleId.get(vehicle.id);
+            if (!summary || summary.totalModCount === 0) return total;
+            return (
+              total +
+              Math.round(
+                (summary.installedCount / summary.totalModCount) * 100,
+              )
+            );
+          }, 0) / vehicles.length,
+        );
+  const currencyFormatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
   const handleBeforeDelete = (vehicleId?: string) => {
     if (!selectedVehicle) return;
@@ -71,9 +99,40 @@ export function GarageDashboard({
             onClick={() => setIsFormOpen((isOpen) => !isOpen)}
             className="button-primary w-full sm:w-auto"
           >
-            {isFormOpen ? "Close form" : "Add Vehicle"}
+            {isFormOpen ? (
+              "Close form"
+            ) : (
+              <>
+                <span aria-hidden="true">+</span> Add Vehicle
+              </>
+            )}
           </button>
         </header>
+
+        {vehicles.length > 0 && (
+          <section className="garage-overview" aria-label="Garage overview">
+            <div className="garage-overview__item">
+              <p className="technical-label">Vehicles</p>
+              <p className="garage-overview__value">
+                {String(vehicles.length).padStart(2, "0")}
+              </p>
+            </div>
+            <div className="garage-overview__item">
+              <p className="technical-label">Installed investment</p>
+              <p className="garage-overview__value">
+                {summaryError
+                  ? "Unavailable"
+                  : currencyFormatter.format(totalInstalledInvestment)}
+              </p>
+            </div>
+            <div className="garage-overview__item">
+              <p className="technical-label">Average tracked progress</p>
+              <p className="garage-overview__value">
+                {summaryError ? "Unavailable" : `${averageBuildProgress}%`}
+              </p>
+            </div>
+          </section>
+        )}
 
         {isFormOpen && (
           <AddVehicleModal onClose={() => setIsFormOpen(false)} />

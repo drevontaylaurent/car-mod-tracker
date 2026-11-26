@@ -27,7 +27,11 @@ export function AddModDialog({ vehicleId, onClose }: AddModDialogProps) {
             ×
           </button>
         </div>
-        <AddModForm vehicleId={vehicleId} onCancel={onClose} />
+        <AddModForm
+          vehicleId={vehicleId}
+          onCancel={onClose}
+          onSuccess={onClose}
+        />
       </section>
     </div>
   );

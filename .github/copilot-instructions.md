@@ -375,3 +375,104 @@ Instead of treating vehicle modifications like rows in a spreadsheet, the vehicl
 The build, modifications, investment, progress, specifications, and future vehicle-health information should feel organized around the vehicle.
 
 The finished product should demonstrate both strong software engineering and intentional product/design thinking.
+
+
+
+# Current Phase: Mockup-Driven Vehicle Build Redesign
+
+The current My Garage experience is approved and frozen.
+
+Do not redesign, restructure, or visually recompose /garage unless a future mission explicitly requests it.
+
+The current focus is the individual Vehicle Build / Open Build experience.
+
+User-created mockups are the primary UX specification for this phase.
+
+When implementing a supplied mockup:
+
+1. Inspect the current implementation first.
+2. Preserve all working functionality.
+3. Reuse existing components and real application data.
+4. Follow the mockup's information hierarchy.
+5. Remove unnecessary repeated information.
+6. Do not invent additional dashboard sections.
+7. Do not fabricate data simply to fill the mockup.
+8. Make the smallest safe changes necessary.
+
+## Open Build Direction
+
+Open Build represents ONE selected vehicle.
+
+The experience should communicate:
+
+THIS IS MY CAR.
+THIS IS MY BUILD.
+
+The visual hierarchy should prioritize:
+
+1. Large vehicle hero visual
+2. Vehicle nickname and identity
+3. Year / Make / Model / Trim
+4. Tracked build progress
+5. Installed investment
+6. Planned investment
+7. Installed / Ordered / Wishlist status
+8. Modification categories
+9. PROFILE / BUILD / PARTS organization
+10. Dedicated electric-green + ADD MOD action
+11. Edit Vehicle as a secondary action
+12. Back to Garage
+
+The vehicle must remain the visual hero.
+
+Supporting information should feel like automotive telemetry rather than a traditional SaaS dashboard.
+
+Avoid repeating the same statistics in multiple nearby sections.
+
+## Vehicle Build Organization
+
+Preserve the primary organization:
+
+PROFILE
+BUILD
+PARTS
+
+Only the selected section should receive primary emphasis.
+
+Do not return to one extremely long page containing every major section at once.
+
+Keep + ADD MOD separate from the navigation tabs.
+
++ ADD MOD remains an electric-green primary action.
+
+## Vehicle Media
+
+Vehicle visuals use progressive enhancement.
+
+Priority:
+
+1. User-uploaded photo of the actual vehicle
+2. Generic or AI-generated representative vehicle visual
+3. Existing futuristic fallback
+4. Future optional GLB / glTF interactive 3D vehicle
+
+The application should still provide a strong vehicle visual when the owner has not uploaded a personal photo.
+
+Representative vehicle imagery is illustrative.
+
+Never claim or imply that a generic or AI-generated vehicle visual is a photograph of the user's actual vehicle.
+
+Where appropriate, identify it as:
+
+Representative Visual
+Vehicle Representation
+Illustrative Vehicle
+
+A user-uploaded vehicle photo always takes priority over a representative visual.
+
+Users must remain able to:
+
+- Upload My Car
+- Replace My Photo
+- Remove My Photo
+- Return to the 

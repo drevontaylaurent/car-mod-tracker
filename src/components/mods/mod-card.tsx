@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { deleteMod, updateModStatus } from "@/actions/mods";
 import { MOD_STATUSES, type Mod } from "@/types/database";
-import { StatusBadge } from "@/components/ui/status-badge";
 
 interface ModCardProps {
   mod: Mod;
@@ -65,41 +64,38 @@ export function ModCard({ mod }: ModCardProps) {
   }
 
   return (
-    <article className="build-mod-entry">
-      <div className="build-mod-entry__top">
-        <div className="min-w-0">
-          <div className="build-mod-entry__identity">
-            <h4 className="build-mod-entry__name">{mod.part_name}</h4>
-            <StatusBadge status={status} />
-          </div>
-          <p className="build-mod-entry__metadata">
+    <article className="open-build__mod-row" data-status={status}>
+      <div className="open-build__mod-main">
+        <div className="open-build__category-marker" aria-hidden="true">
+          {mod.category.slice(0, 3).toUpperCase()}
+        </div>
+        <div className="open-build__mod-details">
+          <h3 className="open-build__part-name">{mod.part_name}</h3>
+          <p className="open-build__part-metadata">
             {[mod.brand, mod.category].filter(Boolean).join(" · ")}
           </p>
+          {mod.install_date && (
+            <p className="open-build__part-date">
+              <span className="technical-label">Install date / </span>
+              <time dateTime={mod.install_date}>{mod.install_date}</time>
+            </p>
+          )}
+          {mod.notes && (
+            <p className="open-build__part-notes">{mod.notes}</p>
+          )}
         </div>
-        <p className="build-mod-entry__cost">
+      </div>
+      <div className="open-build__mod-actions">
+        <p className="open-build__part-cost">
           {currencyFormatter.format(mod.cost)}
         </p>
-      </div>
-      {mod.install_date && (
-        <p className="build-mod-entry__date">
-          <span className="technical-label">Install date / </span>
-          <time dateTime={mod.install_date}>{mod.install_date}</time>
-        </p>
-      )}
-      {mod.notes && (
-        <p className="build-mod-entry__notes">
-          {mod.notes}
-        </p>
-      )}
-      <div className="build-mod-entry__controls">
-        <label className="build-mod-entry__status">
-          <span className="technical-label">Update status</span>
+        <label className="open-build__status-select-label">
+          <span className="sr-only">Update status for {mod.part_name}</span>
           <select
-            aria-label={`Change status for ${mod.part_name}`}
             value={status}
             disabled={isPending}
             onChange={(event) => void handleStatusChange(event.currentTarget.value)}
-            className="field-control"
+            className="open-build__status-select"
           >
             {MOD_STATUSES.map((option) => (
               <option key={option} value={option}>
@@ -112,13 +108,13 @@ export function ModCard({ mod }: ModCardProps) {
           type="button"
           onClick={() => void handleDelete()}
           disabled={isPending}
-          className="button-ghost build-mod-entry__delete"
+          className="button-ghost open-build__delete"
         >
           {isPending ? "Saving..." : "Delete"}
         </button>
       </div>
       {errorMessage && (
-        <p role="alert" className="state-message mt-3" data-tone="error">
+        <p role="alert" className="state-message open-build__mod-error" data-tone="error">
           {errorMessage}
         </p>
       )}
