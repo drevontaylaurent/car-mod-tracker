@@ -9,16 +9,19 @@ import type { Mod } from "@/types/database";
 interface ModPurchaseLinkEditorProps {
   mod: Mod;
   disabled: boolean;
+  isOpen: boolean;
+  onClose: () => void;
   onSaved: (purchaseUrl: string | null) => void;
 }
 
 export function ModPurchaseLinkEditor({
   mod,
   disabled,
+  isOpen,
+  onClose,
   onSaved,
 }: ModPurchaseLinkEditorProps) {
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState(mod.purchase_url ?? "");
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -35,7 +38,7 @@ export function ModPurchaseLinkEditor({
       }
       setValue(result.data.purchase_url ?? "");
       onSaved(result.data.purchase_url);
-      setIsOpen(false);
+      onClose();
       router.refresh();
     } catch {
       setErrorMessage("Could not save this link. Please try again.");
@@ -44,18 +47,7 @@ export function ModPurchaseLinkEditor({
     }
   }
 
-  if (!isOpen) {
-    return (
-      <button
-        type="button"
-        onClick={() => setIsOpen(true)}
-        disabled={disabled}
-        className="button-ghost open-build__delete"
-      >
-        {mod.purchase_url ? "Edit link" : "Add link"}
-      </button>
-    );
-  }
+  if (!isOpen) return null;
 
   return (
     <form onSubmit={(event) => void handleSubmit(event)} className="open-build__link-form">
@@ -80,13 +72,13 @@ export function ModPurchaseLinkEditor({
       <div className="open-build__link-form-actions">
         <button
           type="button"
-          onClick={() => setIsOpen(false)}
+          onClick={onClose}
           disabled={isSaving}
           className="button-secondary"
         >
           Cancel
         </button>
-        <button type="submit" disabled={isSaving} className="button-primary">
+        <button type="submit" disabled={isSaving || disabled} className="button-primary">
           {isSaving ? "Saving..." : "Save link"}
         </button>
       </div>

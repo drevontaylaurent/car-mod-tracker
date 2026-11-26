@@ -10,9 +10,10 @@ const categoryGroups = MOD_CATEGORY_GROUPS;
 interface ModListProps {
   mods: Mod[];
   statusFilter: ModStatus | null;
+  onResetStatusFilter: () => void;
 }
 
-export function ModList({ mods, statusFilter }: ModListProps) {
+export function ModList({ mods, statusFilter, onResetStatusFilter }: ModListProps) {
   const [categoryFilter, setCategoryFilter] = useState<ModCategoryGroupId | "all">(
     "all",
   );
@@ -37,14 +38,22 @@ export function ModList({ mods, statusFilter }: ModListProps) {
   return (
     <section className="open-build__mod-list" aria-labelledby="mod-list-heading">
       <div className="open-build__mod-list-heading">
-        <div>
-          <h2 id="mod-list-heading" className="open-build__mod-list-title">
-            Mod Inventory
-          </h2>
-          <p className="open-build__mod-count" aria-live="polite">
-            {filteredMods.length} of {mods.length} parts shown
-          </p>
-        </div>
+        <h2 id="mod-list-heading" className="sr-only">
+          Mod Inventory
+        </h2>
+        <p className="open-build__mod-count" aria-live="polite">
+          {filteredMods.length} of {mods.length} parts shown
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            setCategoryFilter("all");
+            onResetStatusFilter();
+          }}
+          className="open-build__reset-filters"
+        >
+          Reset Filters
+        </button>
       </div>
 
       <div className="open-build__category-strip" role="group" aria-label="Filter modifications by category">
@@ -55,7 +64,7 @@ export function ModList({ mods, statusFilter }: ModListProps) {
           onClick={() => setCategoryFilter("all")}
           className="open-build__category-filter"
         >
-          <span>ALL</span>
+          <span>All</span>
           <span className="open-build__category-count">{statusFilteredMods.length}</span>
         </button>
         {categoryGroups.map((group) => (
@@ -67,7 +76,7 @@ export function ModList({ mods, statusFilter }: ModListProps) {
             onClick={() => setCategoryFilter(group.id)}
             className="open-build__category-filter"
           >
-            <span>{group.label.toUpperCase()}</span>
+            <span>{group.label}</span>
             <span className="open-build__category-count">
               {categoryGroupCounts.get(group.id) ?? 0}
             </span>

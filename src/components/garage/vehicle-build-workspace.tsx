@@ -111,7 +111,11 @@ export function VehicleBuildWorkspace({
           className="open-build__inventory"
           aria-labelledby="mod-list-heading"
         >
-          <ModList mods={mods} statusFilter={statusFilter} />
+          <ModList
+            mods={mods}
+            statusFilter={statusFilter}
+            onResetStatusFilter={() => setStatusFilter(null)}
+          />
         </section>
       </section>
 

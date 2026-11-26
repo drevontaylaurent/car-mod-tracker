@@ -22,6 +22,7 @@ export function ModCard({ mod }: ModCardProps) {
   const [isPending, setIsPending] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [purchaseUrl, setPurchaseUrl] = useState(mod.purchase_url);
+  const [isLinkEditorOpen, setIsLinkEditorOpen] = useState(false);
   const safePurchaseUrl = getSafePurchaseUrl(purchaseUrl);
 
   async function handleStatusChange(value: string) {
@@ -69,35 +70,59 @@ export function ModCard({ mod }: ModCardProps) {
 
   return (
     <article className="open-build__mod-row" data-status={status}>
-      <div className="open-build__mod-main">
-        <div className="open-build__category-marker" aria-hidden="true">
-          {mod.category.slice(0, 3).toUpperCase()}
-        </div>
-        <div className="open-build__mod-details">
-          <h3 className="open-build__part-name">{mod.part_name}</h3>
-          <p className="open-build__part-metadata">
-            {[mod.brand, mod.category].filter(Boolean).join(" · ")}
-          </p>
-          {mod.install_date && (
-            <p className="open-build__part-date">
-              <span className="technical-label">Install date / </span>
-              <time dateTime={mod.install_date}>{mod.install_date}</time>
-            </p>
-          )}
-          {mod.notes && (
-            <p className="open-build__part-notes">{mod.notes}</p>
-          )}
-          <ModPurchaseLinkEditor
-            mod={{ ...mod, purchase_url: purchaseUrl }}
-            disabled={isPending}
-            onSaved={setPurchaseUrl}
-          />
-        </div>
+      <div className="open-build__category-marker" aria-hidden="true">
+        {mod.category.split(" ")[0].toUpperCase()}
       </div>
-      <div className="open-build__mod-actions">
+      <h3 className="open-build__part-name" title={mod.part_name}>
+        {mod.part_name}
+      </h3>
+      <div className="open-build__part-price">
         <p className="open-build__part-cost">
           {currencyFormatter.format(mod.cost)}
         </p>
+        <button
+          type="button"
+          onClick={() => setIsLinkEditorOpen((isOpen) => !isOpen)}
+          disabled={isPending}
+          aria-expanded={isLinkEditorOpen}
+          aria-label={`${purchaseUrl ? "Edit" : "Add"} purchase link for ${mod.part_name}`}
+          className="open-build__icon-button"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" className="open-build__icon">
+            <path
+              d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+        <button
+          type="button"
+          onClick={() => void handleDelete()}
+          disabled={isPending}
+          aria-label={`Delete ${mod.part_name}`}
+          className="open-build__icon-button open-build__delete"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" className="open-build__icon">
+            <path
+              d="M4 7h16M9 7V4.5h6V7m-8 0 1 13h8l1-13M10 11v6m4-6v6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      </div>
+      <p className="open-build__part-metadata">
+        {mod.brand && <span className="open-build__part-brand">{mod.brand}</span>}
+        <span className="open-build__part-tag">{mod.category}</span>
+      </p>
+      <div className="open-build__part-controls">
         {safePurchaseUrl && (
           <a
             href={safePurchaseUrl}
@@ -124,14 +149,24 @@ export function ModCard({ mod }: ModCardProps) {
             ))}
           </select>
         </label>
-        <button
-          type="button"
-          onClick={() => void handleDelete()}
+      </div>
+      <div className="open-build__part-extra">
+        {mod.install_date && (
+          <p className="open-build__part-date">
+            <span className="technical-label">Install date / </span>
+            <time dateTime={mod.install_date}>{mod.install_date}</time>
+          </p>
+        )}
+        {mod.notes && (
+          <p className="open-build__part-notes">{mod.notes}</p>
+        )}
+        <ModPurchaseLinkEditor
+          mod={{ ...mod, purchase_url: purchaseUrl }}
           disabled={isPending}
-          className="button-ghost open-build__delete"
-        >
-          {isPending ? "Saving..." : "Delete"}
-        </button>
+          isOpen={isLinkEditorOpen}
+          onClose={() => setIsLinkEditorOpen(false)}
+          onSaved={setPurchaseUrl}
+        />
       </div>
       {errorMessage && (
         <p role="alert" className="state-message open-build__mod-error" data-tone="error">
