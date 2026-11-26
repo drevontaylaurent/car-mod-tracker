@@ -3,6 +3,11 @@ import type {
   VehicleDiagnosticInsert,
   VehicleDiagnosticUpdate,
 } from "@/types/diagnostics";
+import type {
+  BuildPhase,
+  BuildPhaseInsert,
+  BuildPhaseUpdate,
+} from "@/types/build-timeline";
 
 export interface Vehicle {
   id: string;
@@ -58,6 +63,7 @@ export interface Mod {
   brand: string | null;
   category: ModCategory;
   status: ModStatus;
+  phase_id: string | null;
   cost: number;
   install_date: string | null;
   notes: string | null;
@@ -73,6 +79,7 @@ export interface ModInsert {
   brand?: string | null;
   category: ModCategory;
   status?: ModStatus;
+  phase_id?: string | null;
   cost?: number;
   install_date?: string | null;
   notes?: string | null;
@@ -109,6 +116,12 @@ export interface Database {
         Row: Mod & Record<string, unknown>;
         Insert: ModInsert & Record<string, unknown>;
         Update: ModUpdate & Record<string, unknown>;
+        Relationships: [];
+      };
+      build_phases: {
+        Row: BuildPhase & Record<string, unknown>;
+        Insert: BuildPhaseInsert & Record<string, unknown>;
+        Update: BuildPhaseUpdate & Record<string, unknown>;
         Relationships: [];
       };
       vehicle_diagnostics: {

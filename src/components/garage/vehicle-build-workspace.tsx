@@ -11,6 +11,8 @@ import {
 import { VehicleMediaStage } from "@/components/garage/vehicle-media-stage";
 import { VehicleProfilePanel } from "@/components/garage/vehicle-profile-panel";
 import { VehicleDiagnosticTracker } from "@/components/diagnostics/vehicle-diagnostic-tracker";
+import { BuildTimeline } from "@/components/timeline/build-timeline";
+import type { BuildPhase } from "@/types/build-timeline";
 import type { Mod, ModStatus } from "@/types/database";
 import type { VehicleDiagnostic } from "@/types/diagnostics";
 import type { VehicleWithMedia } from "@/types/vehicle-media";
@@ -20,6 +22,8 @@ interface VehicleBuildWorkspaceProps {
   mods: Mod[];
   diagnostics: VehicleDiagnostic[] | null;
   diagnosticsError: string | null;
+  phases: BuildPhase[] | null;
+  timelineError: string | null;
 }
 
 export function VehicleBuildWorkspace({
@@ -27,6 +31,8 @@ export function VehicleBuildWorkspace({
   mods,
   diagnostics,
   diagnosticsError,
+  phases,
+  timelineError,
 }: VehicleBuildWorkspaceProps) {
   const [isAddModOpen, setIsAddModOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<ModStatus | null>(null);
@@ -127,6 +133,22 @@ export function VehicleBuildWorkspace({
           vehicleId={vehicle.id}
           diagnostics={diagnostics}
           loadError={diagnosticsError}
+        />
+      </section>
+
+      <section
+        id={`build-${vehicle.id}-timeline-panel`}
+        className="open-build__tab-panel"
+        role="tabpanel"
+        aria-labelledby={`build-${vehicle.id}-timeline-tab`}
+        tabIndex={0}
+        hidden={activeSection !== "timeline"}
+      >
+        <BuildTimeline
+          vehicleId={vehicle.id}
+          phases={phases}
+          mods={mods}
+          loadError={timelineError}
         />
       </section>
 

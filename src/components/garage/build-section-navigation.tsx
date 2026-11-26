@@ -2,7 +2,7 @@
 
 import type { KeyboardEvent } from "react";
 
-export type ActiveBuildSection = "inventory" | "diagnostics";
+export type ActiveBuildSection = "inventory" | "diagnostics" | "timeline";
 
 interface BuildSectionNavigationProps {
   vehicleId: string;
@@ -10,11 +10,20 @@ interface BuildSectionNavigationProps {
   onActiveSectionChange: (section: ActiveBuildSection) => void;
 }
 
-const sections = [
-  { id: "inventory", label: "MOD INVENTORY", available: true },
-  { id: "diagnostics", label: "OBD-II", available: true },
-  { id: "timeline", label: "BUILD TIMELINE", available: false },
-] as const;
+const sections: readonly {
+  id: ActiveBuildSection;
+  label: string;
+}[] = [
+  { id: "inventory", label: "MOD INVENTORY" },
+  { id: "diagnostics", label: "OBD-II" },
+  { id: "timeline", label: "BUILD TIMELINE" },
+];
+
+const sectionIds: readonly ActiveBuildSection[] = [
+  "inventory",
+  "diagnostics",
+  "timeline",
+];
 
 export function BuildSectionNavigation({
   vehicleId,
@@ -30,14 +39,16 @@ export function BuildSectionNavigation({
     }
 
     event.preventDefault();
-    const next: ActiveBuildSection =
+    const currentIndex = sectionIds.indexOf(current);
+    const nextIndex =
       event.key === "Home"
-        ? "inventory"
+        ? 0
         : event.key === "End"
-          ? "diagnostics"
-          : current === "inventory"
-            ? "diagnostics"
-            : "inventory";
+          ? sectionIds.length - 1
+          : (currentIndex +
+              (event.key === "ArrowRight" ? 1 : sectionIds.length - 1)) %
+            sectionIds.length;
+    const next = sectionIds[nextIndex];
     onActiveSectionChange(next);
     document.getElementById(`build-${vehicleId}-${next}-tab`)?.focus();
   }
@@ -56,34 +67,15 @@ export function BuildSectionNavigation({
           className="open-build__nav-item"
           role="tab"
           aria-selected={activeSection === section.id}
-          aria-controls={
-            section.available
-              ? `build-${vehicleId}-${section.id}-panel`
-              : undefined
-          }
-          disabled={!section.available}
-          tabIndex={
-            section.available && activeSection === section.id ? 0 : -1
-          }
-          onClick={() => {
-            if (section.available) {
-              onActiveSectionChange(section.id);
-            }
-          }}
-          onKeyDown={(event) => {
-            if (section.available) {
-              handleKeyDown(event, section.id);
-            }
-          }}
+          aria-controls={`build-${vehicleId}-${section.id}-panel`}
+          tabIndex={activeSection === section.id ? 0 : -1}
+          onClick={() => onActiveSectionChange(section.id)}
+          onKeyDown={(event) => handleKeyDown(event, section.id)}
         >
           <span>{section.label}</span>
-          {section.available ? (
-            <span className="open-build__nav-state">
-              {activeSection === section.id ? "ACTIVE" : "OPEN"}
-            </span>
-          ) : (
-            <span className="open-build__nav-state">COMING SOON</span>
-          )}
+          <span className="open-build__nav-state">
+            {activeSection === section.id ? "ACTIVE" : "OPEN"}
+          </span>
         </button>
       ))}
     </div>

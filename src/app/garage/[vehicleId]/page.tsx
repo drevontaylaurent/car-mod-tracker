@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
+import { getVehicleBuildPhases } from "@/actions/build-timeline";
 import { getVehicleDiagnostics } from "@/actions/diagnostics";
 import { getVehicleMods } from "@/actions/mods";
 import { getUserVehicle } from "@/actions/vehicles";
@@ -25,11 +26,13 @@ async function VehicleBuildContent({
 }) {
   await connection();
   const { vehicleId } = await params;
-  const [vehicleResult, modsResult, diagnosticsResult] = await Promise.all([
-    getUserVehicle(vehicleId),
-    getVehicleMods(vehicleId),
-    getVehicleDiagnostics(vehicleId),
-  ]);
+  const [vehicleResult, modsResult, diagnosticsResult, phasesResult] =
+    await Promise.all([
+      getUserVehicle(vehicleId),
+      getVehicleMods(vehicleId),
+      getVehicleDiagnostics(vehicleId),
+      getVehicleBuildPhases(vehicleId),
+    ]);
 
   if (!vehicleResult.success) {
     return <BuildError message={vehicleResult.error} />;
@@ -46,6 +49,8 @@ async function VehicleBuildContent({
   const diagnosticsError = diagnosticsResult.success
     ? null
     : diagnosticsResult.error;
+  const phases = phasesResult.success ? phasesResult.data : null;
+  const timelineError = phasesResult.success ? null : phasesResult.error;
 
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -62,6 +67,8 @@ async function VehicleBuildContent({
           mods={mods}
           diagnostics={diagnostics}
           diagnosticsError={diagnosticsError}
+          phases={phases}
+          timelineError={timelineError}
         />
       </div>
     </main>

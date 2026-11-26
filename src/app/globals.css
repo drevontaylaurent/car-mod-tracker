@@ -2776,6 +2776,616 @@
       }
   }
 
+  .build-timeline {
+    min-width: 0;
+    padding-block: 0.75rem 1rem;
+  }
+
+  .build-timeline__header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(13rem, 0.65fr);
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .build-timeline__title {
+    display: flex;
+    min-width: 0;
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+
+  .build-timeline__title svg {
+    width: 2.7rem;
+    height: 2.7rem;
+    flex: 0 0 2.7rem;
+    fill: none;
+    stroke: var(--accent);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2.5;
+  }
+
+  .build-timeline__title h2 {
+    margin-top: 0.2rem;
+    color: var(--foreground);
+    font-size: clamp(1.35rem, 4vw, 2rem);
+    font-weight: 650;
+    letter-spacing: -0.045em;
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+  }
+
+  .build-timeline__title > div > p:last-child {
+    margin-top: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+
+  .build-timeline__overall {
+    display: grid;
+    grid-template-columns: auto minmax(4rem, 1fr);
+    align-items: center;
+    gap: 0.35rem 0.75rem;
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-primary);
+    padding: 0.8rem;
+  }
+
+  .build-timeline__overall > span {
+    grid-column: 1 / -1;
+    color: var(--text-secondary);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.62rem;
+    font-weight: 650;
+    letter-spacing: 0.08em;
+  }
+
+  .build-timeline__overall strong {
+    color: var(--accent);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 1.65rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  .build-timeline__overall progress {
+    width: 100%;
+    height: 0.42rem;
+    accent-color: var(--accent);
+  }
+
+  .build-timeline__overall small,
+  .build-timeline__overall > p {
+    grid-column: 1 / -1;
+    color: var(--text-secondary);
+    font-size: 0.68rem;
+  }
+
+  .build-timeline__load-error,
+  .build-timeline__empty {
+    margin-top: 1rem;
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-primary);
+    padding: 1rem;
+  }
+
+  .build-timeline__load-error {
+    color: var(--status-danger);
+    font-size: 0.8rem;
+  }
+
+  .build-timeline__empty h3 {
+    margin-top: 0.35rem;
+    color: var(--foreground);
+    font-size: 1.05rem;
+    font-weight: 650;
+  }
+
+  .build-timeline__empty > p:last-child {
+    margin-top: 0.35rem;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+
+  .build-timeline__phases {
+    position: relative;
+    display: grid;
+    gap: 0.75rem;
+    margin: 1rem 0 0;
+    padding-left: 1.65rem;
+    list-style: none;
+  }
+
+  .build-timeline__phases::before {
+    position: absolute;
+    top: 1rem;
+    bottom: 1rem;
+    left: 0.55rem;
+    width: 2px;
+    background: var(--border-strong);
+    content: "";
+  }
+
+  .build-timeline__phase {
+    position: relative;
+    min-width: 0;
+  }
+
+  .build-timeline__phase::before {
+    position: absolute;
+    z-index: 1;
+    top: 1rem;
+    left: -1.58rem;
+    width: 1.15rem;
+    height: 1.15rem;
+    border: 2px solid var(--text-muted);
+    border-radius: 50%;
+    background: var(--background);
+    content: "";
+  }
+
+  .build-timeline__phase[data-status="in_progress"]::before {
+    border-color: var(--accent);
+  }
+
+  .build-timeline__phase[data-status="completed"]::before {
+    border-color: var(--status-success);
+    background: var(--status-success);
+  }
+
+  .build-timeline__phase-card {
+    min-width: 0;
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-primary);
+    padding: 0.85rem;
+  }
+
+  .build-timeline__phase-header {
+    display: flex;
+    min-width: 0;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .build-timeline__phase-identity {
+    min-width: 0;
+  }
+
+  .build-timeline__phase-identity h3 {
+    margin-top: 0.2rem;
+    color: var(--foreground);
+    font-size: clamp(0.95rem, 2.8vw, 1.2rem);
+    font-weight: 650;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+
+  .build-timeline__phase-cost {
+    display: grid;
+    flex: 0 0 auto;
+    justify-items: end;
+    gap: 0.2rem;
+  }
+
+  .build-timeline__phase-cost strong {
+    color: var(--foreground);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: clamp(0.85rem, 3.2vw, 1.2rem);
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+  }
+
+  .build-timeline__phase-cost span,
+  .build-timeline__optional {
+    color: var(--text-muted);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.06em;
+  }
+
+  .build-timeline__phase-meta {
+    display: flex;
+    min-width: 0;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.7rem;
+    margin-top: 0.55rem;
+  }
+
+  .build-timeline__phase-meta select {
+    min-height: 40px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface-inset);
+    padding: 0.4rem 0.6rem;
+    color: var(--text-secondary);
+    font-size: 0.68rem;
+    text-transform: capitalize;
+  }
+
+  .build-timeline__phase-meta select[data-status="in_progress"] {
+    border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+    color: var(--accent);
+  }
+
+  .build-timeline__phase-meta select[data-status="completed"] {
+    border-color: color-mix(in srgb, var(--status-success) 45%, transparent);
+    color: var(--status-success);
+  }
+
+  .build-timeline__phase-meta p {
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    overflow-wrap: anywhere;
+  }
+
+  .build-timeline__phase-progress {
+    height: 0.42rem;
+    overflow: hidden;
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-inset);
+    margin-top: 0.65rem;
+  }
+
+  .build-timeline__phase-progress span {
+    display: block;
+    height: 100%;
+    background: var(--text-muted);
+    transition: width 180ms ease;
+  }
+
+  .build-timeline__phase[data-status="in_progress"] .build-timeline__phase-progress span {
+    background: var(--accent);
+  }
+
+  .build-timeline__phase[data-status="completed"] .build-timeline__phase-progress span {
+    background: var(--status-success);
+  }
+
+  .build-timeline__phase-progress-caption {
+    display: flex;
+    min-width: 0;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.3rem;
+    color: var(--text-muted);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.58rem;
+    overflow-wrap: anywhere;
+  }
+
+  .build-timeline__phase-description {
+    margin-top: 0.6rem;
+    color: var(--text-secondary);
+    font-size: 0.76rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .build-timeline__mod-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(9rem, 100%), 1fr));
+    gap: 0.5rem;
+    margin-top: 0.7rem;
+    list-style: none;
+    padding: 0;
+  }
+
+  .build-timeline__mod {
+    display: grid;
+    min-width: 0;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-inset);
+    padding: 0.5rem;
+  }
+
+  .build-timeline__mod-marker {
+    display: grid;
+    width: 2rem;
+    height: 2rem;
+    place-items: center;
+    border: 1px solid var(--border-strong);
+    color: var(--accent);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.52rem;
+    font-weight: 650;
+  }
+
+  .build-timeline__mod-info {
+    display: grid;
+    min-width: 0;
+    gap: 0.2rem;
+  }
+
+  .build-timeline__mod-info strong {
+    color: var(--foreground);
+    font-size: 0.68rem;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+
+  .build-timeline__mod-info > span {
+    color: var(--text-muted);
+    font-size: 0.6rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  .build-timeline__unassign {
+    grid-column: 2;
+    min-height: 36px;
+    justify-self: start;
+    border: 1px solid var(--border-subtle);
+    padding: 0.35rem 0.45rem;
+    color: var(--text-muted);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.52rem;
+    letter-spacing: 0.04em;
+  }
+
+  .build-timeline__no-mods {
+    grid-column: 1 / -1;
+    border: 1px dashed var(--border-subtle);
+    padding: 0.65rem;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+  }
+
+  .build-timeline__assign {
+    margin-top: 0.65rem;
+  }
+
+  .build-timeline__assign select {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface-inset);
+    padding: 0.5rem 0.65rem;
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+  }
+
+  .build-timeline__phase-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.55rem;
+    margin-top: 0.65rem;
+  }
+
+  .build-timeline__edit-details summary,
+  .build-timeline__delete-phase {
+    display: inline-flex;
+    min-height: 40px;
+    align-items: center;
+    border: 1px solid var(--border-subtle);
+    background: transparent;
+    padding: 0.4rem 0.6rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.68rem;
+  }
+
+  .build-timeline__delete-phase {
+    color: var(--status-danger);
+  }
+
+  .build-timeline__phase-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+    margin-top: 0.65rem;
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-inset);
+    padding: 0.7rem;
+  }
+
+  .build-timeline__phase-form label {
+    display: grid;
+    min-width: 0;
+    gap: 0.35rem;
+  }
+
+  .build-timeline__phase-form label > span {
+    color: var(--text-muted);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.57rem;
+    font-weight: 650;
+    letter-spacing: 0.07em;
+  }
+
+  .build-timeline__phase-form input,
+  .build-timeline__phase-form textarea {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface-primary);
+    padding: 0.5rem 0.6rem;
+    color: var(--foreground);
+    font-size: 0.75rem;
+  }
+
+  .build-timeline__phase-form textarea {
+    resize: vertical;
+  }
+
+  .build-timeline__phase-form button,
+  .build-timeline__phase-form > p {
+    grid-column: 1 / -1;
+  }
+
+  .build-timeline__add-phase {
+    margin-top: 0.85rem;
+  }
+
+  .build-timeline__add-phase-trigger {
+    display: flex;
+    min-height: 46px;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid var(--accent);
+    background: rgb(201 243 65 / 5%);
+    color: var(--accent);
+    cursor: pointer;
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.68rem;
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    list-style: none;
+  }
+
+  .build-timeline__add-phase-trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .build-timeline__add-phase-trigger span {
+    font-size: 1.2rem;
+  }
+
+  .build-timeline__summary {
+    margin-top: 1rem;
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-primary);
+    padding: 0.85rem;
+  }
+
+  .build-timeline__summary h3 {
+    color: var(--foreground);
+    font-size: 0.95rem;
+    font-weight: 650;
+  }
+
+  .build-timeline__summary ul {
+    display: grid;
+    gap: 0.45rem;
+    margin-top: 0.65rem;
+    list-style: none;
+    padding: 0;
+  }
+
+  .build-timeline__summary li,
+  .build-timeline__summary-phase,
+  .build-timeline__summary-total {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+  }
+
+  .build-timeline__summary-phase {
+    justify-content: flex-start;
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    overflow-wrap: anywhere;
+  }
+
+  .build-timeline__summary-phase > span:last-child {
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  .build-timeline__summary-phase small {
+    color: var(--text-muted);
+    font-size: 0.6rem;
+    text-transform: capitalize;
+  }
+
+  .build-timeline__summary-phase > span:first-child {
+    width: 0.65rem;
+    height: 0.65rem;
+    flex: 0 0 0.65rem;
+    border: 1px solid var(--text-muted);
+    border-radius: 50%;
+  }
+
+  .build-timeline__summary li[data-status="in_progress"] .build-timeline__summary-phase > span:first-child {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+
+  .build-timeline__summary li[data-status="completed"] .build-timeline__summary-phase > span:first-child {
+    border-color: var(--status-success);
+    background: var(--status-success);
+  }
+
+  .build-timeline__summary li > strong {
+    flex: 0 0 auto;
+    color: var(--foreground);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.68rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .build-timeline__summary-total {
+    border-top: 1px solid var(--border-subtle);
+    margin-top: 0.7rem;
+    padding-top: 0.7rem;
+    color: var(--foreground);
+    font-size: 0.74rem;
+    font-weight: 650;
+  }
+
+  .build-timeline__summary-total strong {
+    color: var(--accent);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+  }
+
+  .build-timeline__error {
+    grid-column: 1 / -1;
+    color: var(--status-danger);
+    font-size: 0.72rem;
+    line-height: 1.4;
+  }
+
+  .build-timeline__success {
+    color: var(--status-success);
+    font-size: 0.72rem;
+  }
+
+  .build-timeline button:disabled,
+  .build-timeline select:disabled {
+    cursor: wait;
+    opacity: 0.65;
+  }
+
+  .build-timeline :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 640px) {
+    .build-timeline__header {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .build-timeline__overall {
+      grid-template-columns: auto minmax(4rem, 1fr);
+    }
+
+    .build-timeline__phase-form {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .build-timeline__phase-form button,
+    .build-timeline__phase-form > p {
+      grid-column: 1;
+    }
+  }
+
   .open-build__add-mod {
     width: 100%;
     min-height: 2.875rem;
