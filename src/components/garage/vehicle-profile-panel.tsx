@@ -2,14 +2,40 @@
 
 import { useState } from "react";
 import { EditVehicleModal } from "@/components/garage/edit-vehicle-modal";
+import { getDiagnosticSummary } from "@/lib/diagnostic-summary";
+import type { VehicleDiagnostic } from "@/types/diagnostics";
 import type { VehicleWithMedia } from "@/types/vehicle-media";
 
 interface VehicleProfilePanelProps {
   vehicle: VehicleWithMedia;
+  diagnostics: VehicleDiagnostic[] | null;
+  diagnosticsError: string | null;
 }
 
-export function VehicleProfilePanel({ vehicle }: VehicleProfilePanelProps) {
+export function VehicleProfilePanel({
+  vehicle,
+  diagnostics,
+  diagnosticsError,
+}: VehicleProfilePanelProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const diagnosticSummary = diagnostics
+    ? getDiagnosticSummary(diagnostics)
+    : null;
+  const highestSeverity =
+    diagnosticSummary?.highestUnresolvedSeverity ?? null;
+  const diagnosticState = diagnosticsError || !diagnosticSummary
+    ? "TRACKER UNAVAILABLE"
+    : diagnosticSummary?.unresolvedCount === 0
+      ? "NO ACTIVE CODES"
+      : `${diagnosticSummary?.unresolvedCount} UNRESOLVED · ${highestSeverity?.toUpperCase()}`;
+  const diagnosticLabel =
+    diagnosticsError || !diagnosticSummary
+      ? diagnosticsError ?? "Diagnostic tracker unavailable."
+      : diagnosticSummary.unresolvedCount === 0
+      ? "No active diagnostic records in the tracker; this is not a vehicle-health assessment."
+      : highestSeverity
+        ? `${diagnosticSummary.unresolvedCount} unresolved diagnostic records. Highest severity: ${highestSeverity}.`
+        : "Unresolved diagnostic records are present.";
 
   return (
     <>
@@ -32,13 +58,21 @@ export function VehicleProfilePanel({ vehicle }: VehicleProfilePanelProps) {
           </details>
           <div
             className="open-build__obd-status"
-            aria-label="OBD-II diagnostics are not implemented yet"
+            data-state={
+              diagnosticsError || !diagnosticSummary
+                ? "unavailable"
+                : diagnosticSummary?.unresolvedCount
+                  ? "active"
+                  : "none"
+            }
+            data-severity={highestSeverity ?? "none"}
+            aria-label={diagnosticLabel}
           >
             <span>OBD-II</span>
             <span className="open-build__obd-divider" aria-hidden="true">
               /
             </span>
-            <span className="open-build__obd-state">NOT IMPLEMENTED</span>
+            <span className="open-build__obd-state">{diagnosticState}</span>
           </div>
         </div>
         <button

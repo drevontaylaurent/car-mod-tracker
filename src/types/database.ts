@@ -1,3 +1,9 @@
+import type {
+  VehicleDiagnostic,
+  VehicleDiagnosticInsert,
+  VehicleDiagnosticUpdate,
+} from "@/types/diagnostics";
+
 export interface Vehicle {
   id: string;
   user_id: string;
@@ -103,6 +109,12 @@ export interface Database {
         Row: Mod & Record<string, unknown>;
         Insert: ModInsert & Record<string, unknown>;
         Update: ModUpdate & Record<string, unknown>;
+        Relationships: [];
+      };
+      vehicle_diagnostics: {
+        Row: VehicleDiagnostic & Record<string, unknown>;
+        Insert: VehicleDiagnosticInsert & Record<string, unknown>;
+        Update: VehicleDiagnosticUpdate & Record<string, unknown>;
         Relationships: [];
       };
     };

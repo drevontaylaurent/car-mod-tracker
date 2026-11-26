@@ -4,23 +4,34 @@ import { useCallback, useState } from "react";
 import { AddModDialog } from "@/components/mods/add-mod-dialog";
 import { ModList } from "@/components/mods/mod-list";
 import { BuildSummary } from "@/components/mods/build-summary";
-import { BuildSectionNavigation } from "@/components/garage/build-section-navigation";
+import {
+  BuildSectionNavigation,
+  type ActiveBuildSection,
+} from "@/components/garage/build-section-navigation";
 import { VehicleMediaStage } from "@/components/garage/vehicle-media-stage";
 import { VehicleProfilePanel } from "@/components/garage/vehicle-profile-panel";
+import { VehicleDiagnosticTracker } from "@/components/diagnostics/vehicle-diagnostic-tracker";
 import type { Mod, ModStatus } from "@/types/database";
+import type { VehicleDiagnostic } from "@/types/diagnostics";
 import type { VehicleWithMedia } from "@/types/vehicle-media";
 
 interface VehicleBuildWorkspaceProps {
   vehicle: VehicleWithMedia;
   mods: Mod[];
+  diagnostics: VehicleDiagnostic[] | null;
+  diagnosticsError: string | null;
 }
 
 export function VehicleBuildWorkspace({
   vehicle,
   mods,
+  diagnostics,
+  diagnosticsError,
 }: VehicleBuildWorkspaceProps) {
   const [isAddModOpen, setIsAddModOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<ModStatus | null>(null);
+  const [activeSection, setActiveSection] =
+    useState<ActiveBuildSection>("inventory");
   const vehicleName =
     vehicle.nickname ||
     [vehicle.year, vehicle.make, vehicle.model].filter(Boolean).join(" ") ||
@@ -34,7 +45,10 @@ export function VehicleBuildWorkspace({
   const closeAddMod = useCallback(() => setIsAddModOpen(false), []);
 
   return (
-    <section className="build-experience" aria-label={`Build experience for ${vehicleName}`}>
+    <section
+      className="build-experience"
+      aria-label={`Build experience for ${vehicleName}`}
+    >
       <h1 className="sr-only">Vehicle build: {vehicleName}</h1>
       <div className="open-build__hero">
         <VehicleMediaStage
@@ -52,7 +66,11 @@ export function VehicleBuildWorkspace({
           {!vehicle.nickname && vehicle.trim && (
             <p className="open-build__specifications">Trim / {vehicle.trim}</p>
           )}
-          <VehicleProfilePanel vehicle={vehicle} />
+          <VehicleProfilePanel
+            vehicle={vehicle}
+            diagnostics={diagnostics}
+            diagnosticsError={diagnosticsError}
+          />
         </div>
       </div>
 
@@ -62,29 +80,53 @@ export function VehicleBuildWorkspace({
         onStatusFilterChange={setStatusFilter}
       />
 
-      <BuildSectionNavigation />
-
-      <div className="open-build__actions">
-        <button
-          type="button"
-          className="button-primary open-build__add-mod"
-          aria-haspopup="dialog"
-          aria-expanded={isAddModOpen}
-          aria-controls={isAddModOpen ? "add-mod-dialog" : undefined}
-          onClick={() => setIsAddModOpen(true)}
-        >
-          + ADD MOD
-        </button>
-      </div>
+      <BuildSectionNavigation
+        vehicleId={vehicle.id}
+        activeSection={activeSection}
+        onActiveSectionChange={setActiveSection}
+      />
 
       <section
-        id="open-build-mod-inventory"
-        className="open-build__inventory"
-        aria-labelledby="mod-list-heading"
+        id={`build-${vehicle.id}-inventory-panel`}
+        className="open-build__tab-panel"
+        role="tabpanel"
+        aria-labelledby={`build-${vehicle.id}-inventory-tab`}
+        tabIndex={0}
+        hidden={activeSection !== "inventory"}
       >
-        <ModList
-          mods={mods}
-          statusFilter={statusFilter}
+        <div className="open-build__actions">
+          <button
+            type="button"
+            className="button-primary open-build__add-mod"
+            aria-haspopup="dialog"
+            aria-expanded={isAddModOpen}
+            aria-controls={isAddModOpen ? "add-mod-dialog" : undefined}
+            onClick={() => setIsAddModOpen(true)}
+          >
+            + ADD MOD
+          </button>
+        </div>
+        <section
+          id="open-build-mod-inventory"
+          className="open-build__inventory"
+          aria-labelledby="mod-list-heading"
+        >
+          <ModList mods={mods} statusFilter={statusFilter} />
+        </section>
+      </section>
+
+      <section
+        id={`build-${vehicle.id}-diagnostics-panel`}
+        className="open-build__tab-panel"
+        role="tabpanel"
+        aria-labelledby={`build-${vehicle.id}-diagnostics-tab`}
+        tabIndex={0}
+        hidden={activeSection !== "diagnostics"}
+      >
+        <VehicleDiagnosticTracker
+          vehicleId={vehicle.id}
+          diagnostics={diagnostics}
+          loadError={diagnosticsError}
         />
       </section>
 

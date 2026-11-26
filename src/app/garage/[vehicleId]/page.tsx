@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
+import { getVehicleDiagnostics } from "@/actions/diagnostics";
 import { getVehicleMods } from "@/actions/mods";
 import { getUserVehicle } from "@/actions/vehicles";
 import { SignOutControl } from "@/components/auth/sign-out-control";
@@ -24,9 +25,10 @@ async function VehicleBuildContent({
 }) {
   await connection();
   const { vehicleId } = await params;
-  const [vehicleResult, modsResult] = await Promise.all([
+  const [vehicleResult, modsResult, diagnosticsResult] = await Promise.all([
     getUserVehicle(vehicleId),
     getVehicleMods(vehicleId),
+    getVehicleDiagnostics(vehicleId),
   ]);
 
   if (!vehicleResult.success) {
@@ -38,6 +40,12 @@ async function VehicleBuildContent({
 
   const vehicle = vehicleResult.data;
   const mods = modsResult.data;
+  const diagnostics = diagnosticsResult.success
+    ? diagnosticsResult.data
+    : null;
+  const diagnosticsError = diagnosticsResult.success
+    ? null
+    : diagnosticsResult.error;
 
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -52,6 +60,8 @@ async function VehicleBuildContent({
         <VehicleBuildWorkspace
           vehicle={vehicle}
           mods={mods}
+          diagnostics={diagnostics}
+          diagnosticsError={diagnosticsError}
         />
       </div>
     </main>
