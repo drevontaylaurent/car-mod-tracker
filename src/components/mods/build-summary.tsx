@@ -79,9 +79,16 @@ export function BuildSummary({
           >
             <span style={{ width: `${progress}%` }} />
           </div>
-          <p className="open-build__progress-caption">
-            {installedCount} of {totalModCount} tracked parts installed.
-          </p>
+          <div className="open-build__progress-meta">
+            <p className="open-build__progress-caption">
+              {installedCount} of {totalModCount} tracked parts installed.
+            </p>
+            <ul className="open-build__legend" aria-hidden="true">
+              <li data-status="Installed">Inst</li>
+              <li data-status="Ordered">Ord</li>
+              <li data-status="Wishlist">Wish</li>
+            </ul>
+          </div>
         </section>
 
         <dl className="open-build__costs">
@@ -113,7 +120,12 @@ export function BuildSummary({
             aria-pressed={statusFilter === control.value}
             onClick={() => onStatusFilterChange(control.value)}
           >
-            <span className="open-build__status-label">{control.label}</span>
+            <span className="open-build__status-label">
+              {control.value && (
+                <span className="open-build__filter-dot" aria-hidden="true" />
+              )}
+              {control.label}
+            </span>
             <span className="open-build__status-count">{control.count}</span>
           </button>
         ))}
