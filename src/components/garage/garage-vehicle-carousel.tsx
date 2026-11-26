@@ -1,8 +1,8 @@
 "use client";
 
-import type { GarageModSummary } from "@/types/garage";
 import { VehicleCarouselSlide } from "@/components/garage/vehicle-carousel-slide";
 import { useGarageVehicleCarousel } from "@/components/garage/use-garage-vehicle-carousel";
+import type { GarageModSummary } from "@/types/garage";
 import type { VehicleWithMedia } from "@/types/vehicle-media";
 
 interface GarageVehicleCarouselProps {
@@ -22,16 +22,12 @@ export function GarageVehicleCarousel({
   onBeforeDelete,
   onSelectVehicle,
 }: GarageVehicleCarouselProps) {
-  const {
-    viewportRef,
-    selectedIndex,
-    moveBy,
-    handleScroll,
-  } = useGarageVehicleCarousel({
-    vehicles,
-    selectedVehicleId,
-    onSelectVehicle,
-  });
+  const { viewportRef, selectedIndex, moveBy, handleScroll } =
+    useGarageVehicleCarousel({
+      vehicles,
+      selectedVehicleId,
+      onSelectVehicle,
+    });
   const summariesByVehicleId = new Map(
     modSummaries.map((summary) => [summary.vehicleId, summary]),
   );
@@ -43,36 +39,6 @@ export function GarageVehicleCarousel({
       aria-roledescription="carousel"
       aria-label="Garage vehicle selection"
     >
-      <div className="garage-carousel__controls" role="group" aria-label="Carousel controls">
-        {vehicles.length > 1 && (
-          <button
-            type="button"
-            className="garage-carousel__control"
-            aria-label="Previous vehicle"
-            onClick={() => moveBy(-1)}
-          >
-            <span aria-hidden="true">←</span> Previous
-          </button>
-        )}
-        <p
-          className="garage-carousel__position"
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          VEHICLE {selectedIndex + 1} / {vehicles.length}
-        </p>
-        {vehicles.length > 1 && (
-          <button
-            type="button"
-            className="garage-carousel__control"
-            aria-label="Next vehicle"
-            onClick={() => moveBy(1)}
-          >
-            Next <span aria-hidden="true">→</span>
-          </button>
-        )}
-      </div>
-
       <div
         ref={viewportRef}
         className="garage-carousel__viewport"
@@ -93,6 +59,39 @@ export function GarageVehicleCarousel({
           ))}
         </div>
       </div>
+
+      {vehicles.length > 1 && (
+        <div className="garage-carousel__navigation">
+          <button
+            type="button"
+            aria-label="Previous vehicle"
+            className="garage-carousel__arrow"
+            onClick={() => moveBy(-1)}
+          >
+            <span aria-hidden="true">←</span>
+          </button>
+          <div className="garage-carousel__indicators" aria-label="Choose vehicle">
+            {vehicles.map((vehicle, index) => (
+              <button
+                key={vehicle.id}
+                type="button"
+                className="garage-carousel__indicator"
+                aria-label={`Show vehicle ${index + 1} of ${vehicles.length}`}
+                aria-current={index === selectedIndex ? "true" : undefined}
+                onClick={() => onSelectVehicle(vehicle.id)}
+              />
+            ))}
+          </div>
+          <button
+            type="button"
+            aria-label="Next vehicle"
+            className="garage-carousel__arrow"
+            onClick={() => moveBy(1)}
+          >
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+      )}
     </section>
   );
 }

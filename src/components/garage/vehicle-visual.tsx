@@ -62,7 +62,7 @@ export function VehicleVisual({
         sizes={
           variant === "build"
             ? "(min-width: 1024px) 55vw, 100vw"
-            : "(min-width: 1024px) 35vw, 100vw"
+            : "(min-width: 1024px) 68vw, 100vw"
         }
         loading={variant === "build" ? "eager" : "lazy"}
         className="vehicle-visual__photo"
