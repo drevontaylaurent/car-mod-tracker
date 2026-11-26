@@ -6,6 +6,7 @@ import { MOD_CATEGORY_GROUPS } from "@/lib/mod-categories";
 import { MOD_STATUSES } from "@/types/database";
 import { AddModModeToggle, type AddModMode } from "./add-mod-mode-toggle";
 import { PurchaseUrlField } from "./purchase-url-field";
+import { useAddModFields } from "./use-add-mod-fields";
 
 interface AddModFormProps {
   vehicleId: string;
@@ -17,6 +18,7 @@ export function AddModForm({ vehicleId, onCancel, onSuccess }: AddModFormProps) 
   const [state, formAction, isPending] = useActionState(createMod, undefined);
   const [mode, setMode] = useState<AddModMode>("url");
   const [purchaseUrl, setPurchaseUrl] = useState("");
+  const { values, setField, status, runAutofill } = useAddModFields();
 
   useEffect(() => {
     if (state?.success) {
@@ -28,13 +30,21 @@ export function AddModForm({ vehicleId, onCancel, onSuccess }: AddModFormProps) 
     <form action={formAction} className="add-mod__form">
       <input type="hidden" name="vehicleId" value={vehicleId} />
       <AddModModeToggle mode={mode} onModeChange={setMode} />
-      <PurchaseUrlField mode={mode} value={purchaseUrl} onChange={setPurchaseUrl} />
+      <PurchaseUrlField
+        mode={mode}
+        value={purchaseUrl}
+        onChange={setPurchaseUrl}
+        autofill={status}
+        onAutofill={() => void runAutofill(purchaseUrl)}
+      />
       <label className="field-label add-mod__label add-mod__wide">
         Part name *
         <input
           required
           maxLength={150}
           name="part_name"
+          value={values.partName}
+          onChange={(event) => setField("partName", event.currentTarget.value)}
           className="field-control mt-2"
           placeholder="e.g., Cold Air Intake System"
         />
@@ -44,6 +54,8 @@ export function AddModForm({ vehicleId, onCancel, onSuccess }: AddModFormProps) 
         <input
           maxLength={100}
           name="brand"
+          value={values.brand}
+          onChange={(event) => setField("brand", event.currentTarget.value)}
           className="field-control mt-2"
           placeholder="e.g., K-Tuned"
         />
@@ -57,13 +69,20 @@ export function AddModForm({ vehicleId, onCancel, onSuccess }: AddModFormProps) 
           type="number"
           inputMode="decimal"
           name="cost"
+          value={values.cost}
+          onChange={(event) => setField("cost", event.currentTarget.value)}
           className="field-control mt-2"
           placeholder="249.99"
         />
       </label>
       <label className="field-label add-mod__label">
         System
-        <select name="category" defaultValue="Power Mods" className="field-control mt-2">
+        <select
+          name="category"
+          value={values.category}
+          onChange={(event) => setField("category", event.currentTarget.value)}
+          className="field-control mt-2"
+        >
           {MOD_CATEGORY_GROUPS.map((group) => (
             <option key={group.id} value={group.selectValue}>
               {group.label}
