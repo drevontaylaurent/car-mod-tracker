@@ -1,4 +1,4 @@
-import { CreateDiagnosticForm } from "@/components/diagnostics/create-diagnostic-form";
+import { DiagnosticTrackerHeader } from "@/components/diagnostics/diagnostic-tracker-header";
 import { DiagnosticRow } from "@/components/diagnostics/diagnostic-row";
 import { getDiagnosticSummary } from "@/lib/diagnostic-summary";
 import type { VehicleDiagnostic } from "@/types/diagnostics";
@@ -21,13 +21,10 @@ export function VehicleDiagnosticTracker({
       className="open-build__diagnostics"
       aria-labelledby="diagnostic-tracker-heading"
     >
-      <header className="open-build__diagnostic-heading">
-        <div>
-          <p className="technical-label">Manual records / vehicle-specific</p>
-          <h2 id="diagnostic-tracker-heading">OBD-II Diagnostic Tracker</h2>
-        </div>
-        <span className="open-build__diagnostic-marker">MANUAL</span>
-      </header>
+      <DiagnosticTrackerHeader
+        vehicleId={vehicleId}
+        canAdd={Boolean(diagnostics && summary && !loadError)}
+      />
 
       {loadError || !diagnostics || !summary ? (
         <p role="alert" className="open-build__diagnostic-load-error">
@@ -41,22 +38,19 @@ export function VehicleDiagnosticTracker({
             aria-label="Diagnostic fixed progress"
           >
             <div className="open-build__diagnostic-progress-copy">
-              <span>FIXED PROGRESS</span>
-              <strong>{summary.resolutionPercent}% FIXED</strong>
+              <span>
+                {summary.resolutionPercent}% Resolved — {summary.resolvedCount}{" "}
+                of {summary.totalCount} codes fixed
+              </span>
+              <strong>{summary.resolutionPercent}%</strong>
             </div>
             <progress
               max={100}
               value={summary.resolutionPercent}
               aria-label={`${summary.resolutionPercent}% of diagnostic codes marked fixed`}
             />
-            <p>
-              {summary.resolvedCount} of {summary.totalCount} codes marked fixed
-            </p>
           </section>
 
-          <CreateDiagnosticForm
-            vehicleId={vehicleId}
-          />
           {diagnostics.length === 0 ? (
             <p role="status" className="open-build__diagnostic-empty">
               No diagnostic codes are recorded for this vehicle.

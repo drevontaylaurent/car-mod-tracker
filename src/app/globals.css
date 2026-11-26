@@ -2810,7 +2810,16 @@
       padding-top: 0.75rem;
     }
 
-    .open-build__diagnostic-heading,
+    .open-build__diagnostic-heading {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      border: 1px solid var(--border-subtle);
+      border-radius: 0.85rem;
+      background: var(--surface-primary);
+      padding: 0.75rem;
+    }
+
     .open-build__diagnostic-progress-copy {
       display: flex;
       align-items: center;
@@ -2818,45 +2827,80 @@
       gap: 1rem;
     }
 
-    .open-build__diagnostic-heading h2 {
-      margin-top: 0.35rem;
-      font-size: clamp(1.05rem, 3vw, 1.4rem);
-      font-weight: 650;
-      letter-spacing: -0.035em;
+    .open-build__diagnostic-icon {
+      display: inline-flex;
+      width: 2.4rem;
+      height: 2.4rem;
+      flex: none;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border-strong);
+      border-radius: 0.6rem;
+      background: var(--surface-inset);
+      color: var(--accent);
     }
 
-    .open-build__diagnostic-marker,
-    .open-build__diagnostic-progress-copy span {
-      color: var(--text-muted);
+    .open-build__diagnostic-title {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .open-build__diagnostic-title h2 {
+      color: var(--foreground);
       font-family: var(--font-geist-mono), monospace;
-      font-size: 0.62rem;
-      font-weight: 650;
-      letter-spacing: 0.09em;
+      font-size: 0.66rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .open-build__diagnostic-title p {
+      margin-top: 0.2rem;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      line-height: 1.3;
+    }
+
+    .open-build__diagnostic-add {
+      min-height: 44px;
+      flex: none;
+      border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+      border-radius: 0.6rem;
+      background: transparent;
+      padding: 0 0.8rem;
+      color: var(--accent);
+      font-family: var(--font-geist-mono), monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+    }
+
+    .open-build__diagnostic-progress-copy span {
+      color: var(--text-secondary);
+      font-size: 0.72rem;
     }
 
     .open-build__diagnostic-progress {
-      margin-top: 1rem;
-      border: 1px solid var(--border-subtle);
-      background: var(--surface-primary);
-      padding: 0.8rem;
+      margin-top: 0.7rem;
+      padding: 0 0.15rem;
     }
 
     .open-build__diagnostic-progress-copy strong {
       color: var(--accent);
       font-family: var(--font-geist-mono), monospace;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       letter-spacing: 0.04em;
     }
 
     .open-build__diagnostic-progress progress {
       display: block;
       width: 100%;
-      height: 0.4rem;
-      margin-top: 0.65rem;
+      height: 0.3rem;
+      margin-top: 0.5rem;
       accent-color: var(--accent);
     }
 
-    .open-build__diagnostic-progress p,
     .open-build__diagnostic-empty {
       margin-top: 0.55rem;
       color: var(--text-secondary);
@@ -2865,13 +2909,14 @@
 
     .open-build__diagnostic-form {
       display: grid;
-      grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.8fr) auto;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
       align-items: end;
-      gap: 0.65rem;
-      margin-top: 0.85rem;
+      gap: 0.5rem;
+      margin-top: 0.6rem;
       border: 1px solid var(--border-subtle);
-      background: var(--surface-primary);
-      padding: 0.8rem;
+      border-radius: 0.85rem;
+      background: var(--surface-inset);
+      padding: 0.65rem;
     }
 
     .open-build__diagnostic-field,
@@ -2936,25 +2981,85 @@
     }
 
     .open-build__diagnostic-list {
+      display: grid;
       min-width: 0;
-      margin-top: 0.85rem;
-      border-top: 1px solid var(--border-subtle);
+      gap: 0.4rem;
+      margin-top: 0.7rem;
     }
 
     .open-build__diagnostic-row {
-      display: grid;
       min-width: 0;
-      grid-template-columns: minmax(0, 1fr) minmax(13rem, auto);
-      gap: 1rem;
-      border-bottom: 1px solid var(--border-subtle);
-      padding: 0.85rem 0;
+      border: 1px solid var(--border-subtle);
+      border-radius: 0.7rem;
+      background: var(--surface-primary);
     }
 
     .open-build__diagnostic-main {
+      display: flex;
       min-width: 0;
+      min-height: 2.6rem;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.3rem 0.7rem;
     }
 
-    .open-build__diagnostic-code,
+    .open-build__diagnostic-code {
+      flex: none;
+      color: var(--foreground);
+      font-family: var(--font-geist-mono), monospace;
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+    }
+
+    .open-build__diagnostic-code[data-severity="critical"] {
+      color: var(--status-danger);
+    }
+
+    .open-build__diagnostic-code[data-severity="minor"] {
+      color: var(--status-warning);
+    }
+
+    .open-build__diagnostic-code[data-status="resolved"] {
+      color: var(--status-success);
+    }
+
+    .open-build__diagnostic-main .open-build__diagnostic-notes {
+      min-width: 0;
+      flex: 1;
+      overflow: hidden;
+      color: var(--foreground);
+      font-size: 0.76rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .open-build__diagnostic-manage > summary {
+      display: flex;
+      min-height: 1.7rem;
+      align-items: center;
+      border-top: 1px solid var(--border-subtle);
+      padding: 0 0.7rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.64rem;
+    }
+
+    .open-build__diagnostic-state {
+      margin-left: 0.3rem;
+    }
+
+    .open-build__diagnostic-manage {
+      padding-bottom: 0;
+    }
+
+    .open-build__diagnostic-manage[open] {
+      padding-bottom: 0.7rem;
+    }
+
+    .open-build__diagnostic-manage > :not(summary) {
+      margin-inline: 0.7rem;
+    }
+
     .open-build__diagnostic-actions,
     .open-build__diagnostic-controls {
       display: flex;
@@ -2964,23 +3069,30 @@
       gap: 0.5rem;
     }
 
-    .open-build__diagnostic-code strong {
-      color: var(--foreground);
-      font-family: var(--font-geist-mono), monospace;
-      font-size: 0.95rem;
-      letter-spacing: 0.04em;
+    .open-build__diagnostic-actions {
+      margin-top: 0.5rem;
     }
 
-    .open-build__diagnostic-severity,
-    .open-build__diagnostic-status {
+    .open-build__diagnostic-severity {
+      display: inline-flex;
+      flex: none;
+      align-items: center;
+      gap: 0.35rem;
       border: 1px solid var(--border-subtle);
-      padding: 0.18rem 0.4rem;
+      border-radius: 999px;
+      padding: 0.2rem 0.55rem;
       color: var(--status-neutral);
       font-family: var(--font-geist-mono), monospace;
-      font-size: 0.58rem;
+      font-size: 0.64rem;
       font-weight: 650;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+    }
+
+    .open-build__diagnostic-severity::before {
+      width: 0.4rem;
+      height: 0.4rem;
+      border-radius: 999px;
+      background: currentColor;
+      content: "";
     }
 
     .open-build__diagnostic-severity[data-severity="critical"] {
@@ -2998,21 +3110,8 @@
       color: var(--status-success);
     }
 
-    .open-build__diagnostic-status[data-status="resolved"] {
-      border-color: color-mix(in srgb, var(--status-success) 50%, transparent);
-      color: var(--status-success);
-    }
-
-    .open-build__diagnostic-main > p {
-      margin-top: 0.35rem;
-      color: var(--text-secondary);
-      font-size: 0.8rem;
-      line-height: 1.5;
-      overflow-wrap: anywhere;
-    }
-
-    .open-build__diagnostic-main .open-build__diagnostic-resolved,
-    .open-build__diagnostic-main .open-build__diagnostic-notes {
+    .open-build__diagnostic-manage .open-build__diagnostic-resolved {
+      margin-top: 0.5rem;
       color: var(--text-muted);
       font-size: 0.7rem;
     }
@@ -3091,11 +3190,6 @@
       .open-build__diagnostic-form > button,
       .open-build__diagnostic-form > p {
         grid-column: 1 / -1;
-      }
-
-      .open-build__diagnostic-row {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 0.65rem;
       }
 
       .open-build__diagnostic-actions {

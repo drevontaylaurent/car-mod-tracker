@@ -34,7 +34,7 @@ export function CreateDiagnosticForm({ vehicleId }: CreateDiagnosticFormProps) {
     >
       <input type="hidden" name="vehicleId" value={vehicleId} />
       <label className="open-build__diagnostic-field">
-        <span>DIAGNOSTIC CODE</span>
+        <span className="sr-only">Diagnostic code</span>
         <input
           name="code"
           type="text"
@@ -51,7 +51,7 @@ export function CreateDiagnosticForm({ vehicleId }: CreateDiagnosticFormProps) {
         />
       </label>
       <label className="open-build__diagnostic-field">
-        <span>SEVERITY</span>
+        <span className="sr-only">Severity</span>
         <select
           name="severity"
           defaultValue=""
@@ -68,7 +68,7 @@ export function CreateDiagnosticForm({ vehicleId }: CreateDiagnosticFormProps) {
         </select>
       </label>
       <button type="submit" className="button-primary" disabled={isPending}>
-        {isPending ? "ADDING..." : "ADD DIAGNOSTIC"}
+        {isPending ? "ADDING..." : "Add"}
       </button>
       {state && !state.success && (
         <p role="alert" className="open-build__diagnostic-error">
