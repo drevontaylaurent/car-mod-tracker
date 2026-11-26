@@ -3792,6 +3792,206 @@
     outline-offset: 2px;
   }
 
+  .build-timeline__overall {
+    border-radius: 0.85rem;
+    background: var(--surface-inset);
+  }
+
+  .build-timeline__overall > span {
+    font-size: 0.78rem;
+    letter-spacing: 0;
+  }
+
+  .build-timeline__phases::before {
+    left: 0.6rem;
+    background: color-mix(in srgb, var(--status-success) 55%, var(--border-strong));
+  }
+
+  .build-timeline__phase::before {
+    left: -1.65rem;
+    width: 1.3rem;
+    height: 1.3rem;
+    top: 0.7rem;
+  }
+
+  .build-timeline__phase[data-status="completed"]::before {
+    background: var(--status-success) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23050505' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12 4 4 8-8'/%3E%3C/svg%3E") center / 80% no-repeat;
+  }
+
+  .build-timeline__phase[data-status="in_progress"]::before {
+    border-color: #4cb4ff;
+  }
+
+  .build-timeline__phase-card {
+    border-radius: 0.85rem;
+  }
+
+  .build-timeline__phase-header {
+    align-items: center;
+  }
+
+  .build-timeline__phase-identity {
+    flex: 1;
+  }
+
+  .build-timeline__phase-identity h3 {
+    margin: 0;
+    font-size: clamp(0.95rem, 4vw, 1.15rem);
+  }
+
+  .build-timeline__phase-cost strong {
+    font-family: inherit;
+    font-size: clamp(1rem, 4.5vw, 1.3rem);
+  }
+
+  .build-timeline__phase-cost span {
+    font-family: inherit;
+    font-size: 0.7rem;
+    letter-spacing: 0;
+  }
+
+  .build-timeline__toggle {
+    display: grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex: none;
+    place-items: center;
+    border: 0;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+  }
+
+  .build-timeline__toggle svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2.5;
+    transition: transform 150ms ease;
+  }
+
+  .build-timeline__toggle[aria-expanded="false"] svg {
+    transform: rotate(180deg);
+  }
+
+  .build-timeline__phase-meta select {
+    min-height: 32px;
+    border-radius: 999px;
+    padding: 0.2rem 0.7rem;
+    font-weight: 650;
+  }
+
+  .build-timeline__phase-meta select[data-status="in_progress"] {
+    border-color: color-mix(in srgb, #4cb4ff 60%, transparent);
+    color: #4cb4ff;
+  }
+
+  .build-timeline__phase-progress {
+    height: 0.5rem;
+    border-radius: 999px;
+  }
+
+  .build-timeline__phase[data-status="in_progress"] .build-timeline__phase-progress span {
+    background: #4cb4ff;
+  }
+
+  .build-timeline__phase-progress-caption {
+    font-size: 0.68rem;
+  }
+
+  .build-timeline__mod-list {
+    grid-template-columns: repeat(auto-fill, minmax(min(8.5rem, 100%), 1fr));
+  }
+
+  .build-timeline__mod {
+    grid-template-columns: 1.4rem minmax(0, 1fr);
+    border-radius: 0.6rem;
+  }
+
+  .build-timeline__mod-marker {
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    font-size: 0.75rem;
+  }
+
+  .build-timeline__mod-marker[data-status="Installed"] {
+    border-color: var(--status-success);
+    background: var(--status-success);
+    color: #050505;
+  }
+
+  .build-timeline__mod-info strong {
+    font-size: 0.74rem;
+    text-transform: uppercase;
+  }
+
+  .build-timeline__add-phase-trigger {
+    border-radius: 0.85rem;
+    font-family: inherit;
+    font-size: 0.85rem;
+    letter-spacing: 0;
+  }
+
+  .build-timeline__summary {
+    border-radius: 0.85rem;
+  }
+
+  .build-timeline__summary h3 {
+    font-size: 1rem;
+  }
+
+  .build-timeline__history li {
+    font-size: 0.74rem;
+  }
+
+  .build-timeline__history-name {
+    min-width: 0;
+    flex: 1;
+    color: var(--foreground);
+    overflow-wrap: anywhere;
+  }
+
+  .build-timeline__history time {
+    flex: none;
+    color: var(--text-muted);
+    font-size: 0.68rem;
+  }
+
+  .build-timeline__history li::before {
+    width: 0.55rem;
+    height: 0.55rem;
+    flex: none;
+    border-radius: 50%;
+    background: var(--status-success);
+    content: "";
+  }
+
+  .build-timeline__history li {
+    justify-content: flex-start;
+  }
+
+  .build-timeline__unassign {
+    min-height: 28px;
+    border: 0;
+    background: transparent;
+    padding: 0.15rem 0;
+    font-size: 0.55rem;
+    text-decoration: underline;
+  }
+
+  .build-timeline__phase-actions {
+    margin-top: 0.5rem;
+  }
+
+  .build-timeline__edit-details summary,
+  .build-timeline__delete-phase {
+    border-radius: 0.6rem;
+  }
+
   @media (max-width: 640px) {
     .build-timeline__header {
       grid-template-columns: minmax(0, 1fr);

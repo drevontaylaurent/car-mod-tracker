@@ -1,7 +1,10 @@
 "use client";
 
 import { BuildPhaseCard } from "@/components/timeline/build-phase-card";
-import { BuildTimelineSummary } from "@/components/timeline/build-timeline-summary";
+import {
+  BuildTimelineHistory,
+  BuildTimelineSummary,
+} from "@/components/timeline/build-timeline-summary";
 import { CreateBuildPhaseForm } from "@/components/timeline/create-build-phase-form";
 import {
   getBuildPhaseMetrics,
@@ -38,7 +41,6 @@ export function BuildTimeline({
             <path d="M24 12v13l9 5" />
           </svg>
           <div>
-            <p className="technical-label">BUILD SYSTEM / PLAN</p>
             <h2 id="build-timeline-heading">Build Timeline</h2>
             <p>Plan. Track. Complete. Your build, one phase at a time.</p>
           </div>
@@ -47,7 +49,7 @@ export function BuildTimeline({
           className="build-timeline__overall"
           aria-label="Overall timeline progress"
         >
-          <span>OVERALL PROGRESS</span>
+          <span>Overall Progress</span>
           {metrics && metrics.totalPhaseCount > 0 ? (
             <>
               <strong>{metrics.overallProgressPercent}%</strong>
@@ -100,11 +102,14 @@ export function BuildTimeline({
                 })}
               </ol>
               {metrics && (
-                <BuildTimelineSummary
-                  phases={phases}
-                  mods={mods}
-                  totalTrackedCost={metrics.trackedPhaseCost}
-                />
+                <>
+                  <BuildTimelineSummary
+                    phases={phases}
+                    mods={mods}
+                    totalTrackedCost={metrics.trackedPhaseCost}
+                  />
+                  <BuildTimelineHistory mods={mods} />
+                </>
               )}
             </>
           )}

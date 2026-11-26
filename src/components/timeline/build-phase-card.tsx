@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { getPhaseTitle } from "@/lib/phase-title";
 import { AssignModificationControl } from "@/components/timeline/assign-modification-control";
 import { BuildPhaseManagement } from "@/components/timeline/build-phase-management";
 import { BuildPhaseControls } from "@/components/timeline/build-phase-controls";
@@ -37,18 +39,34 @@ export function BuildPhaseCard({
   assignedMods,
   availableMods,
 }: BuildPhaseCardProps) {
+  const [isExpanded, setIsExpanded] = useState(true);
+  const bodyId = `phase-body-${phase.id}`;
+
   return (
     <li className="build-timeline__phase" data-status={phase.status}>
       <article className="build-timeline__phase-card">
         <header className="build-timeline__phase-header">
           <div className="build-timeline__phase-identity">
-            <p className="technical-label">PHASE {phase.position}</p>
-            <h3>{phase.name}</h3>
+            <h3>{getPhaseTitle(phase)}</h3>
           </div>
           <div className="build-timeline__phase-cost">
             <strong>{currencyFormatter.format(metrics.trackedCost)}</strong>
-            <span>PHASE COST</span>
+            <span>
+              {phase.status === "completed" ? "Total Cost" : "Est. Cost"}
+            </span>
           </div>
+          <button
+            type="button"
+            className="build-timeline__toggle"
+            aria-expanded={isExpanded}
+            aria-controls={bodyId}
+            aria-label={`${isExpanded ? "Collapse" : "Expand"} phase ${phase.position}`}
+            onClick={() => setIsExpanded((open) => !open)}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m6 15 6-6 6 6" />
+            </svg>
+          </button>
         </header>
 
         <BuildPhaseControls
@@ -78,6 +96,7 @@ export function BuildPhaseCard({
           )}
         </div>
 
+        <div id={bodyId} hidden={!isExpanded}>
         {phase.description && (
           <p className="build-timeline__phase-description">
             {phase.description}
@@ -106,6 +125,7 @@ export function BuildPhaseCard({
           availableMods={availableMods}
         />
         <BuildPhaseManagement vehicleId={vehicleId} phase={phase} />
+        </div>
       </article>
     </li>
   );

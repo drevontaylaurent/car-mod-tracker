@@ -30,7 +30,7 @@ export function CreateBuildPhaseForm({
   return (
     <details ref={detailsRef} className="build-timeline__add-phase">
       <summary className="build-timeline__add-phase-trigger">
-        <span aria-hidden="true">+</span> ADD NEW PHASE
+        <span aria-hidden="true">+</span> Add New Phase
       </summary>
       <form ref={formRef} action={formAction} className="build-timeline__phase-form">
         <input type="hidden" name="vehicleId" value={vehicleId} />

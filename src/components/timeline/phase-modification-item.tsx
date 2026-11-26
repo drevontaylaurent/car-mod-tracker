@@ -50,8 +50,12 @@ export function PhaseModificationItem({
 
   return (
     <li className="build-timeline__mod">
-      <span className="build-timeline__mod-marker" aria-hidden="true">
-        {mod.category.slice(0, 3).toUpperCase()}
+      <span
+        className="build-timeline__mod-marker"
+        data-status={mod.status}
+        aria-hidden="true"
+      >
+        {mod.status === "Installed" ? "✓" : ""}
       </span>
       <div className="build-timeline__mod-info">
         <strong>{mod.part_name}</strong>
