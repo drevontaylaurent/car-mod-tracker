@@ -1,7 +1,30 @@
+"use client";
+
+import { useState } from "react";
 import { DiagnosticTrackerHeader } from "@/components/diagnostics/diagnostic-tracker-header";
 import { DiagnosticRow } from "@/components/diagnostics/diagnostic-row";
-import { getDiagnosticSummary } from "@/lib/diagnostic-summary";
 import type { VehicleDiagnostic } from "@/types/diagnostics";
+
+type DiagnosticFilter = "all" | "critical" | "minor" | "fixed";
+const DIAGNOSTIC_FILTERS: readonly DiagnosticFilter[] = [
+  "all",
+  "critical",
+  "minor",
+  "fixed",
+];
+
+const FILTER_LABELS: Record<DiagnosticFilter, string> = {
+  all: "ALL",
+  critical: "CRITICAL",
+  minor: "MINOR",
+  fixed: "FIXED",
+};
+
+const EMPTY_MESSAGES: Record<Exclude<DiagnosticFilter, "all">, string> = {
+  critical: "No critical codes.",
+  minor: "No minor codes.",
+  fixed: "No fixed codes.",
+};
 
 interface VehicleDiagnosticTrackerProps {
   vehicleId: string;
@@ -14,7 +37,35 @@ export function VehicleDiagnosticTracker({
   diagnostics,
   loadError,
 }: VehicleDiagnosticTrackerProps) {
-  const summary = diagnostics ? getDiagnosticSummary(diagnostics) : null;
+  const [selection, setSelection] = useState<{
+    vehicleId: string;
+    filter: DiagnosticFilter;
+  }>({ vehicleId, filter: "all" });
+  const activeFilter =
+    selection.vehicleId === vehicleId ? selection.filter : "all";
+
+  const records = diagnostics ?? [];
+  const counts = {
+    all: records.length,
+    critical: records.filter(
+      (diagnostic) =>
+        diagnostic.status !== "resolved" && diagnostic.severity === "critical",
+    ).length,
+    minor: records.filter(
+      (diagnostic) =>
+        diagnostic.status !== "resolved" && diagnostic.severity === "minor",
+    ).length,
+    fixed: records.filter((diagnostic) => diagnostic.status === "resolved").length,
+  };
+  const filteredDiagnostics =
+    activeFilter === "all"
+      ? records
+      : records.filter((diagnostic) =>
+          activeFilter === "fixed"
+            ? diagnostic.status === "resolved"
+            : diagnostic.status !== "resolved" &&
+              diagnostic.severity === activeFilter,
+        );
 
   return (
     <section
@@ -23,41 +74,50 @@ export function VehicleDiagnosticTracker({
     >
       <DiagnosticTrackerHeader
         vehicleId={vehicleId}
-        canAdd={Boolean(diagnostics && summary && !loadError)}
+        canAdd={Boolean(diagnostics && !loadError)}
       />
 
-      {loadError || !diagnostics || !summary ? (
+      {loadError || !diagnostics ? (
         <p role="alert" className="open-build__diagnostic-load-error">
           {loadError ??
             "Diagnostic records are unavailable. Refresh the page and try again."}
         </p>
       ) : (
         <>
-          <section
-            className="open-build__diagnostic-progress"
-            aria-label="Diagnostic fixed progress"
+          <div
+            className="open-build__diagnostic-filters"
+            role="group"
+            aria-label="Filter diagnostic codes"
           >
-            <div className="open-build__diagnostic-progress-copy">
-              <span>
-                {summary.resolutionPercent}% Resolved — {summary.resolvedCount}{" "}
-                of {summary.totalCount} codes fixed
-              </span>
-              <strong>{summary.resolutionPercent}%</strong>
-            </div>
-            <progress
-              max={100}
-              value={summary.resolutionPercent}
-              aria-label={`${summary.resolutionPercent}% of diagnostic codes marked fixed`}
-            />
-          </section>
+            {DIAGNOSTIC_FILTERS.map((filter) => (
+              <button
+                key={filter}
+                type="button"
+                className="open-build__diagnostic-filter"
+                data-filter={filter}
+                aria-label={`${FILTER_LABELS[filter]} diagnostic codes: ${counts[filter]}`}
+                aria-pressed={activeFilter === filter}
+                onClick={() => setSelection({ vehicleId, filter })}
+              >
+                <span className="open-build__diagnostic-filter-label">
+                  {FILTER_LABELS[filter]}
+                </span>
+                <span className="open-build__diagnostic-filter-count">
+                  {counts[filter]}
+                </span>
+              </button>
+            ))}
+          </div>
 
-          {diagnostics.length === 0 ? (
+          {filteredDiagnostics.length === 0 ? (
             <p role="status" className="open-build__diagnostic-empty">
-              No diagnostic codes are recorded for this vehicle.
+              {activeFilter === "all"
+                ? "No diagnostic codes are recorded for this vehicle."
+                : EMPTY_MESSAGES[activeFilter]}
             </p>
           ) : (
             <ul className="open-build__diagnostic-list" aria-label="Vehicle diagnostic records">
-              {diagnostics.map((diagnostic) => (
+              {filteredDiagnostics.map((diagnostic) => (
                 <DiagnosticRow
                   key={diagnostic.id}
                   vehicleId={vehicleId}

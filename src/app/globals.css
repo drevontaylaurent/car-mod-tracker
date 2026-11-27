@@ -4240,13 +4240,6 @@
       padding: 0.75rem;
     }
 
-    .open-build__diagnostic-progress-copy {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-    }
-
     .open-build__diagnostic-icon {
       display: inline-flex;
       width: 2.4rem;
@@ -4296,29 +4289,91 @@
       cursor: pointer;
     }
 
-    .open-build__diagnostic-progress-copy span {
-      color: var(--text-secondary);
-      font-size: 0.72rem;
-    }
-
-    .open-build__diagnostic-progress {
+    .open-build__diagnostic-filters {
+      display: grid;
+      min-width: 0;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.35rem;
       margin-top: 0.7rem;
-      padding: 0 0.15rem;
     }
 
-    .open-build__diagnostic-progress-copy strong {
-      color: var(--accent);
+    .open-build__diagnostic-filter {
+      display: grid;
+      min-width: 0;
+      min-height: 44px;
+      align-content: center;
+      justify-items: center;
+      gap: 0.1rem;
+      border: 1px solid var(--border-subtle);
+      border-radius: 0.6rem;
+      background: var(--background);
+      padding: 0.35rem 0.15rem;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .open-build__diagnostic-filter:focus-visible {
+      outline: 2px solid var(--foreground);
+      outline-offset: 2px;
+    }
+
+    .open-build__diagnostic-filter-label,
+    .open-build__diagnostic-filter-count {
       font-family: var(--font-geist-mono), monospace;
-      font-size: 0.8rem;
-      letter-spacing: 0.04em;
+      font-variant-numeric: tabular-nums;
     }
 
-    .open-build__diagnostic-progress progress {
-      display: block;
-      width: 100%;
-      height: 0.3rem;
-      margin-top: 0.5rem;
-      accent-color: var(--accent);
+    .open-build__diagnostic-filter-label {
+      font-size: 0.58rem;
+      font-weight: 650;
+      letter-spacing: 0.035em;
+      white-space: nowrap;
+    }
+
+    .open-build__diagnostic-filter-count {
+      color: var(--foreground);
+      font-size: 0.9rem;
+      line-height: 1.1;
+    }
+
+    .open-build__diagnostic-filter[data-filter="all"] .open-build__diagnostic-filter-label {
+      color: var(--accent);
+    }
+
+    .open-build__diagnostic-filter[data-filter="critical"] .open-build__diagnostic-filter-label {
+      color: var(--status-danger);
+    }
+
+    .open-build__diagnostic-filter[data-filter="minor"] .open-build__diagnostic-filter-label {
+      color: var(--status-warning);
+    }
+
+    .open-build__diagnostic-filter[data-filter="fixed"] .open-build__diagnostic-filter-label {
+      color: var(--status-success);
+    }
+
+    .open-build__diagnostic-filter[data-filter="all"][aria-pressed="true"] {
+      border-width: 2px;
+      border-color: var(--accent);
+      background: rgb(201 243 65 / 13%);
+    }
+
+    .open-build__diagnostic-filter[data-filter="critical"][aria-pressed="true"] {
+      border-width: 2px;
+      border-color: var(--status-danger);
+      background: color-mix(in srgb, var(--status-danger) 12%, transparent);
+    }
+
+    .open-build__diagnostic-filter[data-filter="minor"][aria-pressed="true"] {
+      border-width: 2px;
+      border-color: var(--status-warning);
+      background: color-mix(in srgb, var(--status-warning) 12%, transparent);
+    }
+
+    .open-build__diagnostic-filter[data-filter="fixed"][aria-pressed="true"] {
+      border-width: 2px;
+      border-color: var(--status-success);
+      background: color-mix(in srgb, var(--status-success) 12%, transparent);
     }
 
     .open-build__diagnostic-empty {
