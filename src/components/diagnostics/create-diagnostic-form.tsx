@@ -9,19 +9,37 @@ interface CreateDiagnosticFormProps {
   vehicleId: string;
 }
 
+function getLocalDateValue(): string {
+  const now = new Date();
+  const localDate = new Date(
+    now.getTime() - now.getTimezoneOffset() * 60_000,
+  );
+  return localDate.toISOString().slice(0, 10);
+}
+
 export function CreateDiagnosticForm({ vehicleId }: CreateDiagnosticFormProps) {
   const [state, formAction, isPending] = useActionState(
     createVehicleDiagnostic,
     undefined,
   );
   const formRef = useRef<HTMLFormElement>(null);
+  const recordedDateRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    if (recordedDateRef.current) {
+      recordedDateRef.current.value = getLocalDateValue();
+    }
+  }, []);
 
   useEffect(() => {
     if (!state?.success) {
       return;
     }
     formRef.current?.reset();
+    if (recordedDateRef.current) {
+      recordedDateRef.current.value = getLocalDateValue();
+    }
     router.refresh();
   }, [router, state]);
 
@@ -66,6 +84,10 @@ export function CreateDiagnosticForm({ vehicleId }: CreateDiagnosticFormProps) {
             </option>
           ))}
         </select>
+      </label>
+      <label className="open-build__diagnostic-field">
+        <span>Recorded date</span>
+        <input ref={recordedDateRef} name="recorded_date" type="date" />
       </label>
       <button type="submit" className="button-primary" disabled={isPending}>
         {isPending ? "ADDING..." : "Add"}

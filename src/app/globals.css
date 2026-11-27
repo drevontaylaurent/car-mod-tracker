@@ -4384,7 +4384,7 @@
 
     .open-build__diagnostic-form {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
       align-items: end;
       gap: 0.5rem;
       margin-top: 0.6rem;
@@ -4508,6 +4508,54 @@
       white-space: nowrap;
     }
 
+    .open-build__diagnostic-fixed-meta {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.25rem 0.75rem;
+      border-top: 1px solid var(--border-subtle);
+      padding: 0.35rem 0.7rem 0.45rem;
+    }
+
+    .open-build__diagnostic-fixed-label,
+    .open-build__diagnostic-fixed-date {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.35rem;
+      font-family: var(--font-geist-mono), monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .open-build__diagnostic-fixed-label {
+      align-items: center;
+      color: var(--status-success);
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .open-build__diagnostic-fixed-label span {
+      font-size: 0.72rem;
+    }
+
+    .open-build__diagnostic-fixed-date {
+      min-width: 0;
+      color: var(--text-muted);
+      font-size: 0.64rem;
+    }
+
+    .open-build__diagnostic-fixed-date-label {
+      font-size: 0.54rem;
+      font-weight: 650;
+      letter-spacing: 0.06em;
+    }
+
+    .open-build__diagnostic-fixed-date time {
+      white-space: nowrap;
+    }
+
     .open-build__diagnostic-manage > summary {
       display: flex;
       min-height: 1.7rem;
@@ -4583,12 +4631,6 @@
     .open-build__diagnostic-severity[data-status="resolved"] {
       border-color: color-mix(in srgb, var(--status-success) 50%, transparent);
       color: var(--status-success);
-    }
-
-    .open-build__diagnostic-manage .open-build__diagnostic-resolved {
-      margin-top: 0.5rem;
-      color: var(--text-muted);
-      font-size: 0.7rem;
     }
 
     .open-build__diagnostic-controls {

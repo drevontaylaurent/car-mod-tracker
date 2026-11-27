@@ -35,6 +35,7 @@ export function DiagnosticEditForm({
     const formData = new FormData(event.currentTarget);
     const code = formData.get("code");
     const notes = formData.get("notes");
+    const recordedDate = formData.get("recorded_date");
     const severity = DIAGNOSTIC_SEVERITIES.find(
       (option) => option === formData.get("severity"),
     );
@@ -44,6 +45,7 @@ export function DiagnosticEditForm({
     if (
       typeof code !== "string" ||
       typeof notes !== "string" ||
+      (recordedDate !== null && typeof recordedDate !== "string") ||
       !severity ||
       !status
     ) {
@@ -60,6 +62,10 @@ export function DiagnosticEditForm({
         code: code.trim().toUpperCase(),
         severity,
         notes,
+        recordedDate:
+          typeof recordedDate === "string" && recordedDate.length > 0
+            ? recordedDate
+            : null,
         ...(status !== diagnostic.status ? { status } : {}),
       };
       const result = await updateVehicleDiagnostic(input);
@@ -119,6 +125,15 @@ export function DiagnosticEditForm({
               </option>
             ))}
           </select>
+        </label>
+        <label className="field-label add-mod__label add-mod__wide">
+          Recorded date
+          <input
+            type="date"
+            name="recorded_date"
+            defaultValue={diagnostic.recorded_date ?? ""}
+            className="field-control mt-2"
+          />
         </label>
         <label className="field-label add-mod__label add-mod__wide">
           Notes (optional)

@@ -21,6 +21,7 @@ export interface VehicleDiagnostic {
   status: DiagnosticStatus;
   severity: DiagnosticSeverity;
   notes: string | null;
+  recorded_date: string | null;
   created_at: string;
   updated_at: string;
   resolved_at: string | null;
@@ -35,6 +36,7 @@ export interface VehicleDiagnosticInsert {
   status?: DiagnosticStatus;
   severity: DiagnosticSeverity;
   notes?: string | null;
+  recorded_date?: string | null;
   created_at?: string;
   updated_at?: string;
   resolved_at?: string | null;
@@ -43,7 +45,13 @@ export interface VehicleDiagnosticInsert {
 export type VehicleDiagnosticUpdate = Partial<
   Pick<
     VehicleDiagnostic,
-    "code" | "status" | "severity" | "notes" | "updated_at" | "resolved_at"
+    | "code"
+    | "status"
+    | "severity"
+    | "notes"
+    | "recorded_date"
+    | "updated_at"
+    | "resolved_at"
   >
 >;
 
@@ -51,6 +59,7 @@ export interface CreateDiagnosticInput {
   vehicleId: string;
   code: string;
   severity: DiagnosticSeverity;
+  recordedDate: string | null;
 }
 
 export interface UpdateDiagnosticInput {
@@ -60,6 +69,7 @@ export interface UpdateDiagnosticInput {
   status?: DiagnosticStatus;
   severity?: DiagnosticSeverity;
   notes?: string | null;
+  recordedDate?: string | null;
 }
 
 export type DiagnosticActionResponse = ActionResult<VehicleDiagnostic>;
