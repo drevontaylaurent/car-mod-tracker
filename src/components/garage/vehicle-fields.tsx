@@ -1,6 +1,9 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { VehicleDetailFields } from "@/components/garage/vehicle-detail-fields";
+import { VinBarcodeScanner } from "@/components/garage/vin-barcode-scanner";
+import { normalizeVinBarcodeResult } from "@/lib/vin-barcode";
 
 export type VehicleEntryMode = "vin" | "manual";
 
@@ -48,6 +51,41 @@ export function VehicleFields({
   const currentYear = new Date().getFullYear();
   const shouldShowVehicleDetails =
     mode === "manual" || showVehicleDetails;
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [barcodeMessage, setBarcodeMessage] = useState("");
+  const vinInputRef = useRef<HTMLInputElement>(null);
+  const scanButtonRef = useRef<HTMLButtonElement>(null);
+  const focusVinAfterCloseRef = useRef(false);
+  const focusScanButtonAfterCloseRef = useRef(false);
+
+  useEffect(() => {
+    if (isScannerOpen) return;
+
+    if (focusVinAfterCloseRef.current) {
+      focusVinAfterCloseRef.current = false;
+      vinInputRef.current?.focus();
+    } else if (focusScanButtonAfterCloseRef.current) {
+      focusScanButtonAfterCloseRef.current = false;
+      scanButtonRef.current?.focus();
+    }
+  }, [isScannerOpen]);
+
+  function handleBarcodeDetected(payload: string) {
+    const candidate = normalizeVinBarcodeResult(payload);
+    if (!candidate) return;
+
+    onVinChange(candidate);
+    setBarcodeMessage(
+      "VIN barcode detected. Review the VIN, then select Decode VIN.",
+    );
+    focusVinAfterCloseRef.current = true;
+    setIsScannerOpen(false);
+  }
+
+  function handleScannerClose() {
+    focusScanButtonAfterCloseRef.current = true;
+    setIsScannerOpen(false);
+  }
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">
@@ -68,9 +106,35 @@ export function VehicleFields({
           autoComplete="off"
           placeholder="17-character vehicle identification number"
           value={vin}
-          onChange={(event) => onVinChange(event.target.value)}
+          onChange={(event) => {
+            setBarcodeMessage("");
+            onVinChange(event.target.value);
+          }}
+          ref={vinInputRef}
           className="field-control uppercase placeholder:normal-case"
         />
+        {mode === "vin" && (
+          <>
+            <button
+              ref={scanButtonRef}
+              type="button"
+              onClick={() => {
+                setBarcodeMessage("");
+                setIsScannerOpen(true);
+              }}
+              aria-haspopup="dialog"
+              aria-controls="vin-barcode-scanner"
+              className="button-secondary mt-2 w-full justify-center sm:w-auto"
+            >
+              SCAN VIN BARCODE
+            </button>
+            {barcodeMessage && (
+              <p role="status" className="state-message mt-2" data-tone="success">
+                {barcodeMessage}
+              </p>
+            )}
+          </>
+        )}
         {mode === "manual" && (
           <p className="mt-2 text-sm text-zinc-400">
             Don&apos;t know your VIN? You can add it later.
@@ -99,6 +163,12 @@ export function VehicleFields({
           </>
         )}
       </div>
+      {isScannerOpen && (
+        <VinBarcodeScanner
+          onCancel={handleScannerClose}
+          onDetected={handleBarcodeDetected}
+        />
+      )}
       {shouldShowVehicleDetails && (
         <VehicleDetailFields
           enableSuggestions={mode === "manual"}

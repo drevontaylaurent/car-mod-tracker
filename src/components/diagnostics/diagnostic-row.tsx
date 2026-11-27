@@ -40,19 +40,12 @@ export function DiagnosticRow({
         <DiagnosticRowControls vehicleId={vehicleId} diagnostic={diagnostic} />
       </div>
       {diagnostic.status === "resolved" && diagnostic.resolved_at && (
-        <div className="open-build__diagnostic-fixed-meta">
-          <strong className="open-build__diagnostic-fixed-label">
-            <span aria-hidden="true">✓</span> MARKED FIXED
-          </strong>
-          <span className="open-build__diagnostic-fixed-date">
-            <span className="open-build__diagnostic-fixed-date-label">
-              FIXED DATE
-            </span>
-            <time dateTime={diagnostic.resolved_at}>
-              {diagnostic.resolved_at.slice(0, 10)}
-            </time>
-          </span>
-        </div>
+        <p className="open-build__diagnostic-resolved">
+          Marked fixed ·{" "}
+          <time dateTime={diagnostic.resolved_at}>
+            {diagnostic.resolved_at.slice(0, 10)}
+          </time>
+        </p>
       )}
     </li>
   );

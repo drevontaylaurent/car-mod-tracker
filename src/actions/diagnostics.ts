@@ -53,26 +53,6 @@ function diagnosticStorageError(
   return fallback;
 }
 
-function parseRecordedDate(value: unknown): ActionResult<string | null> {
-  if (value === null || value === undefined || value === "") {
-    return { success: true, data: null };
-  }
-  if (
-    typeof value !== "string" ||
-    !/^\d{4}-\d{2}-\d{2}$/.test(value) ||
-    value.startsWith("0000-")
-  ) {
-    return { success: false, error: "Enter a valid recorded date." };
-  }
-
-  const date = new Date(`${value}T00:00:00.000Z`);
-  if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value) {
-    return { success: false, error: "Enter a valid recorded date." };
-  }
-
-  return { success: true, data: value };
-}
-
 function logDiagnosticInsertFailure(
   error: {
     code?: string;
@@ -187,18 +167,12 @@ function parseCreateInput(formData: FormData): ActionResult<CreateDiagnosticInpu
     return { success: false, error: "Choose a valid severity." };
   }
 
-  const recordedDate = parseRecordedDate(formData.get("recorded_date"));
-  if (!recordedDate.success) {
-    return recordedDate;
-  }
-
   return {
     success: true,
     data: {
       vehicleId: vehicleId.trim(),
       code,
       severity: rawSeverity,
-      recordedDate: recordedDate.data,
     },
   };
 }
@@ -257,15 +231,6 @@ function parseUpdateInput(value: unknown): ActionResult<UpdateDiagnosticInput> {
       };
     }
     input.notes = notes || null;
-    hasUpdate = true;
-  }
-
-  if (value.recordedDate !== undefined) {
-    const recordedDate = parseRecordedDate(value.recordedDate);
-    if (!recordedDate.success) {
-      return recordedDate;
-    }
-    input.recordedDate = recordedDate.data;
     hasUpdate = true;
   }
 
@@ -383,15 +348,12 @@ export async function createVehicleDiagnostic(
       return { success: false, error: ownership.error };
     }
 
-    const insert: VehicleDiagnosticInsert & Record<string, unknown> = {
-      ...buildDiagnosticInsert({
-        vehicleId: parsed.data.vehicleId,
-        userId: auth.data.userId,
-        code: parsed.data.code,
-        severity: parsed.data.severity,
-      }),
-      recorded_date: parsed.data.recordedDate,
-    };
+    const insert = buildDiagnosticInsert({
+      vehicleId: parsed.data.vehicleId,
+      userId: auth.data.userId,
+      code: parsed.data.code,
+      severity: parsed.data.severity,
+    });
     if (process.env.NODE_ENV === "development") {
       console.info("Vehicle diagnostic insert payload.", {
         vehicleId: insert.vehicle_id,
@@ -479,9 +441,6 @@ async function updateDiagnostic(
     }
     if (parsed.data.notes !== undefined) {
       changes.notes = parsed.data.notes;
-    }
-    if (parsed.data.recordedDate !== undefined) {
-      changes.recorded_date = parsed.data.recordedDate;
     }
     if (parsed.data.status !== undefined) {
       changes.status = parsed.data.status;
