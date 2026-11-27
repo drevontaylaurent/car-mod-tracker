@@ -102,7 +102,7 @@ export async function signOut(
   redirect("/login");
 }
 
-async function getPasswordRecoveryCallbackUrl(): Promise<string> {
+async function getPasswordRecoveryRedirectUrl(): Promise<string> {
   const requestHeaders = await headers();
   const hostHeader =
     requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
@@ -125,7 +125,7 @@ async function getPasswordRecoveryCallbackUrl(): Promise<string> {
   }
 
   const protocol = host === "localhost:3000" ? "http:" : "https:";
-  return new URL("/auth/callback", `${protocol}//${host}`).toString();
+  return new URL("/auth/reset-password", `${protocol}//${host}`).toString();
 }
 
 async function getPasswordRecoveryClient() {
@@ -176,7 +176,7 @@ export async function requestPasswordReset(
   try {
     const supabase = await createClient();
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: await getPasswordRecoveryCallbackUrl(),
+      redirectTo: await getPasswordRecoveryRedirectUrl(),
     });
 
     if (error) {
@@ -223,7 +223,9 @@ export async function resetPassword(
 
   if (
     typeof passwordValue !== "string" ||
-    typeof confirmPasswordValue !== "string"
+    typeof confirmPasswordValue !== "string" ||
+    !passwordValue ||
+    !confirmPasswordValue
   ) {
     return { success: false, error: "Enter and confirm your new password." };
   }
@@ -270,11 +272,11 @@ export async function resetPassword(
 
       return {
         success: false,
-        error:
-          "Could not update your password. Your reset link may be invalid or expired; request a new one.",
+        error: error.message,
       };
     }
 
+    let signOutFailed = false;
     try {
       const { error: signOutError } = await supabase.auth.signOut({
         scope: "local",
@@ -282,16 +284,21 @@ export async function resetPassword(
 
       if (signOutError) {
         console.error("Could not sign out after password reset.", signOutError);
+        signOutFailed = true;
       }
     } catch (error) {
       console.error("Could not sign out after password reset.", error);
+      signOutFailed = true;
     }
 
     (await cookies()).delete("password-recovery-session");
 
     return {
       success: true,
-      message: "Your password has been updated.",
+      message: signOutFailed
+        ? "Your password was updated, but we could not sign you out. Please sign out manually."
+        : "Your password has been updated. Redirecting to sign in...",
+      signOutFailed,
     };
   } catch (error) {
     console.error("Password update failed.", error);

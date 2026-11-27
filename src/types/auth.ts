@@ -6,4 +6,5 @@ export interface AuthFormState {
 
 export interface PasswordRecoveryFormState extends AuthFormState {
   recoverySessionInvalid?: boolean;
+  signOutFailed?: boolean;
 }

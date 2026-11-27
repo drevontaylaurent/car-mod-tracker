@@ -7,6 +7,7 @@ import {
   checkPasswordRecoverySession,
   resetPassword,
 } from "@/actions/auth";
+import { getPasswordRecoveryLinkState } from "@/lib/password-recovery-link";
 import type { PasswordRecoveryFormState } from "@/types/auth";
 
 type RecoveryStatus = "checking" | "authorized" | "invalid";
@@ -17,6 +18,7 @@ const initialState: PasswordRecoveryFormState = { success: false };
 export function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const recoveryQuery = searchParams.toString();
   const hasInvalidLink =
     searchParams.has("error") || searchParams.has("error_code");
   const [recoveryStatus, setRecoveryStatus] =
@@ -35,18 +37,34 @@ export function ResetPasswordForm() {
       return;
     }
 
-    const timeout = window.setTimeout(() => router.replace("/login"), 2000);
+    const timeout = window.setTimeout(
+      () => router.replace("/login"),
+      state.signOutFailed ? 7000 : 2000,
+    );
     return () => window.clearTimeout(timeout);
-  }, [router, state.success]);
+  }, [router, state.signOutFailed, state.success]);
 
   useEffect(() => {
     if (hasInvalidLink) {
       return;
     }
 
+    const linkState = getPasswordRecoveryLinkState(
+      recoveryQuery,
+      window.location.hash,
+    );
+    if (linkState === "exchange") {
+      window.location.replace(`/auth/callback?${recoveryQuery}`);
+      return;
+    }
+
     let active = true;
 
-    checkPasswordRecoverySession()
+    const sessionCheck = linkState === "invalid"
+      ? Promise.resolve({ success: false })
+      : checkPasswordRecoverySession();
+
+    sessionCheck
       .then((result) => {
         if (active) {
           setRecoveryStatus(result.success ? "authorized" : "invalid");
@@ -62,7 +80,7 @@ export function ResetPasswordForm() {
     return () => {
       active = false;
     };
-  }, [hasInvalidLink]);
+  }, [hasInvalidLink, recoveryQuery]);
 
   if (isInvalid) {
     return <InvalidRecoveryLink />;
@@ -73,7 +91,7 @@ export function ResetPasswordForm() {
   }
 
   if (state.success) {
-    return <PasswordResetSuccess />;
+    return <PasswordResetSuccess message={state.message} />;
   }
 
   return (
@@ -131,7 +149,7 @@ function CheckingRecoveryLink() {
   );
 }
 
-function PasswordResetSuccess() {
+function PasswordResetSuccess({ message }: { message?: string }) {
   return (
     <div
       role="status"
@@ -139,7 +157,7 @@ function PasswordResetSuccess() {
       data-tone="success"
     >
       <p className="text-sm text-lime-100">
-        Your password has been updated. Redirecting to sign in...
+        {message}
       </p>
       <Link
         href="/login"

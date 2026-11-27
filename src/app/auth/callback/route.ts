@@ -11,10 +11,15 @@ export async function GET(request: NextRequest) {
 
   try {
     const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    let isRecovery = false;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") isRecovery = true;
+    });
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+      .finally(() => subscription.unsubscribe());
 
-    if (error) {
-      console.error("Could not exchange password recovery code.", error);
+    if (error || !data.session || !isRecovery) {
+      console.error("Could not verify password recovery code.", error);
       return invalidRecoveryResponse(request);
     }
 
@@ -27,7 +32,7 @@ export async function GET(request: NextRequest) {
       maxAge: 60 * 60,
     });
 
-    return NextResponse.redirect(new URL("/reset-password", request.url));
+    return NextResponse.redirect(new URL("/auth/reset-password", request.url));
   } catch (error) {
     console.error("Could not exchange password recovery code.", error);
     return invalidRecoveryResponse(request);
@@ -36,7 +41,7 @@ export async function GET(request: NextRequest) {
 
 function invalidRecoveryResponse(request: NextRequest) {
   const response = NextResponse.redirect(
-    new URL("/reset-password?error=invalid-link", request.url),
+    new URL("/auth/reset-password?error=invalid-link", request.url),
   );
   response.cookies.delete("password-recovery-session");
   return response;
