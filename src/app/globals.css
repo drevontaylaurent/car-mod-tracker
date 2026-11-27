@@ -1358,8 +1358,7 @@
     line-height: 1;
   }
 
-  .add-mod__close:focus-visible,
-  .add-mod__toggle-option:focus-visible {
+  .add-mod__close:focus-visible {
     outline: 2px solid var(--foreground);
     outline-offset: 2px;
   }
@@ -1387,42 +1386,6 @@
   .add-mod__date {
     min-width: 0;
     max-width: 100%;
-  }
-
-  .add-mod__toggle {
-    display: grid;
-    grid-column: 1 / -1;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.25rem;
-    border: 1px solid var(--border-strong);
-    border-radius: 0.75rem;
-    background: var(--surface-inset);
-    padding: 0.25rem;
-  }
-
-  .add-mod__toggle-option {
-    min-height: 2.75rem;
-    border-radius: 0.55rem;
-    color: var(--text-secondary);
-    font-family: var(--font-geist-mono), monospace;
-    font-size: 0.8rem;
-    font-weight: 650;
-  }
-
-  .add-mod__toggle-option[aria-pressed="true"] {
-    background: var(--accent);
-    color: var(--background);
-  }
-
-  .add-mod__url-row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: end;
-    gap: 0.5rem;
-  }
-
-  .add-mod__autofill {
-    min-height: 2.75rem;
   }
 
   .add-mod__note {

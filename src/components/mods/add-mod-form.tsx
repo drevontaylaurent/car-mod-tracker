@@ -1,12 +1,10 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect } from "react";
 import { createMod } from "@/actions/mods";
 import { MOD_CATEGORY_GROUPS } from "@/lib/mod-categories";
+import { PURCHASE_URL_MAX_LENGTH } from "@/lib/purchase-url";
 import { MOD_STATUSES } from "@/types/database";
-import { AddModModeToggle, type AddModMode } from "./add-mod-mode-toggle";
-import { PurchaseUrlField } from "./purchase-url-field";
-import { useAddModFields } from "./use-add-mod-fields";
 
 interface AddModFormProps {
   vehicleId: string;
@@ -16,9 +14,6 @@ interface AddModFormProps {
 
 export function AddModForm({ vehicleId, onCancel, onSuccess }: AddModFormProps) {
   const [state, formAction, isPending] = useActionState(createMod, undefined);
-  const [mode, setMode] = useState<AddModMode>("url");
-  const [purchaseUrl, setPurchaseUrl] = useState("");
-  const { values, setField, status, runAutofill } = useAddModFields();
 
   useEffect(() => {
     if (state?.success) {
@@ -29,22 +24,12 @@ export function AddModForm({ vehicleId, onCancel, onSuccess }: AddModFormProps) 
   return (
     <form action={formAction} className="add-mod__form">
       <input type="hidden" name="vehicleId" value={vehicleId} />
-      <AddModModeToggle mode={mode} onModeChange={setMode} />
-      <PurchaseUrlField
-        mode={mode}
-        value={purchaseUrl}
-        onChange={setPurchaseUrl}
-        autofill={status}
-        onAutofill={() => void runAutofill(purchaseUrl)}
-      />
       <label className="field-label add-mod__label add-mod__wide">
         Part name *
         <input
           required
           maxLength={150}
           name="part_name"
-          value={values.partName}
-          onChange={(event) => setField("partName", event.currentTarget.value)}
           className="field-control mt-2"
           placeholder="e.g., Cold Air Intake System"
         />
@@ -54,8 +39,6 @@ export function AddModForm({ vehicleId, onCancel, onSuccess }: AddModFormProps) 
         <input
           maxLength={100}
           name="brand"
-          value={values.brand}
-          onChange={(event) => setField("brand", event.currentTarget.value)}
           className="field-control mt-2"
           placeholder="e.g., K-Tuned"
         />
@@ -69,20 +52,13 @@ export function AddModForm({ vehicleId, onCancel, onSuccess }: AddModFormProps) 
           type="number"
           inputMode="decimal"
           name="cost"
-          value={values.cost}
-          onChange={(event) => setField("cost", event.currentTarget.value)}
           className="field-control mt-2"
           placeholder="249.99"
         />
       </label>
       <label className="field-label add-mod__label">
         System
-        <select
-          name="category"
-          value={values.category}
-          onChange={(event) => setField("category", event.currentTarget.value)}
-          className="field-control mt-2"
-        >
+        <select name="category" defaultValue="Power Mods" className="field-control mt-2">
           {MOD_CATEGORY_GROUPS.map((group) => (
             <option key={group.id} value={group.selectValue}>
               {group.label}
@@ -103,6 +79,18 @@ export function AddModForm({ vehicleId, onCancel, onSuccess }: AddModFormProps) 
       <label className="field-label add-mod__label add-mod__wide">
         Install date (optional)
         <input type="date" name="install_date" className="field-control add-mod__date mt-2" />
+      </label>
+      <label className="field-label add-mod__label add-mod__wide">
+        Purchase URL (optional)
+        <input
+          type="url"
+          inputMode="url"
+          name="purchase_url"
+          maxLength={PURCHASE_URL_MAX_LENGTH}
+          className="field-control mt-2"
+          placeholder="https://"
+        />
+        <span className="add-mod__note">Link to the part or product page.</span>
       </label>
       <details className="add-mod__notes add-mod__wide">
         <summary className="add-mod__label">Notes (optional)</summary>

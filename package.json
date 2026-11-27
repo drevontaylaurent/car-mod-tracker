@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:purchase-url": "node --test src/lib/purchase-url.test.ts src/lib/product-autofill/product-autofill.test.ts"
+    "test:purchase-url": "node --test src/lib/purchase-url.test.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
