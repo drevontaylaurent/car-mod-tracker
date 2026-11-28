@@ -5808,6 +5808,21 @@
     background: var(--foreground);
   }
 
+  .open-build__mod-row[data-status="Installed"] .open-build__buy {
+    border: 1px solid var(--border-strong);
+    background: var(--surface-secondary);
+    color: var(--foreground);
+  }
+
+  .open-build__mod-row[data-status="Installed"] .open-build__buy:hover {
+    border-color: var(--text-secondary);
+    background: var(--surface-primary);
+  }
+
+  .open-build__mod-row[data-status="Installed"] .open-build__buy:active {
+    background: var(--background);
+  }
+
   .open-build__buy:focus-visible {
     outline: 2px solid var(--foreground);
     outline-offset: 2px;

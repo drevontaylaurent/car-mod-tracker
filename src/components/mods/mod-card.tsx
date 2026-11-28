@@ -24,6 +24,7 @@ export function ModCard({ mod }: ModCardProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const safePurchaseUrl = getSafePurchaseUrl(mod.purchase_url);
+  const buyLabel = status === "Installed" ? "Buy Again" : "Buy";
 
   async function handleStatusChange(value: string) {
     const nextStatus = MOD_STATUSES.find((candidate) => candidate === value);
@@ -104,10 +105,10 @@ export function ModCard({ mod }: ModCardProps) {
             href={safePurchaseUrl}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`Buy ${mod.part_name} (opens in a new tab)`}
+            aria-label={`${buyLabel} ${mod.part_name} (opens in a new tab)`}
             className="open-build__buy"
           >
-            Buy
+            {buyLabel}
           </a>
         )}
         <label className="open-build__status-select-label">
